@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import ProductForm from "../ProductFrom";
+import ProductForm from "../ProductForm";
 
 export default async function NewProductPage() {
   const { userId } = await auth();
@@ -16,7 +16,7 @@ export default async function NewProductPage() {
         <h1 style={{ fontSize: 15, fontWeight: 600, color: "#1c1b19", letterSpacing: "-.02em" }}>Nuevo producto</h1>
         <p style={{ fontSize: 11, color: "#9e9a92", marginTop: 2 }}>Completá los datos para publicar una zapatilla</p>
       </header>
-      <div style={{ padding: "28px", maxWidth: 700 }}>
+        <div style={{ padding: "28px", maxWidth: 700, margin: "0 auto" }}>
         <ProductForm modo="crear" />
       </div>
     </div>
