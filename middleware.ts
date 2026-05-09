@@ -1,22 +1,35 @@
-// middleware.ts — raíz del proyecto
 // Protege todas las rutas bajo /dashboard con Clerk.
 // Las rutas de API públicas (GET /api/products, POST /api/sales) quedan abiertas.
-// middleware.ts — temporalmente desactivado para desarrollo
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-const isProtectedRoute = createRouteMatcher([
-  "/dashboard(.*)",
-]);
+const isProtectedRoute = createRouteMatcher(["/dashboard(.*)",]);
+const isAdminRoute     = createRouteMatcher(["/dashboard/admin(.*)"]);
 
 const isPublicApiRoute = createRouteMatcher([
-  "/api/products(.*)",
-  "/api/sales",
-  "/api/sales/(.*)",
-]);
+  "/api/products(.*)", "/api/sales", "/api/sales/(.*)",]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isPublicApiRoute(req)) return;
   if (isProtectedRoute(req)) await auth.protect();
+  
+  const { sessionClaims } = await auth();
+
+    const role = (sessionClaims?.metadata as any)?.role
+              ?? (sessionClaims?.publicMetadata as any)?.role
+              ?? (sessionClaims as any)?.role
+              ?? null;
+
+    // solo vendedores y admins pueden entrar al dashboard
+    const rolesPermitidos = ["seller", "admin"];
+    if (role && !rolesPermitidos.includes(role)) {
+      return NextResponse.redirect(new URL("/unauthorized", req.url));
+    }
+
+    // solo admins pueden entrar a /dashboard/admin
+    if (isAdminRoute(req) && role !== "admin") {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
 });
 
 export const config = {
