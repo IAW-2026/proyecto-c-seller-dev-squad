@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 
 type EstadoVenta = "CONFIRMADO" | "PENDIENTE" | "CANCELADO";
@@ -29,191 +28,155 @@ interface Props {
   }[];
 }
 
-// ── helpers ────────────────────────────────────────────────
 const fmt = (n: number) =>
   new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
 
 const fmtFecha = (iso: string) =>
   new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
 
-const ESTADO_STYLES: Record<EstadoVenta, { bg: string; text: string; dot: string; label: string }> = {
-  CONFIRMADO: { bg: "bg-emerald-50",  text: "text-emerald-700", dot: "bg-emerald-500", label: "Confirmado" },
-  PENDIENTE:  { bg: "bg-amber-50",    text: "text-amber-700",   dot: "bg-amber-400",   label: "Pendiente"  },
-  CANCELADO:  { bg: "bg-red-50",      text: "text-red-600",     dot: "bg-red-400",     label: "Cancelado"  },
-};
-
-// ── componente badge ───────────────────────────────────────
 function EstadoBadge({ estado }: { estado: EstadoVenta }) {
-  const s = ESTADO_STYLES[estado];
+  const map = {
+    CONFIRMADO: { cls: "badge-estado badge-confirmado", dot: "dot-success", label: "Confirmado" },
+    PENDIENTE:  { cls: "badge-estado badge-pendiente",  dot: "dot-warning", label: "Pendiente"  },
+    CANCELADO:  { cls: "badge-estado badge-cancelado",  dot: "dot-danger",  label: "Cancelado"  },
+  };
+  const m = map[estado];
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${s.bg} ${s.text}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
-      {s.label}
+    <span className={m.cls}>
+      <span className={`estado-dot ${m.dot}`} />
+      {m.label}
     </span>
   );
 }
 
-// ── nav lateral ────────────────────────────────────────────
-const NAV = [
-  { href: "/dashboard",          label: "Resumen",    icon: "▦" },
-  { href: "/dashboard/products", label: "Productos",  icon: "◫" },
-  { href: "/dashboard/sales",    label: "Ventas",     icon: "◈" },
-  { href: "/dashboard/admin",    label: "Admin",      icon: "◉" },
-];
-
-// ── componente principal ───────────────────────────────────
-export default function DashboardClient({
-  vendedor,
-  metricas,
-  ventasRecientes,
-  productosBajoStock,
-}: Props) {
-  const [navOpen, setNavOpen] = useState(false);
-
+export default function DashboardClient({ vendedor, metricas, ventasRecientes, productosBajoStock }: Props) {
   const { totalProductos, totalVentas, ingresoTotal, ventasPorEstado } = metricas;
 
-  // barra de progreso de estados
   const totalEstados = Object.values(ventasPorEstado).reduce((a, b) => a + b, 0) || 1;
   const pctConf = (ventasPorEstado.CONFIRMADO / totalEstados) * 100;
   const pctPend = (ventasPorEstado.PENDIENTE  / totalEstados) * 100;
   const pctCanc = (ventasPorEstado.CANCELADO  / totalEstados) * 100;
 
   return (
-  <div style={{ minHeight: "100vh", background: "#f6f5f3", fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif" }}>
+    <div className="dashboard-page">
 
-    {/* topbar */}
-    <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-4 border-b border-stone-200 bg-[#f6f5f3]">
-      <div>
-        <h1 className="text-base font-semibold text-stone-900" style={{ letterSpacing: "-0.02em" }}>
-          Resumen
-        </h1>
-        <p className="text-xs text-stone-400 hidden sm:block">
-          {new Date().toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" })}
-        </p>
-      </div>
-      <Link
-        href="/dashboard/products/new"
-        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-opacity hover:opacity-80"
-        style={{ background: "#111", color: "#c8f060" }}
-      >
-        <span className="text-base leading-none">+</span>
-        Nuevo producto
-      </Link>
-    </header>
-
-    <div className="px-6 py-8 max-w-5xl">
-      {/* KPIs */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {[
-          { label: "Ingresos confirmados", value: fmt(ingresoTotal), sub: "en ventas completadas" },
-          { label: "Ventas totales",        value: totalVentas,      sub: `${ventasPorEstado.PENDIENTE} pendientes` },
-          { label: "Productos activos",     value: totalProductos,   sub: "en catálogo" },
-          { label: "Tasa de confirmación",  value: `${totalVentas ? Math.round((ventasPorEstado.CONFIRMADO / totalVentas) * 100) : 0}%`, sub: "ventas confirmadas" },
-        ].map((kpi) => (
-          <div key={kpi.label} className="bg-white rounded-2xl px-5 py-5 border border-stone-100">
-            <p className="text-xs text-stone-400 mb-2 font-medium uppercase tracking-wide">{kpi.label}</p>
-            <p className="text-2xl font-semibold text-stone-900" style={{ letterSpacing: "-0.03em" }}>{kpi.value}</p>
-            <p className="text-xs text-stone-400 mt-1">{kpi.sub}</p>
-          </div>
-        ))}
-      </section>
-
-      <div className="grid lg:grid-cols-3 gap-6 mb-8">
-        {/* distribución de estados */}
-        <div className="bg-white rounded-2xl p-6 border border-stone-100">
-          <h2 className="text-sm font-semibold text-stone-700 mb-5">Distribución de ventas</h2>
-          <div className="flex h-2.5 rounded-full overflow-hidden mb-5 gap-0.5">
-            <div style={{ width: `${pctConf}%` }} className="bg-emerald-400 rounded-l-full" />
-            <div style={{ width: `${pctPend}%` }} className="bg-amber-300" />
-            <div style={{ width: `${pctCanc}%` }} className="bg-red-300 rounded-r-full" />
-          </div>
-          <div className="space-y-3">
-            {(["CONFIRMADO", "PENDIENTE", "CANCELADO"] as EstadoVenta[]).map((e) => {
-              const s = ESTADO_STYLES[e];
-              return (
-                <div key={e} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full ${s.dot}`} />
-                    <span className="text-sm text-stone-600">{s.label}</span>
-                  </div>
-                  <span className="text-sm font-medium text-stone-800">{ventasPorEstado[e]}</span>
-                </div>
-              );
-            })}
-          </div>
+      <header className="dashboard-topbar">
+        <div>
+          <h1 className="dashboard-topbar-title">Resumen</h1>
+          <p className="dashboard-topbar-date">
+            {new Date().toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" })}
+          </p>
         </div>
+        <Link href="/dashboard/products/new" className="btn-primary" style={{ padding: "9px 18px", borderRadius: 9, fontSize: 13, fontWeight: 500, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
+          + Nuevo producto
+        </Link>
+      </header>
 
-        {/* bajo stock */}
-        <div className="bg-white rounded-2xl p-6 border border-stone-100 lg:col-span-2">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-sm font-semibold text-stone-700">Productos con bajo stock</h2>
-            <Link href="/dashboard/products" className="text-xs text-stone-400 hover:text-stone-700 transition-colors">Ver todos →</Link>
-          </div>
-          {productosBajoStock.length === 0 ? (
-            <p className="text-sm text-stone-400 py-4 text-center">Sin alertas de stock 🎉</p>
-          ) : (
-            <div className="space-y-3">
-              {productosBajoStock.map((p) => (
-                <div key={p.id} className="flex items-center justify-between py-2 border-b border-stone-50 last:border-0">
-                  <div>
-                    <p className="text-sm font-medium text-stone-800">{p.nombre}</p>
-                    <p className="text-xs text-stone-400">{p.marca}</p>
-                  </div>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${p.stock === 0 ? "bg-red-50 text-red-600" : "bg-amber-50 text-amber-700"}`}>
-                    {p.stock === 0 ? "Sin stock" : `${p.stock} u.`}
-                  </span>
-                </div>
-              ))}
+      <div className="dashboard-content">
+
+        {/* KPIs */}
+        <section className="kpi-grid">
+          {[
+            { label: "Ingresos confirmados", value: fmt(ingresoTotal),   sub: "en ventas completadas" },
+            { label: "Ventas totales",        value: totalVentas,         sub: `${ventasPorEstado.PENDIENTE} pendientes` },
+            { label: "Productos activos",     value: totalProductos,      sub: "en catálogo" },
+            { label: "Tasa de confirmación",  value: `${totalVentas ? Math.round((ventasPorEstado.CONFIRMADO / totalVentas) * 100) : 0}%`, sub: "ventas confirmadas" },
+          ].map((kpi) => (
+            <div key={kpi.label} className="kpi-card">
+              <p className="kpi-label">{kpi.label}</p>
+              <p className="kpi-value">{kpi.value}</p>
+              <p className="kpi-sub">{kpi.sub}</p>
             </div>
-          )}
-        </div>
-      </div>
+          ))}
+        </section>
 
-      {/* ventas recientes */}
-      <section className="bg-white rounded-2xl border border-stone-100 overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-stone-50">
-          <h2 className="text-sm font-semibold text-stone-700">Ventas recientes</h2>
-          <Link href="/dashboard/sales" className="text-xs text-stone-400 hover:text-stone-700 transition-colors">Ver todas →</Link>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 16, marginBottom: 24 }}>
+
+          {/* distribución */}
+          <div className="card">
+            <div className="card-header">
+              <span className="card-title">Distribución de ventas</span>
+            </div>
+            <div className="card-body">
+              <div className="seg-bar">
+                <div className="seg-conf" style={{ flex: pctConf }} />
+                <div className="seg-pend" style={{ flex: pctPend }} />
+                <div className="seg-canc" style={{ flex: pctCanc }} />
+              </div>
+              <div className="estado-row">
+                <div className="estado-dot-label"><span className="estado-dot dot-success" />Confirmado</div>
+                <strong>{ventasPorEstado.CONFIRMADO}</strong>
+              </div>
+              <div className="estado-row">
+                <div className="estado-dot-label"><span className="estado-dot dot-warning" />Pendiente</div>
+                <strong>{ventasPorEstado.PENDIENTE}</strong>
+              </div>
+              <div className="estado-row">
+                <div className="estado-dot-label"><span className="estado-dot dot-danger" />Cancelado</div>
+                <strong>{ventasPorEstado.CANCELADO}</strong>
+              </div>
+            </div>
+          </div>
+
+          {/* bajo stock */}
+          <div className="card">
+            <div className="card-header">
+              <span className="card-title">Productos con bajo stock</span>
+              <Link href="/dashboard/products" className="card-link">Ver todos →</Link>
+            </div>
+            <div className="card-body">
+              {productosBajoStock.length === 0 ? (
+                <p className="text-muted" style={{ textAlign: "center", padding: "16px 0", fontSize: 13 }}>Sin alertas de stock 🎉</p>
+              ) : (
+                productosBajoStock.map((p) => (
+                  <div key={p.id} className="stock-row">
+                    <div>
+                      <p className="stock-name">{p.nombre}</p>
+                      <p className="stock-marca">{p.marca}</p>
+                    </div>
+                    <span className={p.stock === 0 ? "badge-stock-empty" : "badge-stock-warn"}>
+                      {p.stock === 0 ? "Sin stock" : `${p.stock} u.`}
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
-        <div className="hidden sm:block overflow-x-auto">
-          <table className="w-full text-sm">
+
+        {/* ventas recientes */}
+        <div className="card">
+          <div className="card-header">
+            <span className="card-title">Ventas recientes</span>
+            <Link href="/dashboard/sales" className="card-link">Ver todas →</Link>
+          </div>
+          <table className="ventas-table">
             <thead>
-              <tr className="border-b border-stone-50">
-                {["Orden", "Fecha", "Artículos", "Total", "Estado"].map((h) => (
-                  <th key={h} className="text-left px-6 py-3 text-xs font-medium text-stone-400 uppercase tracking-wide">{h}</th>
+              <tr>
+                {["Orden", "Fecha", "Ítems", "Total", "Estado"].map((h) => (
+                  <th key={h}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {ventasRecientes.map((v) => (
-                <tr key={v.id} className="border-b border-stone-50 hover:bg-stone-50/50 transition-colors">
-                  <td className="px-6 py-4 font-mono text-xs text-stone-400 truncate max-w-[120px]">#{v.ordenId.slice(-8)}</td>
-                  <td className="px-6 py-4 text-stone-600">{fmtFecha(v.creadoEn)}</td>
-                  <td className="px-6 py-4 text-stone-600">{v.items} ítem{v.items !== 1 ? "s" : ""}</td>
-                  <td className="px-6 py-4 font-medium text-stone-900">{fmt(v.total)}</td>
-                  <td className="px-6 py-4"><EstadoBadge estado={v.estado} /></td>
-                </tr>
-              ))}
+              {ventasRecientes.length === 0 ? (
+                <tr><td colSpan={5} style={{ textAlign: "center", color: "var(--color-muted)", padding: "40px 0" }}>No hay ventas registradas aún.</td></tr>
+              ) : (
+                ventasRecientes.map((v) => (
+                  <tr key={v.id}>
+                    <td className="td-mono">#{v.ordenId.slice(-8).toUpperCase()}</td>
+                    <td>{fmtFecha(v.creadoEn)}</td>
+                    <td>{v.items} ítem{v.items !== 1 ? "s" : ""}</td>
+                    <td className="td-total">{fmt(v.total)}</td>
+                    <td><EstadoBadge estado={v.estado} /></td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
-        <div className="sm:hidden divide-y divide-stone-50">
-          {ventasRecientes.map((v) => (
-            <div key={v.id} className="px-5 py-4 flex items-center justify-between">
-              <div>
-                <p className="font-mono text-xs text-stone-400">#{v.ordenId.slice(-8)}</p>
-                <p className="text-sm font-medium text-stone-800 mt-0.5">{fmt(v.total)}</p>
-                <p className="text-xs text-stone-400">{fmtFecha(v.creadoEn)}</p>
-              </div>
-              <EstadoBadge estado={v.estado} />
-            </div>
-          ))}
-        </div>
-        {ventasRecientes.length === 0 && (
-          <p className="text-sm text-stone-400 text-center py-10">No hay ventas registradas aún.</p>
-        )}
-      </section>
+
+      </div>
     </div>
-  </div>
-);
+  );
 }
