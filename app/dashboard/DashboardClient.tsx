@@ -1,10 +1,9 @@
 "use client";
-// app/dashboard/DashboardClient.tsx
 
 import { useState } from "react";
 import Link from "next/link";
+import { UserButton } from "@clerk/nextjs";
 
-// ── tipos ──────────────────────────────────────────────────
 type EstadoVenta = "CONFIRMADO" | "PENDIENTE" | "CANCELADO";
 
 interface Props {
@@ -94,8 +93,25 @@ export default function DashboardClient({
           <span className="text-lg font-semibold tracking-tight" style={{ letterSpacing: "-0.03em" }}>
             seller<span style={{ color: "#c8f060" }}>.</span>
           </span>
-          <p className="text-xs mt-1 opacity-40 truncate">{vendedor.email}</p>
         </div>
+        <div className="px-5 py-5 border-t border-white/10">
+  
+     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <UserButton
+         appearance={{
+           elements: {
+             avatarBox: { width: 32, height: 32 },
+           },
+         }}
+       />
+        <div style={{ overflow: "hidden" }}>
+         <p className="text-xs font-medium truncate" style={{ color: "#e8e6e0" }}>
+           {vendedor.nombre}
+        </p>
+        <p className="text-xs opacity-40 mt-0.5">Vendedor</p>
+      </div>
+    </div>
+  </div>
 
         {/* nav */}
         <nav className="flex-1 px-3 py-4 space-y-0.5">

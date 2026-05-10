@@ -22,13 +22,13 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <ClerkProvider>
-      <html
+    <ClerkProvider afterSignOutUrl="/sign-in">     
+          <html 
         lang="es"
         className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       >
         <body className="min-h-full flex flex-col">{children}</body>
       </html>
-    </ClerkProvider>
-  );
+    </ClerkProvider>  
+    );
 }
