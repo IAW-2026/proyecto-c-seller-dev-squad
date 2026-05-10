@@ -88,14 +88,8 @@ export default function DashboardClient({
           ${navOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
         style={{ background: "#111", color: "#e8e6e0" }}
       >
-        {/* logo */}
-        <div className="px-6 pt-8 pb-6 border-b border-white/10">
-          <span className="text-lg font-semibold tracking-tight" style={{ letterSpacing: "-0.03em" }}>
-            seller<span style={{ color: "#c8f060" }}>.</span>
-          </span>
-        </div>
-        <div className="px-5 py-5 border-t border-white/10">
-  
+
+    <div className="px-5 py-5 border-t border-white/10">
      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <UserButton
          appearance={{
@@ -127,13 +121,7 @@ export default function DashboardClient({
             </Link>
           ))}
         </nav>
-
-        {/* vendedor info */}
-        <div className="px-5 py-5 border-t border-white/10">
-          <p className="text-xs font-medium truncate" style={{ color: "#e8e6e0" }}>{vendedor.nombre}</p>
-          <p className="text-xs opacity-40 mt-0.5">Vendedor</p>
-        </div>
-      </aside>
+      </aside> 
 
       {/* overlay mobile */}
       {navOpen && (
