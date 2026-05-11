@@ -437,6 +437,14 @@
   color: #d97706;
 }
 
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: var(--background);
+}
+
 /* ── Responsive ── */
 @media (min-width: 1024px) {
   .kpi-grid { grid-template-columns: repeat(4, 1fr); }
