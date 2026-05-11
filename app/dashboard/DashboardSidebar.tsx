@@ -11,39 +11,53 @@ const NAV = [
   { href: "/dashboard/admin",    label: "Admin",     icon: "◉" },
 ];
 
-export default function DashboardSidebar() {
+interface Props {
+  open: boolean;
+  onClose: () => void;
+}
+
+export default function DashboardSidebar({ open, onClose }: Props) {
   const pathname = usePathname();
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-logo">
-        seller<span className="sidebar-logo-dot">.</span>
-      </div>
+    <>
+      {/* overlay mobile */}
+      <div
+        className={`sidebar-overlay ${open ? "open" : ""}`}
+        onClick={onClose}
+      />
 
-      <nav className="sidebar-nav">
-        {NAV.map((item) => {
-          const active = pathname === item.href ||
-            (item.href !== "/dashboard" && pathname.startsWith(item.href));
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`sidebar-nav-item ${active ? "active" : ""}`}
-            >
-              <span className="sidebar-nav-icon">{item.icon}</span>
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="sidebar-user">
-        <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
-        <div>
-          <p className="sidebar-user-name">Mi cuenta</p>
-          <p className="sidebar-user-role">Vendedor</p>
+      <aside className={`sidebar ${open ? "open" : ""}`}>
+        <div className="sidebar-logo">
+          seller<span className="sidebar-logo-dot">.</span>
         </div>
-      </div>
-    </aside>
+
+        <nav className="sidebar-nav">
+          {NAV.map((item) => {
+            const active = pathname === item.href ||
+              (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`sidebar-nav-item ${active ? "active" : ""}`}
+                onClick={onClose}
+              >
+                <span className="sidebar-nav-icon">{item.icon}</span>
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="sidebar-user">
+          <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
+          <div>
+            <p className="sidebar-user-name">Mi cuenta</p>
+            <p className="sidebar-user-role">Vendedor</p>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 }
