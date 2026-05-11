@@ -74,107 +74,119 @@ export default function DashboardClient({ vendedor, metricas, ventasRecientes, p
 
       <div className="dashboard-content">
 
-        {/* KPIs */}
-        <section className="kpi-grid">
-          {[
-            { label: "Ingresos confirmados", value: fmt(ingresoTotal),   sub: "en ventas completadas" },
-            { label: "Ventas totales",        value: totalVentas,         sub: `${ventasPorEstado.PENDIENTE} pendientes` },
-            { label: "Productos activos",     value: totalProductos,      sub: "en catálogo" },
-            { label: "Tasa de confirmación",  value: `${totalVentas ? Math.round((ventasPorEstado.CONFIRMADO / totalVentas) * 100) : 0}%`, sub: "ventas confirmadas" },
-          ].map((kpi) => (
-            <div key={kpi.label} className="kpi-card">
-              <p className="kpi-label">{kpi.label}</p>
-              <p className="kpi-value">{kpi.value}</p>
-              <p className="kpi-sub">{kpi.sub}</p>
-            </div>
-          ))}
-        </section>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 16, marginBottom: 24 }}>
-
-          {/* distribución */}
-            <div className="dashboard-cards-grid" style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 16, marginBottom: 24 }}>            <div className="card-header">
-              <span className="card-title">Distribución de ventas</span>
-            </div>
-            <div className="card-body">
-              <div className="seg-bar">
-                <div className="seg-conf" style={{ flex: pctConf }} />
-                <div className="seg-pend" style={{ flex: pctPend }} />
-                <div className="seg-canc" style={{ flex: pctCanc }} />
-              </div>
-              <div className="estado-row">
-                <div className="estado-dot-label"><span className="estado-dot dot-success" />Confirmado</div>
-                <strong>{ventasPorEstado.CONFIRMADO}</strong>
-              </div>
-              <div className="estado-row">
-                <div className="estado-dot-label"><span className="estado-dot dot-warning" />Pendiente</div>
-                <strong>{ventasPorEstado.PENDIENTE}</strong>
-              </div>
-              <div className="estado-row">
-                <div className="estado-dot-label"><span className="estado-dot dot-danger" />Cancelado</div>
-                <strong>{ventasPorEstado.CANCELADO}</strong>
-              </div>
-            </div>
-          </div>
-
-          {/* bajo stock */}
-            <div className="dashboard-cards-grid" style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 16, marginBottom: 24 }}>            <div className="card-header">
-              <span className="card-title">Productos con bajo stock</span>
-              <Link href="/dashboard/products" className="card-link">Ver todos →</Link>
-            </div>
-            <div className="card-body">
-              {productosBajoStock.length === 0 ? (
-                <p className="text-muted" style={{ textAlign: "center", padding: "16px 0", fontSize: 13 }}>Sin alertas de stock 🎉</p>
-              ) : (
-                productosBajoStock.map((p) => (
-                  <div key={p.id} className="stock-row">
-                    <div>
-                      <p className="stock-name">{p.nombre}</p>
-                      <p className="stock-marca">{p.marca}</p>
-                    </div>
-                    <span className={p.stock === 0 ? "badge-stock-empty" : "badge-stock-warn"}>
-                      {p.stock === 0 ? "Sin stock" : `${p.stock} u.`}
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ventas recientes */}
-        <div className="card">
-          <div className="card-header">
-            <span className="card-title">Ventas recientes</span>
-            <Link href="/dashboard/sales" className="card-link">Ver todas →</Link>
-          </div>
-          <table className="ventas-table">
-            <thead>
-              <tr>
-                {["Orden", "Fecha", "Ítems", "Total", "Estado"].map((h) => (
-                  <th key={h}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {ventasRecientes.length === 0 ? (
-                <tr><td colSpan={5} style={{ textAlign: "center", color: "var(--color-muted)", padding: "40px 0" }}>No hay ventas registradas aún.</td></tr>
-              ) : (
-                ventasRecientes.map((v) => (
-                  <tr key={v.id}>
-                    <td className="td-mono">#{v.ordenId.slice(-8).toUpperCase()}</td>
-                    <td>{fmtFecha(v.creadoEn)}</td>
-                    <td>{v.items} ítem{v.items !== 1 ? "s" : ""}</td>
-                    <td className="td-total">{fmt(v.total)}</td>
-                    <td><EstadoBadge estado={v.estado} /></td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
+  {/* KPIs */}
+  <section className="kpi-grid">
+    {[
+      { label: "Ingresos confirmados", value: fmt(ingresoTotal),   sub: "en ventas completadas" },
+      { label: "Ventas totales",        value: totalVentas,         sub: `${ventasPorEstado.PENDIENTE} pendientes` },
+      { label: "Productos activos",     value: totalProductos,      sub: "en catálogo" },
+      { label: "Tasa de confirmación",  value: `${totalVentas ? Math.round((ventasPorEstado.CONFIRMADO / totalVentas) * 100) : 0}%`, sub: "ventas confirmadas" },
+    ].map((kpi) => (
+      <div key={kpi.label} className="kpi-card">
+        <p className="kpi-label">{kpi.label}</p>
+        <p className="kpi-value">{kpi.value}</p>
+        <p className="kpi-sub">{kpi.sub}</p>
       </div>
+    ))}
+  </section>
+
+  {/* fila: distribución + bajo stock */}
+  <div className="dashboard-cards-grid" style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 16, marginBottom: 24, alignItems: "start" }}>
+
+    {/* distribución */}
+    <div className="card">
+      <div className="card-header">
+        <span className="card-title">Distribución de ventas</span>
+      </div>
+      <div className="card-body">
+        <div className="seg-bar">
+          <div className="seg-conf" style={{ flex: pctConf }} />
+          <div className="seg-pend" style={{ flex: pctPend }} />
+          <div className="seg-canc" style={{ flex: pctCanc }} />
+        </div>
+        <div className="estado-row">
+          <div className="estado-dot-label"><span className="estado-dot dot-success" />Confirmado</div>
+          <strong>{ventasPorEstado.CONFIRMADO}</strong>
+        </div>
+        <div className="estado-row">
+          <div className="estado-dot-label"><span className="estado-dot dot-warning" />Pendiente</div>
+          <strong>{ventasPorEstado.PENDIENTE}</strong>
+        </div>
+        <div className="estado-row">
+          <div className="estado-dot-label"><span className="estado-dot dot-danger" />Cancelado</div>
+          <strong>{ventasPorEstado.CANCELADO}</strong>
+        </div>
+      </div>
+    </div>
+
+    {/* bajo stock */}
+    <div className="card">
+      <div className="card-header">
+        <span className="card-title">Productos con bajo stock</span>
+        <Link href="/dashboard/products" className="card-link">Ver todos →</Link>
+      </div>
+      <table className="ventas-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Marca</th>
+            <th>Stock</th>
+          </tr>
+        </thead>
+        <tbody>
+          {productosBajoStock.length === 0 ? (
+            <tr><td colSpan={3} style={{ textAlign: "center", color: "var(--color-muted)", padding: "32px 0" }}>Sin alertas de stock 🎉</td></tr>
+          ) : (
+            productosBajoStock.map((p) => (
+              <tr key={p.id}>
+                <td style={{ fontSize: 13, fontWeight: 500, color: "var(--color-foreground)", padding: "14px 20px" }}>{p.nombre}</td>
+                <td style={{ fontSize: 13, color: "var(--color-muted)", padding: "14px 16px" }}>{p.marca}</td>
+                <td style={{ padding: "14px 20px" }}>
+                  <span className={p.stock === 0 ? "badge-stock-empty" : "badge-stock-warn"}>
+                    {p.stock === 0 ? "Sin stock" : `${p.stock} u.`}
+                  </span>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {/* ventas recientes */}
+  <div className="card">
+    <div className="card-header">
+      <span className="card-title">Ventas recientes</span>
+      <Link href="/dashboard/sales" className="card-link">Ver todas →</Link>
+    </div>
+    <table className="ventas-table">
+      <thead>
+        <tr>
+          {["Orden", "Fecha", "Ítems", "Total", "Estado"].map((h) => (
+            <th key={h}>{h}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {ventasRecientes.length === 0 ? (
+          <tr><td colSpan={5} style={{ textAlign: "center", color: "var(--color-muted)", padding: "40px 0" }}>No hay ventas registradas aún.</td></tr>
+        ) : (
+          ventasRecientes.map((v) => (
+            <tr key={v.id}>
+              <td className="td-mono">#{v.ordenId.slice(-8).toUpperCase()}</td>
+              <td style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px" }}>{fmtFecha(v.creadoEn)}</td>
+              <td style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px" }}>{v.items} ítem{v.items !== 1 ? "s" : ""}</td>
+              <td className="td-total">{fmt(v.total)}</td>
+              <td style={{ padding: "14px 16px" }}><EstadoBadge estado={v.estado} /></td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+</div>
     </div>
   );
 }
+
