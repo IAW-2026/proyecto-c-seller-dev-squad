@@ -231,3 +231,37 @@
   border-radius: 2px;
   transition: all 0.2s;
 }
+
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: 16px;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dashboard-cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .ventas-table th:nth-child(2),
+  .ventas-table td:nth-child(2),
+  .ventas-table th:nth-child(3),
+  .ventas-table td:nth-child(3) {
+    display: none;
+  }
+  .ventas-metricas {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .ventas-td-fecha,
+  .ventas-td-items {
+    display: none;
+  }
+  .ventas-metricas {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

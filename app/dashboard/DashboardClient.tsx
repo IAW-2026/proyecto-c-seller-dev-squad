@@ -93,8 +93,7 @@ export default function DashboardClient({ vendedor, metricas, ventasRecientes, p
         <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 16, marginBottom: 24 }}>
 
           {/* distribución */}
-          <div className="card">
-            <div className="card-header">
+            <div className="dashboard-cards-grid" style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 16, marginBottom: 24 }}>            <div className="card-header">
               <span className="card-title">Distribución de ventas</span>
             </div>
             <div className="card-body">
@@ -119,8 +118,7 @@ export default function DashboardClient({ vendedor, metricas, ventasRecientes, p
           </div>
 
           {/* bajo stock */}
-          <div className="card">
-            <div className="card-header">
+            <div className="dashboard-cards-grid" style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 16, marginBottom: 24 }}>            <div className="card-header">
               <span className="card-title">Productos con bajo stock</span>
               <Link href="/dashboard/products" className="card-link">Ver todos →</Link>
             </div>
