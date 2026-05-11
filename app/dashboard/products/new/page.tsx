@@ -11,12 +11,14 @@ export default async function NewProductPage() {
   if (!vendedor) redirect("/sign-in");
 
   return (
-    <div style={{ fontFamily: "'DM Sans','Helvetica Neue',sans-serif", background: "#f6f5f3", minHeight: "100vh" }}>
-      <header style={{ padding: "16px 28px", background: "#f6f5f3", borderBottom: "0.5px solid #e2e0dc", position: "sticky", top: 0, zIndex: 10 }}>
-        <h1 style={{ fontSize: 15, fontWeight: 600, color: "#1c1b19", letterSpacing: "-.02em" }}>Nuevo producto</h1>
-        <p style={{ fontSize: 11, color: "#9e9a92", marginTop: 2 }}>Completá los datos para publicar una zapatilla</p>
+    <div className="products-page">
+      <header className="products-topbar">
+        <div>
+          <h1 className="dashboard-topbar-title">Nuevo producto</h1>
+          <p className="dashboard-topbar-date">Completá los datos para publicar una zapatilla</p>
+        </div>
       </header>
-        <div style={{ padding: "28px", maxWidth: 700, margin: "0 auto" }}>
+      <div style={{ padding: "28px", maxWidth: 700, margin: "0 auto" }}>
         <ProductForm modo="crear" />
       </div>
     </div>

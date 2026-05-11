@@ -1,7 +1,5 @@
 "use client";
 // app/dashboard/products/ProductForm.tsx
-// Reutilizable para crear y editar. Maneja talles dinámicos, validación client-side
-// y submit a la API route correspondiente.
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -20,16 +18,14 @@ interface Props {
   productoInicial?: ProductoInicial;
 }
 
-// ── talles predefinidos del dominio ───────────────────────
 const TALLES_BASE = ["35","36","37","38","39","40","41","42","43","44","45"];
-
 const MARCAS = ["Adidas","Converse","New Balance","Nike","Puma","Reebok","Vans","Otra"];
 
 // ── helpers de UI ──────────────────────────────────────────
 function Label({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
-    <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#5f5e5a", marginBottom: 6, letterSpacing: ".01em" }}>
-      {children}{required && <span style={{ color: "#ef4444", marginLeft: 3 }}>*</span>}
+    <label style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 6, letterSpacing: ".01em" }} className="text-subtle">
+      {children}{required && <span className="text-danger" style={{ marginLeft: 3 }}>*</span>}
     </label>
   );
 }
@@ -37,16 +33,8 @@ function Label({ children, required }: { children: React.ReactNode; required?: b
 function Input({ error, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { error?: string }) {
   return (
     <>
-      <input
-        {...props}
-        style={{
-          width: "100%", padding: "10px 14px", borderRadius: 9, fontSize: 13,
-          border: `0.5px solid ${error ? "#fca5a5" : "#d4d2cc"}`,
-          background: error ? "#fff7f7" : "#fff", color: "#1c1b19", outline: "none",
-          boxSizing: "border-box",
-        }}
-      />
-      {error && <p style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>{error}</p>}
+      <input {...props} className={`field ${error ? "field-error" : ""}`} />
+      {error && <p className="field-message-error">{error}</p>}
     </>
   );
 }
@@ -54,17 +42,8 @@ function Input({ error, ...props }: React.InputHTMLAttributes<HTMLInputElement> 
 function Textarea({ error, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement> & { error?: string }) {
   return (
     <>
-      <textarea
-        {...props}
-        rows={3}
-        style={{
-          width: "100%", padding: "10px 14px", borderRadius: 9, fontSize: 13,
-          border: `0.5px solid ${error ? "#fca5a5" : "#d4d2cc"}`,
-          background: error ? "#fff7f7" : "#fff", color: "#1c1b19", outline: "none",
-          resize: "vertical", boxSizing: "border-box", fontFamily: "inherit",
-        }}
-      />
-      {error && <p style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>{error}</p>}
+      <textarea {...props} rows={3} className={`field ${error ? "field-error" : ""}`} />
+      {error && <p className="field-message-error">{error}</p>}
     </>
   );
 }
@@ -72,29 +51,21 @@ function Textarea({ error, ...props }: React.TextareaHTMLAttributes<HTMLTextArea
 function Select({ error, children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement> & { error?: string }) {
   return (
     <>
-      <select
-        {...props}
-        style={{
-          width: "100%", padding: "10px 14px", borderRadius: 9, fontSize: 13,
-          border: `0.5px solid ${error ? "#fca5a5" : "#d4d2cc"}`,
-          background: "#fff", color: "#1c1b19", outline: "none",
-          appearance: "none", boxSizing: "border-box",
-        }}
-      >
+      <select {...props} className={`field ${error ? "field-error" : ""}`}>
         {children}
       </select>
-      {error && <p style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>{error}</p>}
+      {error && <p className="field-message-error">{error}</p>}
     </>
   );
 }
 
 function Card({ children, title }: { children: React.ReactNode; title: string }) {
   return (
-    <div style={{ background: "#fff", borderRadius: 14, border: "0.5px solid #e8e6e0", marginBottom: 16, overflow: "hidden" }}>
-      <div style={{ padding: "14px 20px", borderBottom: "0.5px solid #f2f0ec" }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: "#1c1b19", letterSpacing: "-.01em" }}>{title}</p>
+    <div className="card" style={{ marginBottom: 16 }}>
+      <div className="card-header">
+        <p className="card-title">{title}</p>
       </div>
-      <div style={{ padding: "20px" }}>{children}</div>
+      <div className="card-body">{children}</div>
     </div>
   );
 }
@@ -103,7 +74,6 @@ function Card({ children, title }: { children: React.ReactNode; title: string })
 export default function ProductForm({ modo, productoInicial }: Props) {
   const router = useRouter();
 
-  // ── estado del formulario ──
   const [nombre,      setNombre]      = useState(productoInicial?.nombre      ?? "");
   const [descripcion, setDescripcion] = useState(productoInicial?.descripcion ?? "");
   const [precio,      setPrecio]      = useState(productoInicial?.precio?.toString() ?? "");
@@ -113,11 +83,10 @@ export default function ProductForm({ modo, productoInicial }: Props) {
   const [activo,      setActivo]      = useState(productoInicial?.activo      ?? true);
   const [talles,      setTalles]      = useState<TalleItem[]>(productoInicial?.talles ?? []);
 
-  // ── estado de UI ──
-  const [errors,    setErrors]    = useState<Record<string, string>>({});
-  const [loading,   setLoading]   = useState(false);
-  const [apiError,  setApiError]  = useState<string | null>(null);
-  const [success,   setSuccess]   = useState(false);
+  const [errors,   setErrors]   = useState<Record<string, string>>({});
+  const [loading,  setLoading]  = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [success,  setSuccess]  = useState(false);
 
   // ── talles ─────────────────────────────────────────────
   function toggleTalle(t: string) {
@@ -137,10 +106,10 @@ export default function ProductForm({ modo, productoInicial }: Props) {
   // ── validación ─────────────────────────────────────────
   function validate() {
     const e: Record<string, string> = {};
-    if (!nombre.trim())            e.nombre      = "El nombre es obligatorio";
-    if (!marca)                    e.marca       = "Seleccioná una marca";
-    if (!precio || Number(precio) <= 0) e.precio = "Ingresá un precio válido mayor a 0";
-    if (Number(stock) < 0)         e.stock       = "El stock no puede ser negativo";
+    if (!nombre.trim())                 e.nombre    = "El nombre es obligatorio";
+    if (!marca)                         e.marca     = "Seleccioná una marca";
+    if (!precio || Number(precio) <= 0) e.precio    = "Ingresá un precio válido mayor a 0";
+    if (Number(stock) < 0)              e.stock     = "El stock no puede ser negativo";
     if (imagenUrl && !/^https?:\/\/.+/.test(imagenUrl)) e.imagenUrl = "La URL debe empezar con http:// o https://";
     return e;
   }
@@ -195,9 +164,10 @@ export default function ProductForm({ modo, productoInicial }: Props) {
   return (
     <form onSubmit={handleSubmit} noValidate>
 
-      {/* info básica */}
+      {/* ── Información básica ── */}
       <Card title="Información básica">
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+
           <div style={{ gridColumn: "1 / -1" }}>
             <Label required>Nombre</Label>
             <Input
@@ -247,16 +217,18 @@ export default function ProductForm({ modo, productoInicial }: Props) {
               error={errors.imagenUrl}
             />
             {imagenUrl && /^https?:\/\/.+/.test(imagenUrl) && (
-              <div style={{ marginTop: 10, width: 80, height: 80, borderRadius: 10, overflow: "hidden", border: "0.5px solid #e8e6e0" }}>
+              <div style={{ marginTop: 10, width: 80, height: 80, borderRadius: 10, overflow: "hidden" }} className="border-soft" >
                 <img src={imagenUrl} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               </div>
             )}
           </div>
+
         </div>
       </Card>
 
-      {/* stock + talles */}
+      {/* ── Stock y talles ── */}
       <Card title="Stock y talles">
+
         <div style={{ marginBottom: 18 }}>
           <Label>Stock general</Label>
           <Input
@@ -267,32 +239,26 @@ export default function ProductForm({ modo, productoInicial }: Props) {
             style={{ maxWidth: 140 }}
             error={errors.stock}
           />
-          <p style={{ fontSize: 11, color: "#9e9a92", marginTop: 6 }}>
+          <p className="text-faint" style={{ fontSize: 11, marginTop: 6 }}>
             Se usa como stock total si no cargás talles individuales.
           </p>
         </div>
 
         <div>
           <Label>Talles disponibles</Label>
-          <p style={{ fontSize: 11, color: "#9e9a92", marginBottom: 12 }}>
+          <p className="text-faint" style={{ fontSize: 11, marginBottom: 12 }}>
             Seleccioná los talles y ajustá el stock por talle.
           </p>
 
           {/* selector de talles */}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
             {TALLES_BASE.map((t) => {
-              const activo = talles.some((x) => x.talle === t);
+              const seleccionado = talles.some((x) => x.talle === t);
               return (
                 <button
                   key={t} type="button"
                   onClick={() => toggleTalle(t)}
-                  style={{
-                    width: 44, height: 44, borderRadius: 10, fontSize: 13, fontWeight: 500, cursor: "pointer",
-                    border: activo ? "none" : "0.5px solid #d4d2cc",
-                    background: activo ? "#111" : "#fff",
-                    color:      activo ? "#c8f060" : "#5f5e5a",
-                    transition: "all .15s",
-                  }}
+                  className={`talle-toggle ${seleccionado ? "selected" : ""}`}
                 >
                   {t}
                 </button>
@@ -304,46 +270,40 @@ export default function ProductForm({ modo, productoInicial }: Props) {
           {talles.length > 0 && (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10 }}>
               {talles.map(({ talle, stock: st }) => (
-                <div key={talle} style={{ display: "flex", alignItems: "center", gap: 10, background: "#f6f5f3", borderRadius: 9, padding: "10px 14px" }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#1c1b19", minWidth: 28 }}>
+                <div key={talle} className="bg-wash" style={{ display: "flex", alignItems: "center", gap: 10, borderRadius: 9, padding: "10px 14px" }}>
+                  <span className="text-strong" style={{ fontSize: 13, fontWeight: 600, minWidth: 28 }}>
                     {talle}
                   </span>
                   <input
                     type="number" min="0" value={st}
                     onChange={(e) => setStockTalle(talle, e.target.value)}
-                    style={{ width: "100%", padding: "6px 10px", borderRadius: 7, border: "0.5px solid #d4d2cc", fontSize: 13, background: "#fff", color: "#1c1b19", outline: "none" }}
+                    className="field"
+                    style={{ width: "100%", padding: "6px 10px" }}
                   />
-                  <span style={{ fontSize: 11, color: "#9e9a92", flexShrink: 0 }}>u.</span>
+                  <span className="text-faint" style={{ fontSize: 11, flexShrink: 0 }}>u.</span>
                 </div>
               ))}
             </div>
           )}
         </div>
+
       </Card>
 
-      {/* visibilidad (solo en edición) */}
+      {/* ── Visibilidad (solo edición) ── */}
       {modo === "editar" && (
         <Card title="Visibilidad">
           <label style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
             <div
               onClick={() => setActivo((v) => !v)}
-              style={{
-                width: 44, height: 24, borderRadius: 12, position: "relative", cursor: "pointer",
-                background: activo ? "#111" : "#d4d2cc", transition: "background .2s",
-              }}
+              className={`toggle-track ${activo ? "on" : ""}`}
             >
-              <div style={{
-                position: "absolute", top: 3, left: activo ? 23 : 3,
-                width: 18, height: 18, borderRadius: "50%",
-                background: activo ? "#c8f060" : "#fff",
-                transition: "left .2s",
-              }} />
+              <div className="toggle-thumb" />
             </div>
             <div>
-              <p style={{ fontSize: 13, fontWeight: 600, color: "#1c1b19" }}>
+              <p className="text-strong" style={{ fontSize: 13, fontWeight: 600 }}>
                 {activo ? "Producto activo" : "Producto inactivo"}
               </p>
-              <p style={{ fontSize: 11, color: "#9e9a92", marginTop: 2 }}>
+              <p className="text-faint" style={{ fontSize: 11, marginTop: 2 }}>
                 {activo ? "Visible en el catálogo para compradores" : "No aparece en el catálogo"}
               </p>
             </div>
@@ -351,40 +311,20 @@ export default function ProductForm({ modo, productoInicial }: Props) {
         </Card>
       )}
 
-      {/* feedback de API */}
-      {apiError && (
-        <div style={{ background: "#fef2f2", color: "#991b1b", padding: "12px 16px", borderRadius: 10, fontSize: 13, marginBottom: 16, border: "0.5px solid #fecaca" }}>
-          ⚠️ {apiError}
-        </div>
-      )}
+      {/* ── Feedback de API ── */}
+      {apiError && <div className="banner-error">⚠️ {apiError}</div>}
+      {success  && <div className="banner-success">✓ Producto guardado. Redirigiendo…</div>}
 
-      {success && (
-        <div style={{ background: "#ecfdf5", color: "#065f46", padding: "12px 16px", borderRadius: 10, fontSize: 13, marginBottom: 16, border: "0.5px solid #a7f3d0" }}>
-          ✓ Producto guardado. Redirigiendo…
-        </div>
-      )}
-
-      {/* acciones */}
+      {/* ── Acciones ── */}
       <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-        <button
-          type="button"
-          onClick={() => router.back()}
-          style={{ padding: "10px 20px", borderRadius: 9, border: "0.5px solid #d4d2cc", background: "transparent", fontSize: 13, color: "#5f5e5a", cursor: "pointer" }}
-        >
+        <button type="button" onClick={() => router.back()} className="btn-outline">
           Cancelar
         </button>
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            padding: "10px 24px", borderRadius: 9, border: "none", fontSize: 13, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer",
-            background: loading ? "#555" : "#111", color: "#c8f060",
-            opacity: loading ? .8 : 1, transition: "opacity .15s",
-          }}
-        >
+        <button type="submit" disabled={loading} className="btn-accent" style={{ opacity: loading ? 0.8 : 1 }}>
           {loading ? "Guardando…" : modo === "crear" ? "Publicar producto" : "Guardar cambios"}
         </button>
       </div>
+
     </form>
   );
 }
