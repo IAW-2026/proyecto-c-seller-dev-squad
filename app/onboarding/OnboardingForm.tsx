@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useClerk } from "@clerk/nextjs";
 
 export default function OnboardingForm() {
   const router = useRouter();
@@ -10,6 +11,7 @@ export default function OnboardingForm() {
   const [descripcion, setDesc]    = useState("");
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState<string | null>(null);
+  const { signOut } = useClerk();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -109,7 +111,14 @@ export default function OnboardingForm() {
                 style={{ width: "100%", justifyContent: "center", opacity: loading ? .7 : 1 }}
               >
                 {loading ? "Registrando…" : "Comenzar a vender"}
-              </button>
+                </button>
+                <button
+                   type="button"
+                   onClick={() => signOut({ redirectUrl: "/sign-in" })}
+                   style={{ width: "100%", justifyContent: "center", marginTop: 10, padding: "10px", borderRadius: 9, border: "1px solid var(--color-border)", background: "transparent", fontSize: 13, color: "var(--color-muted)", cursor: "pointer" }}
+                            >
+                   Volver al inicio de sesión
+                  </button>
             </form>
           </div>
         </div>
