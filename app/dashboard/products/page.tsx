@@ -8,7 +8,7 @@ import ProductsClient from "./ProductsClient";
 const PER_PAGE = 8;
 
 interface Props {
-  searchParams: { q?: string; page?: string; estado?: string };
+  searchParams: Promise<{ q?: string; page?: string; estado?: string }>;
 }
 
 export default async function ProductsPage({ searchParams }: Props) {
@@ -18,10 +18,12 @@ export default async function ProductsPage({ searchParams }: Props) {
   const vendedor = await prisma.vendedor.findUnique({ where: { clerkUserId: userId } });
   if (!vendedor) redirect("/sign-in");
 
-  const q     = searchParams.q     ?? "";
-  const page  = Math.max(1, Number(searchParams.page ?? "1"));
-  const activo = searchParams.estado === "inactivo" ? false
-               : searchParams.estado === "activo"   ? true
+  const { q: rawQ, page: rawPage, estado } = await searchParams; 
+
+  const q    = rawQ ?? "";
+  const page = Math.max(1, Number(rawPage ?? "1"));
+  const activo = estado === "inactivo" ? false
+               : estado === "activo"   ? true
                : undefined;
 
   const where = {
@@ -64,7 +66,7 @@ export default async function ProductsPage({ searchParams }: Props) {
       page={page}
       perPage={PER_PAGE}
       q={q}
-      estadoFiltro={searchParams.estado ?? "todos"}
+      estadoFiltro={estado ?? "todos"}
     />
   );
 }

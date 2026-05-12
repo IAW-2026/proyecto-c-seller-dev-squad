@@ -51,8 +51,7 @@ const PRODUCTOS_SEED = [
       "Clásico de los 90. Amortiguación Air visible, suela de goma, capellada de cuero y mesh.",
     precio: 89999,
     marca: "Nike",
-    imagenUrl:
-      "https://static.nike.com/a/images/t_PDP_1280_v1/air-max-90.jpg",
+    imagenUrl: null,
     talles: [
       { talle: "40", stock: 3 },
       { talle: "41", stock: 5 },
@@ -67,9 +66,8 @@ const PRODUCTOS_SEED = [
       "Running de alto rendimiento. Entresuela BOOST, upper Primeknit, torsion system.",
     precio: 124999,
     marca: "Adidas",
-    imagenUrl:
-      "https://assets.adidas.com/images/w_600,f_auto,q_auto/ultraboost-23.jpg",
-    talles: [
+    imagenUrl: null,
+        talles: [
       { talle: "39", stock: 4 },
       { talle: "40", stock: 6 },
       { talle: "41", stock: 3 },
