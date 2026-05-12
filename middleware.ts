@@ -7,7 +7,7 @@ const isProtectedRoute = createRouteMatcher(["/dashboard(.*)",]);
 const isAdminRoute     = createRouteMatcher(["/dashboard/admin(.*)"]);
 
 const isPublicApiRoute = createRouteMatcher([
-  "/api/products(.*)", "/api/sales", "/api/sales/(.*)",]);
+  "/api/products(.*)", "/api/sales", "/api/sales/(.*)",  "/onboarding",]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isPublicApiRoute(req)) return;
