@@ -1,4 +1,3 @@
-// app/dashboard/products/page.tsx
 // Lista de productos del vendedor con búsqueda y paginación por URL
 
 import { auth } from "@clerk/nextjs/server";

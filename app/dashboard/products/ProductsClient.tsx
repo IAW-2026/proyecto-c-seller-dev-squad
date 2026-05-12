@@ -58,6 +58,19 @@ function ConfirmModal({ nombre, onConfirm, onCancel, loading }: {
   );
 }
 
+function ProductImage({ src, alt }: { src: string; alt: string }) {
+  const [error, setError] = useState(false);
+  if (error) return <span style={{ fontSize: 36 }}>👟</span>;
+  return (
+    <img
+      src={src}
+      alt={alt}
+      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+      onError={() => setError(true)}
+    />
+  );
+}
+
 // ── card de producto ───────────────────────────────────────
 function ProductCard({ p, onDelete }: { p: Producto; onDelete: (id: string, nombre: string) => void }) {
   const stockTotal = p.talles.reduce((a, t) => a + t.stock, 0) || p.stock;
@@ -69,8 +82,8 @@ function ProductCard({ p, onDelete }: { p: Producto; onDelete: (id: string, nomb
       {/* imagen / placeholder */}
       <div className="product-card-image">
         {p.imagenUrl
-          ? <img src={p.imagenUrl} alt={p.nombre} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          : <span style={{ fontSize: 36 }}>👟</span>
+           ? <ProductImage src={p.imagenUrl} alt={p.nombre} />        
+           : <span style={{ fontSize: 36 }}>👟</span>
         }
         {!p.activo && (
           <span className="badge-estado badge-inactivo" style={{ position: "absolute", top: 10, right: 10 }}>
@@ -125,6 +138,7 @@ function ProductCard({ p, onDelete }: { p: Producto; onDelete: (id: string, nomb
     </div>
   );
 }
+
 
 // ── componente principal ───────────────────────────────────
 export default function ProductsClient({ productos, total, page, perPage, q, estadoFiltro }: Props) {
