@@ -47,9 +47,10 @@ function ConfirmModal({ nombre, onConfirm, onCancel, loading }: {
           <button
             onClick={onConfirm}
             disabled={loading}
-            className="btn-danger"
-            style={{ opacity: loading ? 0.7 : 1, cursor: loading ? "not-allowed" : "pointer" }}
-          >
+            className="btn-outline"
+            style={{ opacity: loading ? 0.7 : 1, cursor: loading ? "not-allowed" : "pointer", color: "var(--color-danger)",
+                    borderColor: "var(--color-danger)", }}
+                >
             {loading ? "Eliminando…" : "Sí, desactivar"}
           </button>
         </div>
@@ -131,6 +132,8 @@ function ProductCard({ p, onDelete }: { p: Producto; onDelete: (id: string, nomb
         <button
           onClick={() => onDelete(p.id, p.nombre)}
           className="product-card-action-btn danger"
+          disabled={!p.activo}
+          style={{ opacity: !p.activo ? 0.4 : 1, cursor: !p.activo ? "not-allowed" : "pointer" }}
         >
           Desactivar
         </button>
