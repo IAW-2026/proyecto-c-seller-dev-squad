@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useTheme } from "@/hooks/useTheme";
+import { useEffect, useState } from "react";
 
 const NAV = [
   { href: "/dashboard",          label: "Resumen",   icon: "▦" },
@@ -21,7 +22,28 @@ interface Props {
 export default function DashboardSidebar({ open, onClose }: Props) {
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
+  const { user } = useUser();
+  const [nombre, setNombre] = useState("Mi cuenta");
 
+  useEffect(() => {
+   async function loadUser() {
+      try {
+        const res = await fetch("/api/me");
+
+       if (!res.ok) return;
+
+        const data = await res.json();
+
+         if (data?.nombre) {
+           setNombre(data.nombre);
+         }
+        } catch (err) {
+      console.error(err);
+     }
+    }
+
+  loadUser();
+}, []);
   return (
     <>
       {/* overlay mobile */}
@@ -90,7 +112,7 @@ export default function DashboardSidebar({ open, onClose }: Props) {
         <div className="sidebar-user">
           <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
           <div>
-            <p className="sidebar-user-name">Mi cuenta</p>
+            <p className="sidebar-user-name">{nombre}</p>
             <p className="sidebar-user-role">Vendedor</p>
           </div>
         </div>

@@ -3,9 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useClerk } from "@clerk/nextjs";
-import Image from "next/image";
 import Navbar from "@/app/components/Navbar";
-import { useTheme } from "@/hooks/useTheme";
 
 export default function OnboardingForm() {
   const router = useRouter();
@@ -15,7 +13,6 @@ export default function OnboardingForm() {
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState<string | null>(null);
   const { signOut } = useClerk();
-  const { theme } = useTheme();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -60,29 +57,15 @@ export default function OnboardingForm() {
     >
       <div style={{ width: "100%", maxWidth: 480 }}>
 
-        {/* logo */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <Image
-            src={
-              theme === "dark"
-                ? "/logo-dark.png"
-                : "/logo-light.png"
-            }
-            alt="ZapasYa"
-            width={220}
-            height={70}
-            priority
-          />
-
-          <p
+           <p
             style={{
-              fontSize: 14,
-              color: "var(--color-muted)",
-              marginTop: 12,
+            fontSize: 14,
+            color: "var(--color-muted)",
             }}
           >
             Completá tu perfil para empezar a vender
-          </p>
+            </p>
         </div>
 
         <div className="card">
@@ -149,7 +132,7 @@ export default function OnboardingForm() {
                    onClick={() => signOut({ redirectUrl: "/sign-in" })}
                    style={{ width: "100%", justifyContent: "center", marginTop: 10, padding: "10px", borderRadius: 9, border: "1px solid var(--color-border)", background: "transparent", fontSize: 13, color: "var(--color-muted)", cursor: "pointer" }}
                             >
-                   Volver al inicio de sesión
+                   Inicio de sesión
                   </button>
             </form>
           </div>
