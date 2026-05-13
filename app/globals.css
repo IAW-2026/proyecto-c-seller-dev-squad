@@ -95,6 +95,29 @@
 [data-theme="dark"] .logo-light { display: none;  }
 [data-theme="dark"] .logo-dark  { display: block; }
 
+.navbar {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.navbar-logo {
+  width: auto;
+  height: auto;
+  max-width: 170px;
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
 /* ── Botones ── */
 .btn-primary { background-color: var(--color-primary); color: var(--color-on-primary); padding: 9px 18px; border-radius: 9px; font-size: 13px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: none; cursor: pointer; }
 .btn-primary:hover { background-color: var(--color-primary-dark); }
@@ -444,11 +467,20 @@
 }
 
 .auth-page {
+  min-height: calc(100vh - 72px);
+
   display: flex;
-  justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background: var(--background);
+  justify-content: center;
+
+  padding: 24px;
+}
+
+.auth-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
 }
 
 /* ── Responsive ── */

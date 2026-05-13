@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
+import ClerkThemeProvider from "./components/ClerkThemeProvider";
 import "./globals.css";
 
 
@@ -22,8 +22,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <ClerkProvider afterSignOutUrl="/sign-in">
+  return (      
       <html
         lang="es"
         className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
@@ -44,9 +43,11 @@ export default function RootLayout({
           />
         </head>
                 <body className="min-h-full flex flex-col" suppressHydrationWarning>
-                  {children}
+
+                  <ClerkThemeProvider>
+                     {children}
+                  </ClerkThemeProvider>
                 </body>
-      </html>
-    </ClerkProvider>
+        </html>
   );
 }
