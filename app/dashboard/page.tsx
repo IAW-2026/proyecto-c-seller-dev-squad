@@ -1,6 +1,4 @@
-// app/dashboard/page.tsx
 // Panel de administración del vendedor — Seller App
-// Requiere: @clerk/nextjs, prisma, lucide-react, tailwindcss
 
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -9,7 +7,6 @@ import DashboardClient from "./DashboardClient";
 
 export default async function DashboardPage() {
   const { userId } = await auth();
-  // Si no está autenticado
   if (!userId) {
     redirect("/sign-in");
   }
@@ -23,8 +20,7 @@ export default async function DashboardPage() {
 
   // Si no existe en DB
   if (!vendedor) redirect("/onboarding"); 
-  // Métricas generales
-  const [totalProductos, totalVentas, ventas] = await Promise.all([
+  const [totalProductos, totalVentas, ventas, productosBajoStock] = await Promise.all([
     prisma.producto.count({
       where: {
         vendedorId: vendedor.id,
@@ -33,16 +29,11 @@ export default async function DashboardPage() {
     }),
 
     prisma.venta.count({
-      where: {
-        vendedorId: vendedor.id,
-      },
+      where: {  vendedorId: vendedor.id, },
     }),
 
     prisma.venta.findMany({
-      where: {
-        vendedorId: vendedor.id,
-      },
-
+      where: {vendedorId: vendedor.id,},
       include: {
         detalles: {
           include: {
@@ -50,14 +41,20 @@ export default async function DashboardPage() {
           },
         },
       },
-
-      orderBy: {
-        creadoEn: "desc",
-      },
-
+      orderBy: { creadoEn: "desc",},
       take: 50,
     }),
-  ]);
+
+    prisma.producto.findMany({
+     where: {
+       vendedorId: vendedor.id,
+       activo: true,
+       stock: { lte: 3 },
+      },
+      take: 5,
+      orderBy: { stock: "asc" },
+   }),
+]);
 
   const ingresoTotal = ventas
     .filter((v) => v.estado === "CONFIRMADO")
@@ -70,23 +67,6 @@ export default async function DashboardPage() {
 
     CANCELADO: ventas.filter((v) => v.estado === "CANCELADO").length,
   };
-
-  // Productos bajo stock
-  const productosBajoStock = await prisma.producto.findMany({
-    where: {
-      vendedorId: vendedor.id,
-      activo: true,
-      stock: {
-        lte: 3,
-      },
-    },
-
-    take: 5,
-
-    orderBy: {
-      stock: "asc",
-    },
-  });
 
   return (
     <DashboardClient

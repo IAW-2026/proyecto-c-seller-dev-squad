@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
+import { useTheme } from "@/hooks/useTheme";
 
 const NAV = [
   { href: "/dashboard",          label: "Resumen",   icon: "▦" },
@@ -18,6 +20,7 @@ interface Props {
 
 export default function DashboardSidebar({ open, onClose }: Props) {
   const pathname = usePathname();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <>
@@ -29,7 +32,24 @@ export default function DashboardSidebar({ open, onClose }: Props) {
 
       <aside className={`sidebar ${open ? "open" : ""}`}>
         <div className="sidebar-logo">
-          seller<span className="sidebar-logo-dot">.</span>
+         <Image
+           src="/logo-light.png"
+           alt="Seller"
+           width={2500}
+           height={2100}
+           className="logo-light"
+           priority
+           style={{ width: "100%", height: "auto" }}         
+            />
+          <Image
+            src="/logo-dark.png"
+            alt="Seller"
+            width={2500}
+            height={2100}
+            className="logo-dark"
+            priority
+            style={{ width: "100%", height: "auto" }}
+           />
         </div>
 
         <nav className="sidebar-nav">
@@ -49,6 +69,23 @@ export default function DashboardSidebar({ open, onClose }: Props) {
             );
           })}
         </nav>
+
+        {/* toggle de tema — desktop */}
+        <div style={{ padding: "12px 18px", borderTop: "1px solid var(--color-border)" }}>
+          <button
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            style={{
+              display: "flex", alignItems: "center", gap: 8,
+              background: "none", border: "none", cursor: "pointer",
+              fontSize: 13, color: "var(--color-muted)", width: "100%",
+              padding: "6px 0",
+            }}
+          >
+            <span style={{ fontSize: 16 }}>{theme === "dark" ? "☀️" : "🌙"}</span>
+            {theme === "dark" ? "Modo claro" : "Modo oscuro"}
+          </button>
+        </div>
 
         <div className="sidebar-user">
           <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />

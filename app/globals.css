@@ -89,6 +89,12 @@
   }
 }
 
+.logo-light { display: block; }
+.logo-dark  { display: none;  }
+
+[data-theme="dark"] .logo-light { display: none;  }
+[data-theme="dark"] .logo-dark  { display: block; }
+
 /* ── Botones ── */
 .btn-primary { background-color: var(--color-primary); color: var(--color-on-primary); padding: 9px 18px; border-radius: 9px; font-size: 13px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: none; cursor: pointer; }
 .btn-primary:hover { background-color: var(--color-primary-dark); }
