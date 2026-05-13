@@ -1,45 +1,34 @@
-"use client";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
-import { useState } from "react";
-import Image from "next/image";
-import { useTheme } from "@/hooks/useTheme";
-import DashboardSidebar from "./DashboardSidebar";
+import DashboardClientLayout from "./DashBoardClientLayout";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    redirect("/sign-in");
+  }
+
+  const vendedor = await prisma.vendedor.findUnique({
+    where: {
+      clerkUserId: userId,
+    },
+  });
+
+  // Usuario autenticado pero sin vendedor
+  if (!vendedor) {
+    redirect("/onboarding");
+  }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      <DashboardSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-      <div className="dashboard-main" style={{ flex: 1, marginLeft: 224 }}>
-
-        {/* topbar mobile — una sola barra */}
-        <div className="mobile-topbar">
-          <Image
-            src={theme === "dark" ? "/logo-dark.png" : "/logo-light.png"}
-            alt="Seller"
-            width={100}
-            height={32}
-            priority
-          />
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-              style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, padding: 4 }}
-            >
-              {theme === "dark" ? "☀️" : "🌙"}
-            </button>
-            <button className="hamburger" onClick={() => setSidebarOpen(true)} aria-label="Abrir menú">
-              <span /><span /><span />
-            </button>
-          </div>
-        </div>
-
-        {children}
-      </div>
-    </div>
+    <DashboardClientLayout>
+      {children}
+    </DashboardClientLayout>
   );
 }

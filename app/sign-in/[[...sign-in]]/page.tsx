@@ -16,6 +16,10 @@ export default function SignInPage() {
       <div className="auth-page">
         <div className="auth-card">
           <SignIn
+          signUpUrl="/sign-up"
+          fallbackRedirectUrl="/dashboard"
+          forceRedirectUrl="/dashboard"
+
             key={theme}
             appearance={{
               baseTheme:
@@ -24,14 +28,6 @@ export default function SignInPage() {
                   : undefined,
 
               elements: {
-                headerTitle: {
-                  display: "none",
-                },
-
-                headerSubtitle: {
-                  display: "none",
-                },
-
                 logoBox: {
                   display: "none",
                 },

@@ -16,6 +16,8 @@ export default function SignUpPage() {
       <div className="auth-page">
         <div className="auth-card">
           <SignUp
+            fallbackRedirectUrl="/onboarding"
+            forceRedirectUrl="/onboarding"
             key={theme}
             appearance={{
               baseTheme:
@@ -24,14 +26,6 @@ export default function SignUpPage() {
                   : undefined,
 
               elements: {
-                headerTitle: {
-                  display: "none",
-                },
-
-                headerSubtitle: {
-                  display: "none",
-                },
-
                 logoBox: {
                   display: "none",
                 },

@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useClerk } from "@clerk/nextjs";
+import Image from "next/image";
+import Navbar from "@/app/components/Navbar";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function OnboardingForm() {
   const router = useRouter();
@@ -12,6 +15,7 @@ export default function OnboardingForm() {
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState<string | null>(null);
   const { signOut } = useClerk();
+  const { theme } = useTheme();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,15 +44,43 @@ export default function OnboardingForm() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans','Helvetica Neue',sans-serif", padding: 24 }}>
+     <>
+    <Navbar />
+
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "var(--background)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "'DM Sans','Helvetica Neue',sans-serif",
+        padding: 24,
+      }}
+    >
       <div style={{ width: "100%", maxWidth: 480 }}>
 
         {/* logo */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <p style={{ fontSize: 24, fontWeight: 600, color: "var(--color-foreground)", letterSpacing: "-.03em" }}>
-            seller<span style={{ color: "var(--color-success)" }}>.</span>
-          </p>
-          <p style={{ fontSize: 14, color: "var(--color-muted)", marginTop: 6 }}>
+          <Image
+            src={
+              theme === "dark"
+                ? "/logo-dark.png"
+                : "/logo-light.png"
+            }
+            alt="ZapasYa"
+            width={220}
+            height={70}
+            priority
+          />
+
+          <p
+            style={{
+              fontSize: 14,
+              color: "var(--color-muted)",
+              marginTop: 12,
+            }}
+          >
             Completá tu perfil para empezar a vender
           </p>
         </div>
@@ -124,5 +156,6 @@ export default function OnboardingForm() {
         </div>
       </div>
     </div>
+    </>
   );
 }
