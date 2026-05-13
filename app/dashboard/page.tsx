@@ -11,14 +11,12 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
 
-  // Buscar vendedor existente
   const vendedor = await prisma.vendedor.findFirst({
     where: {
       clerkUserId: userId,
     },
   });
 
-  // Si no existe en DB
   if (!vendedor) redirect("/onboarding"); 
   const [totalProductos, totalVentas, ventas, productosBajoStock] = await Promise.all([
     prisma.producto.count({
@@ -49,8 +47,8 @@ export default async function DashboardPage() {
      where: {
        vendedorId: vendedor.id,
        activo: true,
-       stock: { lte: 3 },
       },
+      include: {talles: true},
       take: 5,
       orderBy: { stock: "asc" },
    }),
@@ -67,6 +65,17 @@ export default async function DashboardPage() {
 
     CANCELADO: ventas.filter((v) => v.estado === "CANCELADO").length,
   };
+
+  const stockReal = (p: typeof productosBajoStock[0]) =>
+  p.talles.length > 0
+    ? p.talles.reduce((a, t) => a + t.stock, 0)
+    : p.stock;
+
+  const productosBajoStockFiltrados = productosBajoStock
+  .map((p) => ({ ...p, stockCalculado: stockReal(p) }))
+  .filter((p) => p.stockCalculado <= 3)
+  .sort((a, b) => a.stockCalculado - b.stockCalculado)
+  .slice(0, 5);
 
   return (
     <DashboardClient
@@ -91,10 +100,10 @@ export default async function DashboardPage() {
         items: v.detalles.length,
       }))}
 
-      productosBajoStock={productosBajoStock.map((p) => ({
+      productosBajoStock={productosBajoStockFiltrados.map((p) => ({
         id: p.id,
         nombre: p.nombre,
-        stock: p.stock,
+        stock: p.stockCalculado,
         marca: p.marca ?? "",
       }))}
     />

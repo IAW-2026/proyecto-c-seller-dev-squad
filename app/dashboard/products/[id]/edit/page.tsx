@@ -3,9 +3,10 @@ import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ProductForm from "../../ProductForm";
  
-interface Props { params: { id: string } }
+interface Props { params: Promise<{ id: string }> }
  
 export default async function EditProductPage({ params }: Props) {
+  const { id } = await params;
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
  
@@ -13,7 +14,7 @@ export default async function EditProductPage({ params }: Props) {
   if (!vendedor) redirect("/sign-in");
  
   const producto = await prisma.producto.findFirst({
-    where: { id: params.id, vendedorId: vendedor.id },
+    where: { id, vendedorId: vendedor.id },
     include: { talles: true },
   });
   if (!producto) notFound();
