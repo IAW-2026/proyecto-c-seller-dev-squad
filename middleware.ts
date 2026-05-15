@@ -26,10 +26,10 @@ export default clerkMiddleware(async (auth, req) => {
       return NextResponse.redirect(new URL("/unauthorized", req.url));
     }
 
-    // solo admins pueden entrar a /dashboard/admin
+   /* // solo admins pueden entrar a /dashboard/admin
     if (isAdminRoute(req) && role !== "admin") {
       return NextResponse.redirect(new URL("/dashboard", req.url));
-    }
+    }*/
 });
 
 export const config = {

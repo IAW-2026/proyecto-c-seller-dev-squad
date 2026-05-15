@@ -57,8 +57,8 @@ export default function DashboardSidebar({ open, onClose }: Props) {
          <Image
            src="/logo-light.png"
            alt="Seller"
-           width={2500}
-           height={2100}
+           width={1000}
+           height={360}
            className="logo-light"
            priority
            style={{ width: "100%", height: "auto" }}         
@@ -66,8 +66,8 @@ export default function DashboardSidebar({ open, onClose }: Props) {
           <Image
             src="/logo-dark.png"
             alt="Seller"
-            width={2500}
-            height={2100}
+            width={1000}
+            height={360}
             className="logo-dark"
             priority
             style={{ width: "100%", height: "auto" }}
