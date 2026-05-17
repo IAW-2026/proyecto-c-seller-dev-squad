@@ -246,7 +246,7 @@ export default function AdminClient({ stats,  sellers,  products, sells }: Props
         {tab === " products" && (
           <div className="card">
             <div className="card-header">
-              <span className="card-title">{ products.length}  products registrados</span>
+              <span className="card-title">{ products.length} Productos registrados</span>
               <input type="search" placeholder="Buscar…" value={searchP} onChange={e => setSearchP(e.target.value)}
                 style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: 12, color: "var(--color-foreground)", outline: "none", width: 200 }} />
             </div>

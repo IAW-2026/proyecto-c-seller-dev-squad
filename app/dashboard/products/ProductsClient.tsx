@@ -198,8 +198,8 @@ export default function ProductsClient({  products, total, page, perPage, q, est
 
   const FILTROS = [
     { label: "Todos",     value: "todos"    },
-    { label: "actives",   value: "active"   },
-    { label: "Inactives", value: "inactive" },
+    { label: "Activos",   value: "active"   },
+    { label: "Inactivos", value: "inactive" },
   ];
 
   return (

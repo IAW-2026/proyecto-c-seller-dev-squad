@@ -14,7 +14,7 @@ export default async function NewProductPage() {
     <div className="products-page">
       <header className="products-topbar">
         <div>
-          <h1 className="dashboard-topbar-title">Nuevo  product</h1>
+          <h1 className="dashboard-topbar-title">Nuevo  producto</h1>
           <p className="dashboard-topbar-date">Completá los datos para publicar una zapatilla</p>
         </div>
       </header>

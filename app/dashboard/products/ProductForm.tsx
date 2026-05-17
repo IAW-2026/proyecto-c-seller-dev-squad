@@ -181,7 +181,7 @@ export default function ProductForm({ modo,  productInicial }: Props) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
 
           <div style={{ gridColumn: "1 / -1" }}>
-            <Label required> name</Label>
+            <Label required>Nombre</Label>
             <Input
               value={ name}
               onChange={(e) => setname(e.target.value)}
@@ -193,7 +193,7 @@ export default function ProductForm({ modo,  productInicial }: Props) {
           <div>
             <Label required>Marca</Label>
             <Select value={brand} onChange={(e) => setbrand(e.target.value)} error={errors.brand}>
-              <option value="">Seleccioná una brand</option>
+              <option value="">Seleccioná una marca</option>
               {brandS.map((m) => <option key={m} value={m}>{m}</option>)}
             </Select>
           </div>
@@ -258,7 +258,7 @@ export default function ProductForm({ modo,  productInicial }: Props) {
       </Card>
 
       {/* ── Stock y sizes ── */}
-      <Card title="Stock y sizes">
+      <Card title="Stock y talles">
 
         <div style={{ marginBottom: 18 }}>
           <Label>Stock general</Label>
@@ -289,7 +289,7 @@ export default function ProductForm({ modo,  productInicial }: Props) {
                 <button
                   key={t} type="button"
                   onClick={() => togglesize(t)}
-                  className={`size-toggle ${seleccionado ? "selected" : ""}`}
+                  className={`talle-toggle ${seleccionado ? "selected" : ""}`}
                 >
                   {t}
                 </button>
@@ -344,7 +344,7 @@ export default function ProductForm({ modo,  productInicial }: Props) {
 
       {/* ── Feedback de API ── */}
       {apiError && <div className="banner-error">⚠️ {apiError}</div>}
-      {success  && <div className="banner-success">✓  product guardado. Redirigiendo…</div>}
+      {success  && <div className="banner-success">✓  producto guardado. Redirigiendo…</div>}
 
       {/* ── Acciones ── */}
       <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
@@ -352,7 +352,7 @@ export default function ProductForm({ modo,  productInicial }: Props) {
           Cancelar
         </button>
         <button type="submit" disabled={loading} className="btn-accent" style={{ opacity: loading ? 0.8 : 1 }}>
-          {loading ? "Guardando…" : modo === "crear" ? "Publicar  product" : "Guardar cambios"}
+          {loading ? "Guardando…" : modo === "crear" ? "Publicar  producto" : "Guardar cambios"}
         </button>
       </div>
 
