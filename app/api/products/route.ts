@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     const  product = await prisma.product.create({
       data: {
          name:       name.trim(),
-        description: description?.trim() ?? "",
+        description: description?.trim() ?? null,
         price:      Number(price),
         stock:       Number(stock ?? 0),
         brand:       brand ?? null,

@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 interface sizeItem { size: string; stock: number }
 
 interface  productInicial {
-  id: string;  name: string; description: string; price: number;
-  stock: number; brand: string; category:string; image: string;
+  id: string;  name: string; description: string | null; price: number;
+  stock: number; brand: string; category:string; image: string | null;
   active: boolean; sizes: sizeItem[];
 }
 
@@ -85,11 +85,11 @@ export default function ProductForm({ modo,  productInicial }: Props) {
   const router = useRouter();
 
   const [ name,      setname]      = useState( productInicial?. name      ?? "");
-  const [description, setdescription] = useState( productInicial?.description ?? "");
+  const [description, setdescription] = useState( productInicial?.description ?? null);
   const [price,      setprice]      = useState( productInicial?.price?.toString() ?? "");
   const [stock,       setStock]       = useState( productInicial?.stock?.toString()  ?? "0");
   const [brand,       setbrand]       = useState( productInicial?.brand       ?? "");
-  const [image,   setimage]   = useState( productInicial?.image   ?? "");
+  const [image,   setimage]   = useState( productInicial?.image   ?? null);
   const [active,      setactive]      = useState( productInicial?.active      ?? true);
   const [sizes,      setsizes]      = useState<sizeItem[]>( productInicial?.sizes ?? []);
   const [category, setCategory] = useState(productInicial?.category ?? "");
@@ -137,12 +137,12 @@ export default function ProductForm({ modo,  productInicial }: Props) {
 
     const body = {
        name:       name.trim(),
-      description: description.trim() || null,
+      description: description?.trim() || null,
       price:      Number(price),
       stock:       Number(stock),
       brand:       brand || null,
       category:    category || null,
-      image:   image.trim() || null,
+      image:   image?.trim() || null,
       active,
       sizes,
     };
@@ -231,7 +231,7 @@ export default function ProductForm({ modo,  productInicial }: Props) {
           <div style={{ gridColumn: "1 / -1" }}>
             <Label>Descripción</Label>
             <Textarea
-              value={description}
+              value={description ?? ""}
               onChange={(e) => setdescription(e.target.value)}
               placeholder="Describí el  producto: materiales, características, etc."
               error={errors.description}
@@ -242,7 +242,7 @@ export default function ProductForm({ modo,  productInicial }: Props) {
             <Label>URL de imagen</Label>
             <Input
               type="url"
-              value={image}
+              value={image ?? ""}
               onChange={(e) => setimage(e.target.value)}
               placeholder="https://..."
               error={errors.image}

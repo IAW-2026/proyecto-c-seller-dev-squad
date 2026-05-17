@@ -58,7 +58,7 @@ export default async function ProductsPage({ searchParams }: Props) {
         price:    Number(p.price),
         stock:     p.stock,
         active:    p.active,
-        image:     p.image,
+        image:     p.image ?? null,
         sizes:    p.sizes.map((t) => ({ size: t.size, stock: t.stock })),
         createdAt:  p.createdAt.toISOString(),
       }))}

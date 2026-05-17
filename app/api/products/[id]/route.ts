@@ -77,7 +77,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         ...(price      !== undefined && { price:      Number(price) }),
         ...(stock       !== undefined && { stock:       Number(stock) }),
         ...(brand       !== undefined && { brand }),
-        ...(image   !== undefined && { image }),
+        ...(image   !== undefined && { image:   image?.trim() || null }),
         ...(active      !== undefined && { active }),
       },
       include: { sizes: true },

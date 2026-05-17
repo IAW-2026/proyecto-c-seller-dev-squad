@@ -1,48 +1,5 @@
-/*
-  Warnings:
-
-  - You are about to drop the `details_venta` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the ` product_sizes` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the ` products` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the ` sellers` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `ventas` table. If the table is not empty, all the data it contains will be lost.
-
-*/
 -- CreateEnum
 CREATE TYPE "SellStatus" AS ENUM ('PENDING', 'CONFIRMED', 'CANCELLED');
-
--- DropForeignKey
-ALTER TABLE "details_venta" DROP CONSTRAINT "details_venta_ product_id_fkey";
-
--- DropForeignKey
-ALTER TABLE "details_venta" DROP CONSTRAINT "details_venta_venta_id_fkey";
-
--- DropForeignKey
-ALTER TABLE " product_sizes" DROP CONSTRAINT " product_sizes_ product_id_fkey";
-
--- DropForeignKey
-ALTER TABLE " products" DROP CONSTRAINT " products_ seller_id_fkey";
-
--- DropForeignKey
-ALTER TABLE "ventas" DROP CONSTRAINT "ventas_ seller_id_fkey";
-
--- DropTable
-DROP TABLE "details_venta";
-
--- DropTable
-DROP TABLE " product_sizes";
-
--- DropTable
-DROP TABLE " products";
-
--- DropTable
-DROP TABLE " sellers";
-
--- DropTable
-DROP TABLE "ventas";
-
--- DropEnum
-DROP TYPE "SellStatus";
 
 -- CreateTable
 CREATE TABLE "sellers" (
@@ -50,8 +7,8 @@ CREATE TABLE "sellers" (
     "clerk_user_id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "avatar_url" TEXT NOT NULL,
+    "description" TEXT,
+    "avatar_url" TEXT,
     "active" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -63,12 +20,13 @@ CREATE TABLE "sellers" (
 CREATE TABLE "products" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "description" TEXT,
     "price" DECIMAL(10,2) NOT NULL,
     "stock" INTEGER NOT NULL DEFAULT 0,
     "brand" TEXT NOT NULL,
     "category" TEXT NOT NULL,
-    "image" TEXT NOT NULL,
+    "image" TEXT,
+    "colors" TEXT[],
     "active" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,

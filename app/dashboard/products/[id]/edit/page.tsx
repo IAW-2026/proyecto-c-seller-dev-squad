@@ -36,12 +36,12 @@ export default async function EditProductPage({ params }: Props) {
            productInicial={{
             id:           product.id,
             name:       product. name,
-            description:  product.description ?? "",
+            description:  product.description ?? null,
             price:      Number( product.price),
             stock:        product.stock,
             brand:        product.brand ?? "",
             category: product.category ?? "",
-            image:    product.image ?? "",
+            image:    product.image ?? null,
             active:       product.active,
             sizes:       product.sizes.map((t) => ({ size: t.size, stock: t.stock })),
           }}

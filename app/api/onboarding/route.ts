@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
         clerkUserId: userId,
          name:       name.trim(),
         email:       email.trim(),
-        description: description?.trim(),
-         avatarUrl: "",
+        description: description?.trim() ?? null,
+         avatarUrl: ""
       },
     });
 

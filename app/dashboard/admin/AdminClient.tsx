@@ -8,12 +8,12 @@ type SellStatus = "CONFIRMED" | "PENDING" | "CANCELLED";
 type Tab = "resumen" | " sellers" | " products" | "ventas";
  
 interface Seller{
-  id: string;  name: string; email: string; description: string;
+  id: string;  name: string; email: string; description: string | null;
   active: boolean; createdAt: string; totalProducts: number; totalSells: number;
 }
 interface  Product {
   id: string;  name: string; brand: string; price: number;
-  stock: number; active: boolean; image: string, createdAt: string;  seller: string; totalSells: number;
+  stock: number; active: boolean; image: string | null; createdAt: string;  seller: string; totalSells: number;
 }
 interface Sell {
   id: string; orderId: string; total: number; status: SellStatus;
