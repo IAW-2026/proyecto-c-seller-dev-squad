@@ -5,14 +5,14 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 // ── tipos ──────────────────────────────────────────────────
-interface Talle   { talle: string; stock: number }
-interface Producto {
-  id: string; nombre: string; marca: string; precio: number;
-  stock: number; activo: boolean; imagenUrl: string | null;
-  talles: Talle[]; creadoEn: string;
+interface Size   { size: string; stock: number }
+interface  Product {
+  id: string;  name: string; brand: string; price: number;
+  stock: number; active: boolean; image: string | null;
+  sizes: Size[]; createdAt: string;
 }
 interface Props {
-  productos: Producto[]; total: number; page: number;
+   products:  Product[]; total: number; page: number;
   perPage: number; q: string; estadoFiltro: string;
 }
 
@@ -21,8 +21,8 @@ const fmt = (n: number) =>
   new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
 
 // ── modal confirmación de eliminación ─────────────────────
-function ConfirmModal({ nombre, onConfirm, onCancel, loading }: {
-  nombre: string; loading: boolean;
+function ConfirmModal({  name, onConfirm, onCancel, loading }: {
+   name: string; loading: boolean;
   onConfirm: () => void; onCancel: () => void;
 }) {
   return (
@@ -35,22 +35,32 @@ function ConfirmModal({ nombre, onConfirm, onCancel, loading }: {
         onClick={(e) => e.stopPropagation()}
       >
         <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 8 }} className="text-primary">
-          ¿Eliminar producto?
+          ¿Eliminar  product?
         </p>
         <p style={{ fontSize: 13, marginBottom: 24, lineHeight: 1.5 }} className="text-muted">
-          Vas a desactivar <strong className="text-primary">{nombre}</strong>. No se eliminará de la base de datos.
+          Vas a desactivar <strong className="text-primary">{ name}</strong>. No se eliminará de la base de datos.
         </p>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-          <button onClick={onCancel} className="btn-outline">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="btn-outline"
+          >
             Cancelar
           </button>
+
           <button
+            type="button"
             onClick={onConfirm}
             disabled={loading}
             className="btn-outline"
-            style={{ opacity: loading ? 0.7 : 1, cursor: loading ? "not-allowed" : "pointer", color: "var(--color-danger)",
-                    borderColor: "var(--color-danger)", }}
-                >
+            style={{
+              opacity: loading ? 0.7 : 1,
+              cursor: loading ? "not-allowed" : "pointer",
+              color: "var(--color-danger)",
+              borderColor: "var(--color-danger)",
+            }}
+          >
             {loading ? "Eliminando…" : "Sí, desactivar"}
           </button>
         </div>
@@ -72,26 +82,26 @@ function ProductImage({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-// ── card de producto ───────────────────────────────────────
-function ProductCard({ p, onDelete }: { p: Producto; onDelete: (id: string, nombre: string) => void }) {
-  const stockTotal = p.talles.reduce((a, t) => a + t.stock, 0) || p.stock;
+// ── card de  product ───────────────────────────────────────
+function ProductCard({ p, onDelete }: { p:  Product; onDelete: (id: string,  name: string) => void }) {
+  const stockTotal = p.sizes.reduce((a, t) => a + t.stock, 0) || p.stock;
   const stockBajo  = stockTotal <= 3;
 
   return (
-    <div className={`product-card${p.activo ? "" : " inactive"}`}>
+    <div className={`product-card${p.active ? "" : " inactive"}`}>
 
       {/* imagen / placeholder */}
       <div className="product-card-image">
-        {p.imagenUrl
-           ? <ProductImage src={p.imagenUrl} alt={p.nombre} />        
+        {p.image
+           ? <ProductImage src={p.image} alt={p.name} />        
            : <span style={{ fontSize: 36 }}>👟</span>
         }
-        {!p.activo && (
-          <span className="badge-estado badge-inactivo" style={{ position: "absolute", top: 10, right: 10 }}>
-            Inactivo
+        {!p.active && (
+          <span className="badge-estado badge-inactive" style={{ position: "absolute", top: 10, right: 10 }}>
+            Inactive
           </span>
         )}
-        {p.activo && stockBajo && (
+        {p.active && stockBajo && (
           <span className="badge-estado badge-pendiente" style={{ position: "absolute", top: 10, right: 10 }}>
             Bajo stock
           </span>
@@ -101,19 +111,19 @@ function ProductCard({ p, onDelete }: { p: Producto; onDelete: (id: string, nomb
       {/* info */}
       <div className="product-card-body">
         <p style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: ".05em" }} className="text-muted">
-          {p.marca}
+          {p.brand}
         </p>
         <p style={{ fontSize: 14, fontWeight: 600, letterSpacing: "-.02em", lineHeight: 1.3 }} className="text-primary">
-          {p.nombre}
+          {p.name}
         </p>
-        <p className="product-card-price">{fmt(p.precio)}</p>
+        <p className="product-card-price">{fmt(p.price)}</p>
 
-        {/* talles */}
-        {p.talles.length > 0 && (
+        {/* sizes */}
+        {p.sizes.length > 0 && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 6 }}>
-            {p.talles.map((t) => (
-              <span key={t.talle} className={`talle-chip${t.stock === 0 ? " agotado" : ""}`}>
-                {t.talle}{t.stock === 0 && " ✕"}
+            {p.sizes.map((t) => (
+              <span key={t.size} className={`size-chip${t.stock === 0 ? " agotado" : ""}`}>
+                {t.size}{t.stock === 0 && " ✕"}
               </span>
             ))}
           </div>
@@ -130,10 +140,10 @@ function ProductCard({ p, onDelete }: { p: Producto; onDelete: (id: string, nomb
           Editar
         </Link>
         <button
-          onClick={() => onDelete(p.id, p.nombre)}
+          onClick={() => onDelete(p.id, p.name)}
           className="product-card-action-btn danger"
-          disabled={!p.activo}
-          style={{ opacity: !p.activo ? 0.4 : 1, cursor: !p.activo ? "not-allowed" : "pointer" }}
+          disabled={!p.active}
+          style={{ opacity: !p.active ? 0.4 : 1, cursor: !p.active ? "not-allowed" : "pointer" }}
         >
           Desactivar
         </button>
@@ -144,13 +154,13 @@ function ProductCard({ p, onDelete }: { p: Producto; onDelete: (id: string, nomb
 
 
 // ── componente principal ───────────────────────────────────
-export default function ProductsClient({ productos, total, page, perPage, q, estadoFiltro }: Props) {
+export default function ProductsClient({  products, total, page, perPage, q, estadoFiltro }: Props) {
   const router       = useRouter();
   const pathname     = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; nombre: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string;  name: string } | null>(null);
   const [deleting, setDeleting]         = useState(false);
   const [error, setError]               = useState<string | null>(null);
 
@@ -165,7 +175,7 @@ export default function ProductsClient({ productos, total, page, perPage, q, est
     startTransition(() => router.push(`${pathname}?${params.toString()}`));
   }
 
-  // ── desactivar producto ────────────────────────────────
+  // ── desactivar  product ────────────────────────────────
   async function handleDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -174,9 +184,9 @@ export default function ProductsClient({ productos, total, page, perPage, q, est
       const res = await fetch(`/api/products/${deleteTarget.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ activo: false }),
+        body: JSON.stringify({ active: false }),
       });
-      if (!res.ok) throw new Error("Error al desactivar el producto");
+      if (!res.ok) throw new Error("Error al desactivar el  producto");
       setDeleteTarget(null);
       router.refresh();
     } catch (e: any) {
@@ -188,8 +198,8 @@ export default function ProductsClient({ productos, total, page, perPage, q, est
 
   const FILTROS = [
     { label: "Todos",     value: "todos"    },
-    { label: "Activos",   value: "activo"   },
-    { label: "Inactivos", value: "inactivo" },
+    { label: "actives",   value: "active"   },
+    { label: "Inactives", value: "inactive" },
   ];
 
   return (
@@ -200,7 +210,7 @@ export default function ProductsClient({ productos, total, page, perPage, q, est
         <div>
           <h1 className="dashboard-topbar-title">Productos</h1>
           <p className="dashboard-topbar-date">
-            {total} producto{total !== 1 ? "s" : ""} encontrado{total !== 1 ? "s" : ""}
+            {total}  producto{total !== 1 ? "s" : ""} encontrado{total !== 1 ? "s" : ""}
           </p>
         </div>
         <Link href="/dashboard/products/new" className="btn-accent">
@@ -215,7 +225,7 @@ export default function ProductsClient({ productos, total, page, perPage, q, est
           <input
             type="search"
             defaultValue={q}
-            placeholder="Buscar por nombre, marca…"
+            placeholder="Buscar por  nombre, marca…"
             onChange={(e) => navigate({ q: e.target.value, page: "1" })}
             className="products-search"
           />
@@ -237,15 +247,15 @@ export default function ProductsClient({ productos, total, page, perPage, q, est
 
         {error && <div className="banner-error">{error}</div>}
 
-        {/* grid de productos */}
+        {/* grid de  products */}
         {isPending ? (
           <div className="products-empty">
             <p className="text-muted" style={{ fontSize: 14 }}>Cargando…</p>
           </div>
-        ) : productos.length === 0 ? (
+        ) :  products.length === 0 ? (
           <div className="products-empty">
             <p className="text-muted" style={{ fontSize: 15 }}>
-              No hay productos que coincidan con tu búsqueda.
+              No hay  productos que coincidan con tu búsqueda.
             </p>
             <Link
               href="/dashboard/products/new"
@@ -257,8 +267,8 @@ export default function ProductsClient({ productos, total, page, perPage, q, est
           </div>
         ) : (
           <div className="products-grid">
-            {productos.map((p) => (
-              <ProductCard key={p.id} p={p} onDelete={(id, nombre) => setDeleteTarget({ id, nombre })} />
+            { products.map((p) => (
+              <ProductCard key={p.id} p={p} onDelete={(id,  name) => setDeleteTarget({ id,  name })} />
             ))}
           </div>
         )}
@@ -298,7 +308,7 @@ export default function ProductsClient({ productos, total, page, perPage, q, est
       {/* modal confirmación */}
       {deleteTarget && (
         <ConfirmModal
-          nombre={deleteTarget.nombre}
+           name={deleteTarget. name}
           loading={deleting}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}

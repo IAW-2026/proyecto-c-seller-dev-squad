@@ -7,14 +7,14 @@ export default async function NewProductPage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
-  const vendedor = await prisma.vendedor.findUnique({ where: { clerkUserId: userId } });
-  if (!vendedor) redirect("/sign-in");
+  const seller= await prisma.seller.findUnique({ where: { clerkUserId: userId } });
+  if (!seller) redirect("/onboarding");
 
   return (
     <div className="products-page">
       <header className="products-topbar">
         <div>
-          <h1 className="dashboard-topbar-title">Nuevo producto</h1>
+          <h1 className="dashboard-topbar-title">Nuevo  product</h1>
           <p className="dashboard-topbar-date">Completá los datos para publicar una zapatilla</p>
         </div>
       </header>

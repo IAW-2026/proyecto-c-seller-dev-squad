@@ -7,9 +7,9 @@ import Navbar from "@/app/components/Navbar";
 
 export default function OnboardingForm() {
   const router = useRouter();
-  const [nombre, setNombre]       = useState("");
+  const [ name, setname]       = useState("");
   const [email, setEmail]         = useState("");
-  const [descripcion, setDesc]    = useState("");
+  const [description, setDescription] = useState("");
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState<string | null>(null);
   const { signOut } = useClerk();
@@ -17,8 +17,8 @@ export default function OnboardingForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!nombre.trim() || !email.trim()) {
-      setError("Nombre y email son obligatorios");
+    if (!name.trim() || !email.trim()) {
+      setError(" name y email son obligatorios");
       return;
     }
     setLoading(true);
@@ -26,7 +26,7 @@ export default function OnboardingForm() {
       const res = await fetch("/api/onboarding", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre, email, descripcion }),
+        body: JSON.stringify({  name, email, description }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -76,12 +76,12 @@ export default function OnboardingForm() {
             <form onSubmit={handleSubmit} noValidate>
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--color-muted)", marginBottom: 6 }}>
-                  Nombre completo <span style={{ color: "var(--color-danger)" }}>*</span>
+                   Nombre completo <span style={{ color: "var(--color-danger)" }}>*</span>
                 </label>
                 <input
                   type="text"
-                  value={nombre}
-                  onChange={e => setNombre(e.target.value)}
+                  value={name}
+                  onChange={e => setname(e.target.value)}
                   placeholder="Tu nombre"
                   style={{ width: "100%", padding: "10px 14px", borderRadius: 9, border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: 13, color: "var(--color-foreground)", outline: "none", boxSizing: "border-box" }}
                 />
@@ -105,8 +105,8 @@ export default function OnboardingForm() {
                   Descripción <span style={{ color: "var(--color-muted)", fontWeight: 400 }}>(opcional)</span>
                 </label>
                 <textarea
-                  value={descripcion}
-                  onChange={e => setDesc(e.target.value)}
+                  value={description}
+                  onChange={e => setDescription(e.target.value)}
                   placeholder="Contá brevemente qué tipo de zapatillas vendés"
                   rows={3}
                   style={{ width: "100%", padding: "10px 14px", borderRadius: 9, border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: 13, color: "var(--color-foreground)", outline: "none", resize: "vertical", fontFamily: "inherit", boxSizing: "border-box" }}

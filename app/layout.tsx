@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ClerkThemeProvider from "./components/ClerkThemeProvider";
 import "./globals.css";
+import Script from "next/script";
 
 
 const geistSans = Geist({
@@ -16,38 +17,50 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Seller App — Marketplace de Zapatillas",
-  description: "Panel de vendedores",
+  description: "Panel de  sellers",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (      
-      <html
-        lang="es"
-        className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+       <html
+      lang="es"
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
+      <body
         suppressHydrationWarning
+        className="min-h-full flex flex-col"
       >
-        <head>
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                (function() {
-                  const saved = localStorage.getItem('theme');
-                  const preferred = saved ||
-                    (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-                  document.documentElement.setAttribute('data-theme', preferred);
-                })();
-              `,
-            }}
-          />
-        </head>
-                <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <Script
+          id="theme-script"
+          strategy="beforeInteractive"
+        >
+          {`
+            (function () {
+              try {
+                const saved = localStorage.getItem("theme");
 
-                  <ClerkThemeProvider>
-                     {children}
-                  </ClerkThemeProvider>
-                </body>
-        </html>
+                const preferred =
+                  saved ||
+                  (window.matchMedia("(prefers-color-scheme: light)").matches
+                    ? "light"
+                    : "dark");
+
+                document.documentElement.setAttribute(
+                  "data-theme",
+                  preferred
+                );
+              } catch (e) {}
+            })();
+          `}
+        </Script>
+
+        <ClerkThemeProvider>
+          {children}
+        </ClerkThemeProvider>
+      </body>
+    </html>
   );
 }

@@ -1,4 +1,4 @@
-// PATCH /api/admin/vendedores/:id — activar/desactivar vendedor (solo admin)
+// PATCH /api/admin/ sellers/:id — activar/desactivar seller(solo admin)
  
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
@@ -12,19 +12,19 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     if (!userId) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
  
     const { id } = await params;
-    const { activo } = await req.json();
-    if (typeof activo !== "boolean") {
-      return NextResponse.json({ error: "El campo activo debe ser booleano" }, { status: 400 });
+    const { active } = await req.json();
+    if (typeof active !== "boolean") {
+      return NextResponse.json({ error: "El campo active debe ser booleano" }, { status: 400 });
     }
  
-    const vendedor = await prisma.vendedor.update({
+    const seller= await prisma.seller.update({
       where: { id: id },
-      data:  { activo },
+      data:  { active },
     });
  
-    return NextResponse.json(vendedor);
+    return NextResponse.json( seller);
   } catch (error) {
-    console.error("[PATCH /api/admin/vendedores/:id]", error);
+    console.error("[PATCH /api/admin/ sellers/:id]", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

@@ -1,5 +1,5 @@
 // app/dashboard/sales/page.tsx
-// Historial de ventas del vendedor con filtros por estado y paginación
+// Historial de ventas del  seller con filtros por estado y paginación
 
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -12,72 +12,74 @@ interface Props {
   searchParams: Promise<{ estado?: string; page?: string; q?: string }>;
 }
 
+type SellStatus = "CONFIRMED" | "PENDING" | "CANCELLED";
+
 export default async function SalesPage({ searchParams }: Props) {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
-  const vendedor = await prisma.vendedor.findUnique({ where: { clerkUserId: userId } });
-  if (!vendedor) redirect("/sign-in");
+  const seller= await prisma.seller.findUnique({ where: { clerkUserId: userId } });
+  if (!seller) redirect("/onboarding");
   const { estado, page: pageParam, q: qParam } = await searchParams;
 
   const page   = Math.max(1, Number(pageParam ?? "1"));
-  const estado_ = estado as "CONFIRMADO" | "PENDIENTE" | "CANCELADO" | undefined;
+  const estadoFiltro = estado as SellStatus | undefined;
   const q      = qParam ?? "";
 
   const where = {
-    vendedorId: vendedor.id,
-    ...(estado_ && { estado: estado_ }),
-    ...(q && { ordenId: { contains: q, mode: "insensitive" as const } }),
+    sellerId:  seller.id,
+    ...(estadoFiltro && { status: estadoFiltro }),
+    ...(q && { orderId: { contains: q, mode: "insensitive" as const } }),
   };
 
   const [total, ventas, resumen] = await Promise.all([
-    prisma.venta.count({ where }),
-    prisma.venta.findMany({
+    prisma.sell.count({ where }),
+    prisma.sell.findMany({
       where,
       include: {
-        detalles: {
-          include: { producto: { select: { nombre: true, marca: true, imagenUrl: true } } },
+        details: {
+          include: {  product: { select: {  name: true, brand: true, image: true } } },
         },
       },
-      orderBy: { creadoEn: "desc" },
+      orderBy: { createdAt: "desc" },
       skip: (page - 1) * PER_PAGE,
       take: PER_PAGE,
     }),
-    prisma.venta.groupBy({
-      by: ["estado"],
-      where: { vendedorId: vendedor.id },
-      _count: { estado: true },
+    prisma.sell.groupBy({
+      by: ["status"],
+      where: { sellerId:  seller.id },
+      _count: { status: true },
       _sum:   { total: true },
     }),
   ]);
 
   const totalPorEstado = Object.fromEntries(
-    resumen.map((r) => [r.estado, { count: r._count.estado, sum: Number(r._sum.total ?? 0) }])
+    resumen.map((r) => [r.status, { count: r._count.status, sum: Number(r._sum.total ?? 0) }])
   ) as Record<string, { count: number; sum: number }>;
 
   return (
     <SalesClient
-      ventas={ventas.map((v) => ({
+      sells={ventas.map((v) => ({
         id:       v.id,
-        ordenId:  v.ordenId,
+        orderId:  v.orderId,
         total:    Number(v.total),
-        estado:   v.estado as "CONFIRMADO" | "PENDIENTE" | "CANCELADO",
-        creadoEn: v.creadoEn.toISOString(),
-        detalles: v.detalles.map((d) => ({
-          cantidad:       d.cantidad,
-          precioUnitario: Number(d.precioUnitario),
-          talle:          d.talle ?? "",
-          producto: {
-            nombre:    d.producto.nombre,
-            marca:     d.producto.marca ?? "",
-            imagenUrl: d.producto.imagenUrl ?? null,
+        status:   v.status as SellStatus,
+        createdAt: v.createdAt.toISOString(),
+        details: v.details.map((d) => ({
+        quantity:       d.quantity,
+        unitPrice: Number(d.unitPrice),
+          size:          d.size ?? "",
+           product: {
+             name:    d. product. name,
+            brand:     d. product.brand ?? "",
+            image: d. product.image ?? null,
           },
         })),
       }))}
       total={total}
       page={page}
       perPage={PER_PAGE}
-      estadoFiltro={estado ?? ""}   
+      estadoFiltro={estadoFiltro ?? ""}   
       q={q}
       resumen={totalPorEstado}
     />

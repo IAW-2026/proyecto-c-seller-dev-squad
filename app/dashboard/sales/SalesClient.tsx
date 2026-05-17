@@ -1,40 +1,49 @@
 "use client";
-// app/dashboard/sales/SalesClient.tsx
 
 import { useState, useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
-type EstadoVenta = "CONFIRMADO" | "PENDIENTE" | "CANCELADO";
-interface DetalleProducto { nombre: string; marca: string; imagenUrl: string | null }
-interface Detalle { cantidad: number; precioUnitario: number; talle: string; producto: DetalleProducto }
-interface Venta { id: string; ordenId: string; total: number; estado: EstadoVenta; creadoEn: string; detalles: Detalle[] }
+type SellStatus = "CONFIRMED" | "PENDING" | "CANCELLED";
+interface ProductInfo {
+  name: string;
+  brand: string;
+  image: string | null;
+}
+
+interface Detail {
+  quantity: number;
+  unitPrice: number;
+  size: string;
+  product: ProductInfo;
+}
+interface Sell { id: string; orderId: string; total: number; status: SellStatus; createdAt: string; details: Detail[] }
 interface Resumen { count: number; sum: number }
-interface Props { ventas: Venta[]; total: number; page: number; perPage: number; estadoFiltro: string; q: string; resumen: Record<string, Resumen> }
+interface Props { sells: Sell[]; total: number; page: number; perPage: number; estadoFiltro: string; q: string; resumen: Record<string, Resumen> }
 
 const fmt = (n: number) => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
 const fmtFecha = (iso: string) => new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
 
-const ESTADO_META: Record<EstadoVenta, { label: string; cls: string; dot: string }> = {
-  CONFIRMADO: { label: "Confirmado", cls: "badge-estado badge-confirmado", dot: "estado-dot dot-success" },
-  PENDIENTE:  { label: "Pendiente",  cls: "badge-estado badge-pendiente",  dot: "estado-dot dot-warning" },
-  CANCELADO:  { label: "Cancelado",  cls: "badge-estado badge-cancelado",  dot: "estado-dot dot-danger"  },
+const ESTADO_META: Record<SellStatus, { label: string; cls: string; dot: string }> = {
+  CONFIRMED: { label: "Confirmado", cls: "badge-estado badge-confirmado", dot: "estado-dot dot-success" },
+  PENDING:  { label: "Pendiente",  cls: "badge-estado badge-pendiente",  dot: "estado-dot dot-warning" },
+  CANCELLED:  { label: "Cancelado",  cls: "badge-estado badge-cancelado",  dot: "estado-dot dot-danger"  },
 };
 
-function EstadoBadge({ estado }: { estado: EstadoVenta }) {
+function EstadoBadge({ estado }: { estado: SellStatus }) {
   const m = ESTADO_META[estado];
   return <span className={m.cls}><span className={m.dot} />{m.label}</span>;
 }
 
-function VentaRow({ v, onCambiarEstado }: { v: Venta; onCambiarEstado: (id: string, estado: EstadoVenta) => void }) {
+function VentaRow({ v, onCambiarEstado }: { v: Sell; onCambiarEstado: (id: string, estado: SellStatus) => void }) {
   const [open, setOpen] = useState(false);
   return (
     <>
       <tr style={{ borderBottom: "1px solid var(--color-border)", cursor: "pointer", background: open ? "var(--color-surface-alt)" : "transparent" }} onClick={() => setOpen(o => !o)}>
-        <td className="td-mono">#{v.ordenId.slice(-8).toUpperCase()}</td>
-        <td className="ventas-td-fecha" style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px" }}>{fmtFecha(v.creadoEn)}</td>
-        <td className="ventas-td-items" style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px" }}>{v.detalles.length} ítem{v.detalles.length !== 1 ? "s" : ""}</td>
+        <td className="td-mono">#{v.orderId.toUpperCase()}</td>
+        <td className="ventas-td-fecha" style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px" }}>{fmtFecha(v.createdAt)}</td>
+        <td className="ventas-td-items" style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px" }}>{v.details.length} ítem{v.details.length !== 1 ? "s" : ""}</td>
         <td className="td-total">{fmt(v.total)}</td>
-        <td style={{ padding: "14px 16px" }}><EstadoBadge estado={v.estado} /></td>
+        <td style={{ padding: "14px 16px" }}><EstadoBadge estado={v.status} /></td>
         <td style={{ padding: "14px 16px", textAlign: "right", fontSize: 12, color: "var(--color-muted)" }}>{open ? "▲" : "▼"}</td>
       </tr>
       {open && (
@@ -43,18 +52,18 @@ function VentaRow({ v, onCambiarEstado }: { v: Venta; onCambiarEstado: (id: stri
             <div className="card" style={{ marginTop: 8 }}>
               <div className="card-body" style={{ borderBottom: "1px solid var(--color-border)" }}>
                 <p style={{ fontSize: 10, fontWeight: 600, color: "var(--color-muted)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 12 }}>Artículos</p>
-                {v.detalles.map((d, i) => (
+                {v.details.map((d, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, flexWrap: "wrap", gap: 8 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                       <div style={{ width: 40, height: 40, borderRadius: 8, background: "var(--color-surface-alt)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
-                        {d.producto.imagenUrl ? <img src={d.producto.imagenUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8 }} /> : "👟"}
+                        {d. product.image ? <img src={d. product.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8 }} /> : "👟"}
                       </div>
                       <div>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>{d.producto.nombre}</p>
-                        <p style={{ fontSize: 12, color: "var(--color-muted)" }}>{d.producto.marca}{d.talle ? ` · Talle ${d.talle}` : ""} · ×{d.cantidad}</p>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>{d. product. name}</p>
+                        <p style={{ fontSize: 12, color: "var(--color-muted)" }}>{d. product.brand}{d.size ? ` · size ${d.size}` : ""} · ×{d.quantity}</p>
                       </div>
                     </div>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>{fmt(d.precioUnitario * d.cantidad)}</p>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>{fmt(d.unitPrice * d.quantity)}</p>
                   </div>
                 ))}
               </div>
@@ -62,7 +71,7 @@ function VentaRow({ v, onCambiarEstado }: { v: Venta; onCambiarEstado: (id: stri
                 <div>
                   <p style={{ fontSize: 10, color: "var(--color-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".06em" }}>Cambiar estado</p>
                   <div style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
-                    {(["CONFIRMADO", "PENDIENTE", "CANCELADO"] as EstadoVenta[]).filter(e => e !== v.estado).map(e => (
+                    {(["CONFIRMED", "PENDING", "CANCELLED"] as SellStatus[]).filter(e => e !== v.status).map(e => (
                       <button key={e} onClick={ev => { ev.stopPropagation(); onCambiarEstado(v.id, e); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: 12, cursor: "pointer", color: "var(--color-foreground)" }}>
                         → {ESTADO_META[e].label}
                       </button>
@@ -82,7 +91,7 @@ function VentaRow({ v, onCambiarEstado }: { v: Venta; onCambiarEstado: (id: stri
   );
 }
 
-export default function SalesClient({ ventas, total, page, perPage, estadoFiltro, q, resumen }: Props) {
+export default function SalesClient({ sells, total, page, perPage, estadoFiltro, q, resumen }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -96,7 +105,7 @@ export default function SalesClient({ ventas, total, page, perPage, estadoFiltro
     startTransition(() => router.push(`${pathname}?${params.toString()}`));
   }
 
-  async function handleCambiarEstado(id: string, estado: EstadoVenta) {
+  async function handleCambiarEstado(id: string, estado: SellStatus) {
     setError(null);
     try {
       const res = await fetch(`/api/sales/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ estado }) });
@@ -106,13 +115,13 @@ export default function SalesClient({ ventas, total, page, perPage, estadoFiltro
   }
 
   const TABS = [
-    { label: "Todas", value: "" }, { label: "Confirmadas", value: "CONFIRMADO" },
-    { label: "Pendientes", value: "PENDIENTE" }, { label: "Canceladas", value: "CANCELADO" },
+    { label: "Todas", value: "" }, { label: "Confirmadas", value: "CONFIRMED" },
+    { label: "Pendientes", value: "PENDING" }, { label: "Canceladas", value: "CANCELLED" },
   ];
 
-  const conf = resumen["CONFIRMADO"] ?? { count: 0, sum: 0 };
-  const pend = resumen["PENDIENTE"]  ?? { count: 0, sum: 0 };
-  const canc = resumen["CANCELADO"]  ?? { count: 0, sum: 0 };
+  const conf = resumen["CONFIRMED"] ?? { count: 0, sum: 0 };
+  const pend = resumen["PENDING"]  ?? { count: 0, sum: 0 };
+  const canc = resumen["CANCELLED"]  ?? { count: 0, sum: 0 };
 
   return (
     <div className="dashboard-page">
@@ -159,7 +168,7 @@ export default function SalesClient({ ventas, total, page, perPage, estadoFiltro
         <div className="card">
           {isPending ? (
             <div style={{ textAlign: "center", padding: "60px 0", color: "var(--color-muted)", fontSize: 14 }}>Cargando…</div>
-          ) : ventas.length === 0 ? (
+          ) : sells.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0" }}><p style={{ fontSize: 15, color: "var(--color-muted)" }}>No hay ventas que coincidan.</p></div>
           ) : (
             <table className="ventas-table">
@@ -174,7 +183,7 @@ export default function SalesClient({ ventas, total, page, perPage, estadoFiltro
                 </tr>
               </thead>
               <tbody>
-                {ventas.map(v => <VentaRow key={v.id} v={v} onCambiarEstado={handleCambiarEstado} />)}
+                {sells.map(v => <VentaRow key={v.id} v={v} onCambiarEstado={handleCambiarEstado} />)}
               </tbody>
             </table>
           )}
@@ -182,10 +191,54 @@ export default function SalesClient({ ventas, total, page, perPage, estadoFiltro
 
         {/* paginación */}
         {totalPages > 1 && (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 24 }}>
-            <button onClick={() => navigate({ page: String(page - 1) })} disabled={page === 1} style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: 13, color: "var(--color-foreground)", cursor: page === 1 ? "not-allowed" : "pointer", opacity: page === 1 ? .4 : 1 }}>← Anterior</button>
-            <span style={{ fontSize: 13, color: "var(--color-muted)" }}>Página {page} de {totalPages}</span>
-            <button onClick={() => navigate({ page: String(page + 1) })} disabled={page === totalPages} style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: 13, color: "var(--color-foreground)", cursor: page === totalPages ? "not-allowed" : "pointer", opacity: page === totalPages ? .4 : 1 }}>Siguiente →</button>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+              marginTop: 24,
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => navigate({ page: String(page - 1) })}
+              disabled={page === 1}
+              style={{
+                padding: "8px 14px",
+                borderRadius: 8,
+                border: "1px solid var(--color-border)",
+                background: "var(--color-surface)",
+                fontSize: 13,
+                color: "var(--color-foreground)",
+                cursor: page === 1 ? "not-allowed" : "pointer",
+                opacity: page === 1 ? 0.4 : 1,
+              }}
+            >
+              ← Anterior
+            </button>
+
+            <span style={{ fontSize: 13, color: "var(--color-muted)" }}>
+              Página {page} de {totalPages}
+            </span>
+
+            <button
+              type="button"
+              onClick={() => navigate({ page: String(page + 1) })}
+              disabled={page === totalPages}
+              style={{
+                padding: "8px 14px",
+                borderRadius: 8,
+                border: "1px solid var(--color-border)",
+                background: "var(--color-surface)",
+                fontSize: 13,
+                color: "var(--color-foreground)",
+                cursor: page === totalPages ? "not-allowed" : "pointer",
+                opacity: page === totalPages ? 0.4 : 1,
+              }}
+            >
+              Siguiente →
+            </button>
           </div>
         )}
       </div>

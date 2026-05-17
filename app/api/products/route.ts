@@ -1,5 +1,5 @@
-// GET  /api/products  — lista productos (consumido por Buyer App)
-// POST /api/products  — crea producto (consumido por el panel del vendedor)
+// GET  /api/products  — lista  products (consumido por Buyer App)
+// POST /api/products  — crea  product (consumido por el panel del  seller)
  
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
@@ -7,50 +7,50 @@ import { prisma } from "@/lib/prisma";
  
 // ── GET /api/products ──────────────────────────────────────
 // Público: la Buyer App lo consume sin autenticación de usuario.
-// Soporta ?q=, ?marca=, ?page=, ?limit=
+// Soporta ?q=, ?brand=, ?page=, ?limit=
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl;
     const q      = searchParams.get("q")     ?? "";
-    const marca  = searchParams.get("marca")  ?? "";
+    const brand  = searchParams.get("brand")  ?? "";
     const page   = Math.max(1, Number(searchParams.get("page")  ?? "1"));
     const limit  = Math.min(50, Math.max(1, Number(searchParams.get("limit") ?? "20")));
  
     const where = {
-      activo: true,
-      ...(marca && { marca: { equals: marca, mode: "insensitive" as const } }),
+      active: true,
+      ...(brand && { brand: { equals: brand, mode: "insensitive" as const } }),
       ...(q && {
         OR: [
-          { nombre:      { contains: q, mode: "insensitive" as const } },
-          { marca:       { contains: q, mode: "insensitive" as const } },
-          { descripcion: { contains: q, mode: "insensitive" as const } },
+          {  name:      { contains: q, mode: "insensitive" as const } },
+          { brand:       { contains: q, mode: "insensitive" as const } },
+          { description: { contains: q, mode: "insensitive" as const } },
         ],
       }),
     };
  
-    const [total, productos] = await Promise.all([
-      prisma.producto.count({ where }),
-      prisma.producto.findMany({
+    const [total,  products] = await Promise.all([
+      prisma.product.count({ where }),
+      prisma.product.findMany({
         where,
         select: {
           id:          true,
-          nombre:      true,
-          descripcion: true,
-          precio:      true,
+          name:      true,
+          description: true,
+          price:      true,
           stock:       true,
-          marca:       true,
-          imagenUrl:   true,
-          vendedorId:  true,
-          talles: { select: { talle: true, stock: true } },
+          brand:       true,
+          image:   true,
+          sellerId:  true,
+          sizes: { select: { size: true, stock: true } },
         },
-        orderBy: { creadoEn: "desc" },
+        orderBy: { createdAt: "desc" },
         skip:  (page - 1) * limit,
         take:  limit,
       }),
     ]);
  
     return NextResponse.json({
-      data:  productos.map((p) => ({ ...p, precio: Number(p.precio) })),
+      data:   products.map((p) => ({ ...p, price: Number(p.price) })),
       meta:  { total, page, limit, totalPages: Math.ceil(total / limit) },
     });
   } catch (error) {
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
 }
  
 // ── POST /api/products ─────────────────────────────────────
-// Privado: solo vendedores autenticados con Clerk.
+// Privado: solo  sellers autenticados con Clerk.
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
@@ -68,40 +68,41 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
  
-    const vendedor = await prisma.vendedor.findUnique({ where: { clerkUserId: userId } });
-    if (!vendedor) {
+    const seller= await prisma.seller.findUnique({ where: { clerkUserId: userId } });
+    if (!seller) {
       return NextResponse.json({ error: "Vendedor no encontrado" }, { status: 403 });
     }
  
     const body = await req.json();
-    const { nombre, descripcion, precio, stock, marca, imagenUrl, talles } = body;
+    const {  name, description, price, stock, brand, category, image, sizes } = body;
  
     // validación server-side
-    if (!nombre?.trim()) {
-      return NextResponse.json({ error: "El nombre es obligatorio" }, { status: 400 });
+    if (! name?.trim()) {
+      return NextResponse.json({ error: "El  nombre es obligatorio" }, { status: 400 });
     }
-    if (!precio || Number(precio) <= 0) {
+    if (!price || Number(price) <= 0) {
       return NextResponse.json({ error: "El precio debe ser mayor a 0" }, { status: 400 });
     }
  
-    const producto = await prisma.producto.create({
+    const  product = await prisma.product.create({
       data: {
-        nombre:      nombre.trim(),
-        descripcion: descripcion?.trim() ?? null,
-        precio:      Number(precio),
+         name:       name.trim(),
+        description: description?.trim() ?? "",
+        price:      Number(price),
         stock:       Number(stock ?? 0),
-        marca:       marca ?? null,
-        imagenUrl:   imagenUrl ?? null,
-        vendedorId:  vendedor.id,
-        talles: talles?.length
-          ? { create: talles.map((t: { talle: string; stock: number }) => ({ talle: t.talle, stock: t.stock })) }
+        brand:       brand ?? null,
+        category:    category ?? null,
+        image:      image ?? null,
+        sellerId:   seller.id,
+        sizes: sizes?.length
+          ? { create: sizes.map((t: { size: string; stock: number }) => ({ size: t.size, stock: t.stock })) }
           : undefined,
       },
-      include: { talles: true },
+      include: { sizes: true },
     });
  
     return NextResponse.json(
-      { ...producto, precio: Number(producto.precio) },
+      { ... product, price: Number( product.price) },
       { status: 201 }
     );
   } catch (error) {

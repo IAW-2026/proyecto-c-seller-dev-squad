@@ -10,14 +10,14 @@ export default async function EditProductPage({ params }: Props) {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
  
-  const vendedor = await prisma.vendedor.findUnique({ where: { clerkUserId: userId } });
-  if (!vendedor) redirect("/sign-in");
+  const seller= await prisma.seller.findUnique({ where: { clerkUserId: userId } });
+  if (!seller) redirect("/onboarding");
  
-  const producto = await prisma.producto.findFirst({
-    where: { id, vendedorId: vendedor.id },
-    include: { talles: true },
+  const  product = await prisma.product.findFirst({
+    where: { id, sellerId:  seller.id },
+    include: { sizes: true },
   });
-  if (!producto) notFound();
+  if (! product) notFound();
  
   return (
     <div className="bg-wash" style={{ minHeight: "100vh" }}>
@@ -26,23 +26,24 @@ export default async function EditProductPage({ params }: Props) {
           Editar producto
         </h1>
         <p className="text-faint" style={{ fontSize: 11, marginTop: 2 }}>
-          {producto.nombre}
+          { product. name}
         </p>
       </header>
  
       <div style={{ padding: "28px", maxWidth: 700, margin: "0 auto" }}>
         <ProductForm
           modo="editar"
-          productoInicial={{
-            id:          producto.id,
-            nombre:      producto.nombre,
-            descripcion: producto.descripcion ?? "",
-            precio:      Number(producto.precio),
-            stock:       producto.stock,
-            marca:       producto.marca ?? "",
-            imagenUrl:   producto.imagenUrl ?? "",
-            activo:      producto.activo,
-            talles:      producto.talles.map((t) => ({ talle: t.talle, stock: t.stock })),
+           productInicial={{
+            id:           product.id,
+            name:       product. name,
+            description:  product.description ?? "",
+            price:      Number( product.price),
+            stock:        product.stock,
+            brand:        product.brand ?? "",
+            category: product.category ?? "",
+            image:    product.image ?? "",
+            active:       product.active,
+            sizes:       product.sizes.map((t) => ({ size: t.size, stock: t.stock })),
           }}
         />
       </div>

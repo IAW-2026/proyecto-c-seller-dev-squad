@@ -1,26 +1,36 @@
 "use client";
-// app/dashboard/products/ProductForm.tsx
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 // ── tipos ──────────────────────────────────────────────────
-interface TalleItem { talle: string; stock: number }
+interface sizeItem { size: string; stock: number }
 
-interface ProductoInicial {
-  id: string; nombre: string; descripcion: string; precio: number;
-  stock: number; marca: string; imagenUrl: string;
-  activo: boolean; talles: TalleItem[];
+interface  productInicial {
+  id: string;  name: string; description: string; price: number;
+  stock: number; brand: string; category:string; image: string;
+  active: boolean; sizes: sizeItem[];
 }
 
 interface Props {
   modo: "crear" | "editar";
-  productoInicial?: ProductoInicial;
+   productInicial?:  productInicial;
 }
 
-const TALLES_BASE = ["35","36","37","38","39","40","41","42","43","44","45"];
-const MARCAS = ["Adidas","Converse","New Balance","Nike","Puma","Reebok","Vans","Otra"];
-
+const sizes_BASE = ["35","36","37","38","39","40","41","42","43","44","45"];
+const brandS = ["Adidas","Converse","New Balance","Nike","Puma","Reebok","Vans","Otra"];
+const categories = [
+  "Running",
+  "Basket",
+  "Skate",
+  "Lifestyle",
+  "Training",
+  "Fútbol",
+  "Outdoor",
+  "Casual",
+  "Moda",
+  "Otra",
+];
 // ── helpers de UI ──────────────────────────────────────────
 function Label({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
@@ -71,46 +81,47 @@ function Card({ children, title }: { children: React.ReactNode; title: string })
 }
 
 // ── componente principal ───────────────────────────────────
-export default function ProductForm({ modo, productoInicial }: Props) {
+export default function ProductForm({ modo,  productInicial }: Props) {
   const router = useRouter();
 
-  const [nombre,      setNombre]      = useState(productoInicial?.nombre      ?? "");
-  const [descripcion, setDescripcion] = useState(productoInicial?.descripcion ?? "");
-  const [precio,      setPrecio]      = useState(productoInicial?.precio?.toString() ?? "");
-  const [stock,       setStock]       = useState(productoInicial?.stock?.toString()  ?? "0");
-  const [marca,       setMarca]       = useState(productoInicial?.marca       ?? "");
-  const [imagenUrl,   setImagenUrl]   = useState(productoInicial?.imagenUrl   ?? "");
-  const [activo,      setActivo]      = useState(productoInicial?.activo      ?? true);
-  const [talles,      setTalles]      = useState<TalleItem[]>(productoInicial?.talles ?? []);
-
+  const [ name,      setname]      = useState( productInicial?. name      ?? "");
+  const [description, setdescription] = useState( productInicial?.description ?? "");
+  const [price,      setprice]      = useState( productInicial?.price?.toString() ?? "");
+  const [stock,       setStock]       = useState( productInicial?.stock?.toString()  ?? "0");
+  const [brand,       setbrand]       = useState( productInicial?.brand       ?? "");
+  const [image,   setimage]   = useState( productInicial?.image   ?? "");
+  const [active,      setactive]      = useState( productInicial?.active      ?? true);
+  const [sizes,      setsizes]      = useState<sizeItem[]>( productInicial?.sizes ?? []);
+  const [category, setCategory] = useState(productInicial?.category ?? "");
   const [errors,   setErrors]   = useState<Record<string, string>>({});
   const [loading,  setLoading]  = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [success,  setSuccess]  = useState(false);
 
-  // ── talles ─────────────────────────────────────────────
-  function toggleTalle(t: string) {
-    setTalles((prev) => {
-      const existe = prev.find((x) => x.talle === t);
-      if (existe) return prev.filter((x) => x.talle !== t);
-      return [...prev, { talle: t, stock: 1 }].sort((a, b) => Number(a.talle) - Number(b.talle));
+  // ── sizes ─────────────────────────────────────────────
+  function togglesize(t: string) {
+    setsizes((prev) => {
+      const existe = prev.find((x) => x.size === t);
+      if (existe) return prev.filter((x) => x.size !== t);
+      return [...prev, { size: t, stock: 1 }].sort((a, b) => Number(a.size) - Number(b.size));
     });
   }
 
-  function setStockTalle(t: string, value: string) {
-    setTalles((prev) =>
-      prev.map((x) => x.talle === t ? { ...x, stock: Math.max(0, Number(value) || 0) } : x)
+  function setStocksize(t: string, value: string) {
+    setsizes((prev) =>
+      prev.map((x) => x.size === t ? { ...x, stock: Math.max(0, Number(value) || 0) } : x)
     );
   }
 
   // ── validación ─────────────────────────────────────────
   function validate() {
     const e: Record<string, string> = {};
-    if (!nombre.trim())                 e.nombre    = "El nombre es obligatorio";
-    if (!marca)                         e.marca     = "Seleccioná una marca";
-    if (!precio || Number(precio) <= 0) e.precio    = "Ingresá un precio válido mayor a 0";
+    if (! name.trim())                 e. name    = "El nombre es obligatorio";
+    if (!brand)                         e.brand     = "Seleccioná una marca";
+    if (!category) e.category = "Seleccioná una categoría";
+    if (!price || Number(price) <= 0) e.price    = "Ingresá un precio válido mayor a 0";
     if (Number(stock) < 0)              e.stock     = "El stock no puede ser negativo";
-    if (imagenUrl && !/^https?:\/\/.+/.test(imagenUrl)) e.imagenUrl = "La URL debe empezar con http:// o https://";
+    if (image && !/^https?:\/\/.+/.test(image)) e.image = "La URL debe empezar con http:// o https://";
     return e;
   }
 
@@ -125,19 +136,20 @@ export default function ProductForm({ modo, productoInicial }: Props) {
     setErrors({});
 
     const body = {
-      nombre:      nombre.trim(),
-      descripcion: descripcion.trim() || null,
-      precio:      Number(precio),
+       name:       name.trim(),
+      description: description.trim() || null,
+      price:      Number(price),
       stock:       Number(stock),
-      marca:       marca || null,
-      imagenUrl:   imagenUrl.trim() || null,
-      activo,
-      talles,
+      brand:       brand || null,
+      category:    category || null,
+      image:   image.trim() || null,
+      active,
+      sizes,
     };
 
     setLoading(true);
     try {
-      const url    = modo === "crear" ? "/api/products" : `/api/products/${productoInicial!.id}`;
+      const url    = modo === "crear" ? "/api/products" : `/api/products/${ productInicial!.id}`;
       const method = modo === "crear" ? "POST" : "PATCH";
 
       const res = await fetch(url, {
@@ -148,7 +160,7 @@ export default function ProductForm({ modo, productoInicial }: Props) {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "Ocurrió un error al guardar el producto");
+        throw new Error(data.error ?? "Ocurrió un error al guardar el  producto");
       }
 
       setSuccess(true);
@@ -169,41 +181,60 @@ export default function ProductForm({ modo, productoInicial }: Props) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
 
           <div style={{ gridColumn: "1 / -1" }}>
-            <Label required>Nombre</Label>
+            <Label required> name</Label>
             <Input
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              value={ name}
+              onChange={(e) => setname(e.target.value)}
               placeholder="Ej: Nike Air Max 90"
-              error={errors.nombre}
+              error={errors. name}
             />
           </div>
 
           <div>
             <Label required>Marca</Label>
-            <Select value={marca} onChange={(e) => setMarca(e.target.value)} error={errors.marca}>
-              <option value="">Seleccioná una marca</option>
-              {MARCAS.map((m) => <option key={m} value={m}>{m}</option>)}
+            <Select value={brand} onChange={(e) => setbrand(e.target.value)} error={errors.brand}>
+              <option value="">Seleccioná una brand</option>
+              {brandS.map((m) => <option key={m} value={m}>{m}</option>)}
             </Select>
           </div>
+          <div>
+ 
+ 
+          <Label required>Categoría</Label>
+
+            <Select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            error={errors.category}
+          >
+            <option value="">Seleccioná una categoría</option>
+
+            {categories.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </Select>
+        </div>
 
           <div>
             <Label required>Precio (ARS)</Label>
             <Input
               type="number" min="0" step="0.01"
-              value={precio}
-              onChange={(e) => setPrecio(e.target.value)}
+              value={price}
+              onChange={(e) => setprice(e.target.value)}
               placeholder="89999"
-              error={errors.precio}
+              error={errors.price}
             />
           </div>
 
           <div style={{ gridColumn: "1 / -1" }}>
             <Label>Descripción</Label>
             <Textarea
-              value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
-              placeholder="Describí el producto: materiales, características, etc."
-              error={errors.descripcion}
+              value={description}
+              onChange={(e) => setdescription(e.target.value)}
+              placeholder="Describí el  producto: materiales, características, etc."
+              error={errors.description}
             />
           </div>
 
@@ -211,14 +242,14 @@ export default function ProductForm({ modo, productoInicial }: Props) {
             <Label>URL de imagen</Label>
             <Input
               type="url"
-              value={imagenUrl}
-              onChange={(e) => setImagenUrl(e.target.value)}
+              value={image}
+              onChange={(e) => setimage(e.target.value)}
               placeholder="https://..."
-              error={errors.imagenUrl}
+              error={errors.image}
             />
-            {imagenUrl && /^https?:\/\/.+/.test(imagenUrl) && (
+            {image && /^https?:\/\/.+/.test(image) && (
               <div style={{ marginTop: 10, width: 80, height: 80, borderRadius: 10, overflow: "hidden" }} className="border-soft" >
-                <img src={imagenUrl} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <img src={image} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               </div>
             )}
           </div>
@@ -226,8 +257,8 @@ export default function ProductForm({ modo, productoInicial }: Props) {
         </div>
       </Card>
 
-      {/* ── Stock y talles ── */}
-      <Card title="Stock y talles">
+      {/* ── Stock y sizes ── */}
+      <Card title="Stock y sizes">
 
         <div style={{ marginBottom: 18 }}>
           <Label>Stock general</Label>
@@ -247,18 +278,18 @@ export default function ProductForm({ modo, productoInicial }: Props) {
         <div>
           <Label>Talles disponibles</Label>
           <p className="text-faint" style={{ fontSize: 11, marginBottom: 12 }}>
-            Seleccioná los talles y ajustá el stock por talle.
+            Seleccioná los talles y ajustá el stock por talla.
           </p>
 
-          {/* selector de talles */}
+          {/* selector de sizes */}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
-            {TALLES_BASE.map((t) => {
-              const seleccionado = talles.some((x) => x.talle === t);
+            {sizes_BASE.map((t) => {
+              const seleccionado = sizes.some((x) => x.size === t);
               return (
                 <button
                   key={t} type="button"
-                  onClick={() => toggleTalle(t)}
-                  className={`talle-toggle ${seleccionado ? "selected" : ""}`}
+                  onClick={() => togglesize(t)}
+                  className={`size-toggle ${seleccionado ? "selected" : ""}`}
                 >
                   {t}
                 </button>
@@ -266,17 +297,17 @@ export default function ProductForm({ modo, productoInicial }: Props) {
             })}
           </div>
 
-          {/* stock por talle */}
-          {talles.length > 0 && (
+          {/* stock por size */}
+          {sizes.length > 0 && (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10 }}>
-              {talles.map(({ talle, stock: st }) => (
-                <div key={talle} className="bg-wash" style={{ display: "flex", alignItems: "center", gap: 10, borderRadius: 9, padding: "10px 14px" }}>
+              {sizes.map(({ size, stock: st }) => (
+                <div key={size} className="bg-wash" style={{ display: "flex", alignItems: "center", gap: 10, borderRadius: 9, padding: "10px 14px" }}>
                   <span className="text-strong" style={{ fontSize: 13, fontWeight: 600, minWidth: 28 }}>
-                    {talle}
+                    {size}
                   </span>
                   <input
                     type="number" min="0" value={st}
-                    onChange={(e) => setStockTalle(talle, e.target.value)}
+                    onChange={(e) => setStocksize(size, e.target.value)}
                     className="field"
                     style={{ width: "100%", padding: "6px 10px" }}
                   />
@@ -294,17 +325,17 @@ export default function ProductForm({ modo, productoInicial }: Props) {
         <Card title="Visibilidad">
           <label style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
             <div
-              onClick={() => setActivo((v) => !v)}
-              className={`toggle-track ${activo ? "on" : ""}`}
+              onClick={() => setactive((v) => !v)}
+              className={`toggle-track ${active ? "on" : ""}`}
             >
               <div className="toggle-thumb" />
             </div>
             <div>
               <p className="text-strong" style={{ fontSize: 13, fontWeight: 600 }}>
-                {activo ? "Producto activo" : "Producto inactivo"}
+                {active ? " Producto activo" : " Producto inactivo"}
               </p>
               <p className="text-faint" style={{ fontSize: 11, marginTop: 2 }}>
-                {activo ? "Visible en el catálogo para compradores" : "No aparece en el catálogo"}
+                {active ? "Visible en el catálogo para compradores" : "No aparece en el catálogo"}
               </p>
             </div>
           </label>
@@ -313,7 +344,7 @@ export default function ProductForm({ modo, productoInicial }: Props) {
 
       {/* ── Feedback de API ── */}
       {apiError && <div className="banner-error">⚠️ {apiError}</div>}
-      {success  && <div className="banner-success">✓ Producto guardado. Redirigiendo…</div>}
+      {success  && <div className="banner-success">✓  product guardado. Redirigiendo…</div>}
 
       {/* ── Acciones ── */}
       <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
@@ -321,7 +352,7 @@ export default function ProductForm({ modo, productoInicial }: Props) {
           Cancelar
         </button>
         <button type="submit" disabled={loading} className="btn-accent" style={{ opacity: loading ? 0.8 : 1 }}>
-          {loading ? "Guardando…" : modo === "crear" ? "Publicar producto" : "Guardar cambios"}
+          {loading ? "Guardando…" : modo === "crear" ? "Publicar  product" : "Guardar cambios"}
         </button>
       </div>
 

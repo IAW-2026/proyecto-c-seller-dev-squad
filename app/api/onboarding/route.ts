@@ -7,26 +7,27 @@ export async function POST(req: NextRequest) {
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-    const { nombre, email, descripcion } = await req.json();
+    const {  name, email, description } = await req.json();
 
-    if (!nombre?.trim() || !email?.trim()) {
-      return NextResponse.json({ error: "Nombre y email son obligatorios" }, { status: 400 });
+    if (! name?.trim() || !email?.trim()) {
+      return NextResponse.json({ error: " name y email son obligatorios" }, { status: 400 });
     }
 
     // verificar que no exista ya
-    const existente = await prisma.vendedor.findUnique({ where: { clerkUserId: userId } });
-    if (existente) return NextResponse.json({ error: "Ya tenés un perfil de vendedor" }, { status: 409 });
+    const existente = await prisma.seller.findUnique({ where: { clerkUserId: userId } });
+    if (existente) return NextResponse.json({ error: "Ya tenés un perfil de  seller" }, { status: 409 });
 
-    const vendedor = await prisma.vendedor.create({
+    const seller= await prisma.seller.create({
       data: {
         clerkUserId: userId,
-        nombre:      nombre.trim(),
+         name:       name.trim(),
         email:       email.trim(),
-        descripcion: descripcion?.trim() ?? null,
+        description: description?.trim(),
+         avatarUrl: "",
       },
     });
 
-    return NextResponse.json(vendedor, { status: 201 });
+    return NextResponse.json( seller, { status: 201 });
   } catch (error) {
     console.error("[POST /api/onboarding]", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });

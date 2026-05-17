@@ -12,11 +12,11 @@ export async function GET() {
     );
   }
 
-  const vendedor = await prisma.vendedor.findUnique({
+  const seller= await prisma.seller.findUnique({
     where: {
       clerkUserId: userId,
     },
   });
 
-  return NextResponse.json(vendedor);
+  return NextResponse.json( seller);
 }

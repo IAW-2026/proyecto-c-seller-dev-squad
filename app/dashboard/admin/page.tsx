@@ -7,75 +7,86 @@ export default async function AdminPage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
  
-  const vendedor = await prisma.vendedor.findUnique({ where: { clerkUserId: userId } });
-  if (!vendedor) redirect("/onboarding");
+  const seller= await prisma.seller.findUnique({ where: { clerkUserId: userId } });
+  if (!seller) redirect("/onboarding");
  
-  const [vendedores, productos, ventas] = await Promise.all([
-    prisma.vendedor.findMany({
-      orderBy: { creadoEn: "desc" },
+  const [ sellers,  products, sells] = await Promise.all([
+    prisma.seller.findMany({
+      orderBy: { createdAt: "desc" },
       include: {
-        _count: { select: { productos: true, ventas: true } },
+        _count: { select: {  products: true, sells: true } },
       },
     }),
-    prisma.producto.findMany({
-      orderBy: { creadoEn: "desc" },
+    prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
       include: {
-        vendedor: { select: { nombre: true } },
-        _count: { select: { detallesVenta: true } },
+         seller: { select: {  name: true } },
+        _count: { select: { sellDetails: true } },
       },
     }),
-    prisma.venta.findMany({
-      orderBy: { creadoEn: "desc" },
+    prisma.sell.findMany({
+      orderBy: { createdAt: "desc" },
       include: {
-        vendedor: { select: { nombre: true } },
-        _count: { select: { detalles: true } },
+         seller: { select: {  name: true } },
+        _count: { select: { details: true } },
       },
       take: 50,
     }),
   ]);
  
-  const stats = {
-    totalVendedores:       vendedores.length,
-    vendedoresActivos:     vendedores.filter(v => v.activo).length,
-    totalProductos:        productos.length,
-    productosActivos:      productos.filter(p => p.activo).length,
-    totalVentas:           ventas.length,
-    ventasConfirmadas:     ventas.filter(v => v.estado === "CONFIRMADO").length,
-    ingresoTotal:          ventas.filter(v => v.estado === "CONFIRMADO").reduce((a, v) => a + Number(v.total), 0),
+    const stats = {
+    totalSellers: sellers.length,
+    activeSellers: sellers.filter((s) => s.active).length,
+
+    totalProducts: products.length,
+    activeProducts: products.filter((p) => p.active).length,
+
+    totalSells: sells.length,
+
+    confirmedSells: sells.filter(
+      (s) => s.status === "CONFIRMED"
+    ).length,
+
+    totalRevenue: sells
+      .filter((s) => s.status === "CONFIRMED")
+      .reduce((acc, s) => acc + Number(s.total), 0),
   };
- 
+
   return (
     <AdminClient
       stats={stats}
-      vendedores={vendedores.map(v => ({
-        id:          v.id,
-        nombre:      v.nombre,
-        email:       v.email,
-        descripcion: v.descripcion ?? "",
-        activo:      v.activo,
-        creadoEn:    v.creadoEn.toISOString(),
-        totalProductos: v._count.productos,
-        totalVentas:    v._count.ventas,
+      sellers={sellers.map((s) => ({
+        id: s.id,
+        name: s.name,
+        email: s.email,
+        description: s.description ?? "",
+        active: s.active,
+        createdAt: s.createdAt.toISOString(),
+        totalProducts: s._count.products,
+        totalSells: s._count.sells,
       }))}
-      productos={productos.map(p => ({
-        id:        p.id,
-        nombre:    p.nombre,
-        marca:     p.marca ?? "",
-        precio:    Number(p.precio),
-        stock:     p.stock,
-        activo:    p.activo,
-        creadoEn:  p.creadoEn.toISOString(),
-        vendedor:  p.vendedor.nombre,
-        totalVentas: p._count.detallesVenta,
+
+      products={products.map((p) => ({
+        id: p.id,
+        name: p.name,
+        brand: p.brand,
+        price: Number(p.price),
+        stock: p.stock,
+        active: p.active,
+        image:     p.image,
+        createdAt: p.createdAt.toISOString(),
+        seller: p.seller.name,
+        totalSells: p._count.sellDetails,
       }))}
-      ventas={ventas.map(v => ({
-        id:        v.id,
-        ordenId:   v.ordenId,
-        total:     Number(v.total),
-        estado:    v.estado as "CONFIRMADO" | "PENDIENTE" | "CANCELADO",
-        creadoEn:  v.creadoEn.toISOString(),
-        vendedor:  v.vendedor.nombre,
-        items:     v._count.detalles,
+
+      sells={sells.map((s) => ({
+        id: s.id,
+        orderId: s.orderId,
+        total: Number(s.total),
+        status: s.status,
+        createdAt: s.createdAt.toISOString(),
+        seller: s.seller.name,
+        items: s._count.details,
       }))}
     />
   );

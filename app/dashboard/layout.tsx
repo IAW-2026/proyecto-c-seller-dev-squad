@@ -15,14 +15,14 @@ export default async function DashboardLayout({
     redirect("/sign-in");
   }
 
-  const vendedor = await prisma.vendedor.findUnique({
+  const seller= await prisma.seller.findUnique({
     where: {
       clerkUserId: userId,
     },
   });
 
-  // Usuario autenticado pero sin vendedor
-  if (!vendedor) {
+  // Usuario autenticado pero sin  seller
+  if (!seller) {
     redirect("/onboarding");
   }
 

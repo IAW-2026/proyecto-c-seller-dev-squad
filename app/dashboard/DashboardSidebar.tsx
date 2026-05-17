@@ -23,7 +23,7 @@ export default function DashboardSidebar({ open, onClose }: Props) {
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
   const { user } = useUser();
-  const [nombre, setNombre] = useState("Mi cuenta");
+  const [ name, setname] = useState("Mi cuenta");
 
   useEffect(() => {
    async function loadUser() {
@@ -34,8 +34,8 @@ export default function DashboardSidebar({ open, onClose }: Props) {
 
         const data = await res.json();
 
-         if (data?.nombre) {
-           setNombre(data.nombre);
+         if (data?. name) {
+           setname(data. name);
          }
         } catch (err) {
       console.error(err);
@@ -112,8 +112,8 @@ export default function DashboardSidebar({ open, onClose }: Props) {
         <div className="sidebar-user">
           <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
           <div>
-            <p className="sidebar-user-name">{nombre}</p>
-            <p className="sidebar-user-role">Vendedor</p>
+            <p className="sidebar-user-name">{name}</p>
+            <p className="sidebar-user-role"> seller</p>
           </div>
         </div>
       </aside>

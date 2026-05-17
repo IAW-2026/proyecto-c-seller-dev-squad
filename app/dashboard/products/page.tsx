@@ -1,4 +1,4 @@
-// Lista de productos del vendedor con búsqueda y paginación por URL
+// Lista de  products del  seller con búsqueda y paginación por URL
 
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -15,35 +15,35 @@ export default async function ProductsPage({ searchParams }: Props) {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
-  const vendedor = await prisma.vendedor.findUnique({ where: { clerkUserId: userId } });
-  if (!vendedor) redirect("/sign-in");
+  const seller= await prisma.seller.findUnique({ where: { clerkUserId: userId } });
+  if (!seller) redirect("/onboarding");
 
   const { q: rawQ, page: rawPage, estado } = await searchParams; 
 
   const q    = rawQ ?? "";
   const page = Math.max(1, Number(rawPage ?? "1"));
-  const activo = estado === "inactivo" ? false
-               : estado === "activo"   ? true
+  const active = estado === "inactive" ? false
+               : estado === "active"   ? true
                : undefined;
 
   const where = {
-    vendedorId: vendedor.id,
-    ...(activo !== undefined && { activo }),
+    sellerId:  seller.id,
+    ...(active !== undefined && { active }),
     ...(q && {
       OR: [
-        { nombre:      { contains: q, mode: "insensitive" as const } },
-        { marca:       { contains: q, mode: "insensitive" as const } },
-        { descripcion: { contains: q, mode: "insensitive" as const } },
+        {  name:      { contains: q, mode: "insensitive" as const } },
+        { brand:       { contains: q, mode: "insensitive" as const } },
+        { description: { contains: q, mode: "insensitive" as const } },
       ],
     }),
   };
 
-  const [total, productos] = await Promise.all([
-    prisma.producto.count({ where }),
-    prisma.producto.findMany({
+  const [total,  products] = await Promise.all([
+    prisma.product.count({ where }),
+    prisma.product.findMany({
       where,
-      include: { talles: true },
-      orderBy: { creadoEn: "desc" },
+      include: { sizes: true },
+      orderBy: { createdAt: "desc" },
       skip: (page - 1) * PER_PAGE,
       take: PER_PAGE,
     }),
@@ -51,16 +51,16 @@ export default async function ProductsPage({ searchParams }: Props) {
 
   return (
     <ProductsClient
-      productos={productos.map((p) => ({
+       products={ products.map((p) => ({
         id:        p.id,
-        nombre:    p.nombre,
-        marca:     p.marca ?? "",
-        precio:    Number(p.precio),
+         name:    p. name,
+        brand:     p.brand,
+        price:    Number(p.price),
         stock:     p.stock,
-        activo:    p.activo,
-        imagenUrl: p.imagenUrl ?? null,
-        talles:    p.talles.map((t) => ({ talle: t.talle, stock: t.stock })),
-        creadoEn:  p.creadoEn.toISOString(),
+        active:    p.active,
+        image:     p.image,
+        sizes:    p.sizes.map((t) => ({ size: t.size, stock: t.stock })),
+        createdAt:  p.createdAt.toISOString(),
       }))}
       total={total}
       page={page}

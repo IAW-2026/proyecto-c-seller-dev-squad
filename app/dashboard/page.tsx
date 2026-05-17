@@ -1,4 +1,4 @@
-// Panel de administración del vendedor — Seller App
+// Panel de administración del  seller — Seller App
 
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -11,67 +11,67 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
 
-  const vendedor = await prisma.vendedor.findFirst({
+  const seller= await prisma.seller.findFirst({
     where: {
       clerkUserId: userId,
     },
   });
 
-  if (!vendedor) redirect("/onboarding"); 
-  const [totalProductos, totalVentas, ventas, productosBajoStock] = await Promise.all([
-    prisma.producto.count({
+  if (!seller) redirect("/onboarding"); 
+  const [total_products, total_Ventas, ventas,  productosBajoStock] = await Promise.all([
+    prisma.product.count({
       where: {
-        vendedorId: vendedor.id,
-        activo: true,
+        sellerId:  seller.id,
+        active: true,
       },
     }),
 
-    prisma.venta.count({
-      where: {  vendedorId: vendedor.id, },
+    prisma.sell.count({
+      where: {  sellerId:  seller.id, },
     }),
 
-    prisma.venta.findMany({
-      where: {vendedorId: vendedor.id,},
+    prisma.sell.findMany({
+      where: {sellerId:  seller.id,},
       include: {
-        detalles: {
+        details: {
           include: {
-            producto: true,
+             product: true,
           },
         },
       },
-      orderBy: { creadoEn: "desc",},
+      orderBy: { createdAt: "desc",},
       take: 50,
     }),
 
-    prisma.producto.findMany({
+    prisma.product.findMany({
      where: {
-       vendedorId: vendedor.id,
-       activo: true,
+       sellerId:  seller.id,
+       active: true,
       },
-      include: {talles: true},
+      include: {sizes: true},
       take: 5,
       orderBy: { stock: "asc" },
    }),
 ]);
 
   const ingresoTotal = ventas
-    .filter((v) => v.estado === "CONFIRMADO")
+    .filter((v) => v.status=== "CONFIRMED")
     .reduce((acc, v) => acc + Number(v.total), 0);
 
   const ventasPorEstado = {
-    CONFIRMADO: ventas.filter((v) => v.estado === "CONFIRMADO").length,
+    CONFIRMED: ventas.filter((v) => v.status=== "CONFIRMED").length,
 
-    PENDIENTE: ventas.filter((v) => v.estado === "PENDIENTE").length,
+    PENDING: ventas.filter((v) => v.status=== "PENDING").length,
 
-    CANCELADO: ventas.filter((v) => v.estado === "CANCELADO").length,
+    CANCELLED: ventas.filter((v) => v.status=== "CANCELLED").length,
   };
 
-  const stockReal = (p: typeof productosBajoStock[0]) =>
-  p.talles.length > 0
-    ? p.talles.reduce((a, t) => a + t.stock, 0)
+  const stockReal = (p: typeof  productosBajoStock[0]) =>
+  p.sizes.length > 0
+    ? p.sizes.reduce((a, t) => a + t.stock, 0)
     : p.stock;
 
-  const productosBajoStockFiltrados = productosBajoStock
+  const  productosBajoStockFiltrados =  productosBajoStock
   .map((p) => ({ ...p, stockCalculado: stockReal(p) }))
   .filter((p) => p.stockCalculado <= 3)
   .sort((a, b) => a.stockCalculado - b.stockCalculado)
@@ -79,32 +79,32 @@ export default async function DashboardPage() {
 
   return (
     <DashboardClient
-      vendedor={{
-        nombre: vendedor.nombre,
-        email: vendedor.email,
+       seller={{
+         name:  seller. name,
+        email:  seller.email,
       }}
 
       metricas={{
-        totalProductos,
-        totalVentas,
+        total_products,
+        total_Ventas,
         ingresoTotal,
         ventasPorEstado,
       }}
 
       ventasRecientes={ventas.slice(0, 10).map((v) => ({
         id: v.id,
-        ordenId: v.ordenId,
+        orderId: v.orderId,
         total: Number(v.total),
-        estado: v.estado,
-        creadoEn: v.creadoEn.toISOString(),
-        items: v.detalles.length,
+        status: v.status,
+        createdAt: v.createdAt.toISOString(),
+        items: v.details.length,
       }))}
 
-      productosBajoStock={productosBajoStockFiltrados.map((p) => ({
+       productosBajoStock={ productosBajoStockFiltrados.map((p) => ({
         id: p.id,
-        nombre: p.nombre,
+         name: p. name,
         stock: p.stockCalculado,
-        marca: p.marca ?? "",
+        brand: p.brand ?? "",
       }))}
     />
   );

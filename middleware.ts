@@ -20,7 +20,7 @@ export default clerkMiddleware(async (auth, req) => {
               ?? (sessionClaims as any)?.role
               ?? null;
 
-    // solo vendedores y admins pueden entrar al dashboard
+    // solo  sellers y admins pueden entrar al dashboard
     const rolesPermitidos = ["seller", "admin"];
     if (role && !rolesPermitidos.includes(role)) {
       return NextResponse.redirect(new URL("/unauthorized", req.url));

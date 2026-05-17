@@ -4,7 +4,7 @@
 //
 // Ejecutar con:
 //   npx prisma db seed
-import { PrismaClient, EstadoVenta } from "../app/generated/prisma/client";
+import { PrismaClient, SellStatus } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import * as dotenv from "dotenv";
 
@@ -18,281 +18,319 @@ const prisma = new PrismaClient({ adapter });
 // de las cuentas que uses para la demo. Los podés obtener
 // desde el dashboard de Clerk → Users.
 // ------------------------------------------------------------
-const VENDEDORES_SEED = [
+const SELLERS_SEED = [
   {
-    clerkUserId: "user_3DRefS5HUbAbLrWg5SM0lJ4tHAf", 
-    nombre: "Brian Crowley",
-    email: "brian@seller.com",
-    descripcion: "Vendedor oficial de zapatillas de colección y running.",
-    avatarUrl: null,
+    clerkUserId: "user_3Dmn3iLVDbiXRlsplW5U4D8Nikn",
+    name: "Brian Crowley",
+    email: "crowley.brian2004@gmail.com",
+    description: "Official seller of running and collector sneakers.",
+    avatarUrl: "",
   },
   {
     clerkUserId: "user_seller_002",
-    nombre: "Lady Gaga",
-    email: "Gaga@seller.com",
-    descripcion: "Especialista en zapatillas urbanas y skate.",
-    avatarUrl: null,
+    name: "Bart Simpson",
+    email: "simpson.bart@gmail.com",
+    description: "Urban and skate sneakers specialist.",
+    avatarUrl: "",
   },
   {
     clerkUserId: "user_admin_001",
-    nombre: "Administrador",
+    name: "Administrator",
     email: "admin@marketplace.com",
-    descripcion: "Cuenta de administración del sistema.",
-    avatarUrl: null,
+    description: "Marketplace admin account.",
+    avatarUrl: "",
   },
 ];
 
-const PRODUCTOS_SEED = [
-  // --- Brian ---
+const PRODUCTS_SEED = [
+  // ----- Brian -----
   {
-    vendedorIdx: 0,
-    nombre: "Nike Air Max 90",
-    descripcion:
-      "Clásico de los 90. Amortiguación Air visible, suela de goma, capellada de cuero y mesh.",
-    precio: 89999,
-    marca: "Nike",
-    imagenUrl: null,
-    talles: [
-      { talle: "40", stock: 3 },
-      { talle: "41", stock: 5 },
-      { talle: "42", stock: 2 },
-      { talle: "43", stock: 1 },
+    sellerIdx: 0,
+    name: "Nike Air Max 90",
+    description:
+      "Classic 90s sneaker with visible Air cushioning and premium leather upper.",
+    price: 89999,
+    brand: "Nike",
+    category: "Running",
+    image: "https://newsport.vtexassets.com/arquivos/ids/8456341-800-auto?v=637629136499930000&width=800&height=auto&aspect=true",      
+    colors: ["Black", "White", "Red"],
+    
+    sizes: [
+      { size: "40", stock: 3 },
+      { size: "41", stock: 5 },
+      { size: "42", stock: 2 },
+      { size: "43", stock: 1 },
     ],
   },
   {
-    vendedorIdx: 0,
-    nombre: "Adidas Ultraboost 23",
-    descripcion:
-      "Running de alto rendimiento. Entresuela BOOST, upper Primeknit, torsion system.",
-    precio: 124999,
-    marca: "Adidas",
-    imagenUrl: null,
-        talles: [
-      { talle: "39", stock: 4 },
-      { talle: "40", stock: 6 },
-      { talle: "41", stock: 3 },
-      { talle: "42", stock: 2 },
+    sellerIdx: 0,
+    name: "Adidas Ultraboost 23",
+    description:
+      "High-performance running shoe with BOOST cushioning and Primeknit upper.",
+    price: 124999,
+    brand: "Adidas",
+    category: "Running",
+    image: "https://http2.mlstatic.com/D_Q_NP_664895-MLU79062099952_092024-O.webp",
+    
+    colors: ["Black", "White", "Red"],
+    
+    sizes: [
+      { size: "39", stock: 4 },
+      { size: "40", stock: 6 },
+      { size: "41", stock: 3 },
+      { size: "42", stock: 2 },
     ],
   },
   {
-    vendedorIdx: 0,
-    nombre: "New Balance 574",
-    descripcion:
-      "Ícono del streetwear. Suela ENCAP, parte superior de gamuza y mesh. Muy versátil.",
-    precio: 67500,
-    marca: "New Balance",
-    imagenUrl: null,
-    talles: [
-      { talle: "41", stock: 8 },
-      { talle: "42", stock: 5 },
-      { talle: "43", stock: 3 },
+    sellerIdx: 0,
+    name: "New Balance 574",
+    description:
+      "Streetwear icon featuring ENCAP cushioning and suede mesh construction.",
+    price: 67500,
+    brand: "New Balance",
+    category: "Lifestyle",
+    image: "https://cdn-images.farfetch-contents.com/20/20/64/43/20206443_50082436_600.jpg",
+    
+    colors: ["Black", "White", "Red"],
+
+    sizes: [
+      { size: "41", stock: 8 },
+      { size: "42", stock: 5 },
+      { size: "43", stock: 3 },
     ],
   },
   {
-    vendedorIdx: 0,
-    nombre: "Jordan 1 Retro High OG",
-    descripcion:
-      "El original de 1985 re-editado. Cuero premium, suela de goma vulcanizada.",
-    precio: 189999,
-    marca: "Nike",
-    imagenUrl: null,
-    talles: [
-      { talle: "40", stock: 1 },
-      { talle: "41", stock: 2 },
-      { talle: "42", stock: 1 },
+    sellerIdx: 0,
+    name: "Jordan 1 Retro High OG",
+    description:
+      "The iconic 1985 silhouette reimagined with premium leather construction.",
+    price: 189999,
+    brand: "Nike",
+    category: "Basketball",
+    image: "https://i5.walmartimages.com/seo/Men-s-Air-Jordan-1-Retro-High-OG-Reimagined-Patent-Bred-Banned-2021-555088-063_f7999591-55f6-4344-bbaf-1735f4a6fd55.85d5cc8382de5b2a41fb421fb6b93965.jpeg",
+    colors: ["Black", "White", "Red"],
+    sizes: [
+      { size: "40", stock: 1 },
+      { size: "41", stock: 2 },
+      { size: "42", stock: 1 },
     ],
   },
-  // --- Marta ---
+
+  // ----- Bart -----
   {
-    vendedorIdx: 1,
-    nombre: "Vans Old Skool",
-    descripcion:
-      "El clásico del skate desde 1977. Capellada de lona y gamuza, suela Waffle.",
-    precio: 52000,
-    marca: "Vans",
-    imagenUrl: null,
-    talles: [
-      { talle: "37", stock: 6 },
-      { talle: "38", stock: 4 },
-      { talle: "39", stock: 7 },
-      { talle: "40", stock: 5 },
-    ],
-  },
-  {
-    vendedorIdx: 1,
-    nombre: "Converse Chuck Taylor All Star",
-    descripcion:
-      "El eterno básico. Capellada de lona, puntera de goma, suela vulcanizada.",
-    precio: 41999,
-    marca: "Converse",
-    imagenUrl: null,
-    talles: [
-      { talle: "36", stock: 5 },
-      { talle: "37", stock: 8 },
-      { talle: "38", stock: 6 },
-      { talle: "39", stock: 4 },
-      { talle: "40", stock: 3 },
+    sellerIdx: 1,
+    name: "Vans Old Skool",
+    description:
+      "Classic skate shoe with suede and canvas upper and waffle outsole.",
+    price: 52000,
+    brand: "Vans",
+    category: "Skate",
+    image: "https://cdn-images.farfetch-contents.com/25/25/55/72/25255572_55353963_1000.jpg",
+    colors: ["Red", "Blue", "White"],
+    sizes: [
+      { size: "37", stock: 6 },
+      { size: "38", stock: 4 },
+      { size: "39", stock: 7 },
+      { size: "40", stock: 5 },
     ],
   },
   {
-    vendedorIdx: 1,
-    nombre: "Puma Suede Classic",
-    descripcion:
-      "Diseño limpio de gamuza. Icónico desde los años 60, favorito del streetwear.",
-    precio: 58500,
-    marca: "Puma",
-    imagenUrl: null,
-    talles: [
-      { talle: "40", stock: 4 },
-      { talle: "41", stock: 3 },
-      { talle: "42", stock: 2 },
+    sellerIdx: 1,
+    name: "Converse Chuck Taylor All Star",
+    description:
+      "Timeless canvas sneaker with vulcanized rubber sole and iconic silhouette.",
+    price: 41999,
+    brand: "Converse",
+    category: "Lifestyle",
+    image: "https://sportline.vtexassets.com/arquivos/ids/1757802/026030000156996_1.jpg?v=639009455740600000",
+    
+    colors: ["Red", "Blue", "White"],
+
+      sizes: [
+      { size: "36", stock: 5 },
+      { size: "37", stock: 8 },
+      { size: "38", stock: 6 },
+      { size: "39", stock: 4 },
+      { size: "40", stock: 3 },
     ],
   },
   {
-    vendedorIdx: 1,
-    nombre: "Reebok Classic Leather",
-    descripcion:
-      "Cuero suave con suela de goma de baja densidad. Cómodo para todo el día.",
-    precio: 63000,
-    marca: "Reebok",
-    imagenUrl: null,
-    talles: [
-      { talle: "38", stock: 2 },
-      { talle: "39", stock: 5 },
-      { talle: "40", stock: 4 },
-      { talle: "41", stock: 3 },
+    sellerIdx: 1,
+    name: "Puma Suede Classic",
+    description:
+      "Legendary suede sneaker loved by generations of streetwear enthusiasts.",
+    price: 58500,
+    brand: "Puma",
+    category: "Lifestyle",
+    image: "https://production.cdn.vaypol.com/variants/s56mrdxb731turq2yej3bvp5vshr/e82c8d6171dd25bb538f2e7263b5bc7dfc6a79352d85923074be76df53fbc6f4",
+   
+     colors: ["Red", "Blue", "White"],
+
+     sizes: [
+      { size: "40", stock: 4 },
+      { size: "41", stock: 3 },
+      { size: "42", stock: 2 },
+    ],
+  },
+  {
+    sellerIdx: 1,
+    name: "Reebok Classic Leather",
+    description:
+      "Soft leather sneaker with lightweight cushioning for all-day comfort.",
+    price: 63000,
+    brand: "Reebok",
+    category: "Lifestyle",
+    image: "https://acdn-us.mitiendanube.com/stores/004/951/039/products/whatsapp-image-2025-08-28-at-10-36-30-f1230cb833f0048bf117563883514097-480-0.webp",
+    
+    colors: ["Red", "Blue", "White"],
+
+    sizes: [
+      { size: "38", stock: 2 },
+      { size: "39", stock: 5 },
+      { size: "40", stock: 4 },
+      { size: "41", stock: 3 },
     ],
   },
 ];
 
-// Ventas con distintos estados para que el panel se vea completo
-const VENTAS_SEED = [
+const SELLS_SEED = [
   {
-    vendedorIdx: 0,
-    ordenId: "orden-buyer-uuid-001",
+    sellerIdx: 0,
+    orderId: "buyer-order-001",
     total: 89999,
-    estado: EstadoVenta.CONFIRMADO,
-    detalles: [{ productoIdx: 0, cantidad: 1, precioUnitario: 89999, talle: "42" }],
+    status: SellStatus.CONFIRMED,
+    details: [
+      {
+        productIdx: 0,
+        quantity: 1,
+        unitPrice: 89999,
+        size: "42",
+      },
+    ],
   },
   {
-    vendedorIdx: 0,
-    ordenId: "orden-buyer-uuid-002",
+    sellerIdx: 0,
+    orderId: "buyer-order-002",
     total: 249998,
-    estado: EstadoVenta.CONFIRMADO,
-    detalles: [
-      { productoIdx: 1, cantidad: 1, precioUnitario: 124999, talle: "41" },
-      { productoIdx: 2, cantidad: 1, precioUnitario: 67500,  talle: "41" },
-      // redondeado al total
+    status: SellStatus.CONFIRMED,
+    details: [
+      {
+        productIdx: 1,
+        quantity: 1,
+        unitPrice: 124999,
+        size: "41",
+      },
+      {
+        productIdx: 2,
+        quantity: 1,
+        unitPrice: 67500,
+        size: "41",
+      },
     ],
   },
   {
-    vendedorIdx: 0,
-    ordenId: "orden-buyer-uuid-003",
+    sellerIdx: 0,
+    orderId: "buyer-order-003",
     total: 189999,
-    estado: EstadoVenta.PENDIENTE,
-    detalles: [{ productoIdx: 3, cantidad: 1, precioUnitario: 189999, talle: "40" }],
-  },
-  {
-    vendedorIdx: 0,
-    ordenId: "orden-buyer-uuid-004",
-    total: 89999,
-    estado: EstadoVenta.CANCELADO,
-    detalles: [{ productoIdx: 0, cantidad: 1, precioUnitario: 89999, talle: "43" }],
-  },
-  {
-    vendedorIdx: 1,
-    ordenId: "orden-buyer-uuid-005",
-    total: 93999,
-    estado: EstadoVenta.CONFIRMADO,
-    detalles: [
-      { productoIdx: 4, cantidad: 1, precioUnitario: 52000, talle: "38" },
-      { productoIdx: 5, cantidad: 1, precioUnitario: 41999, talle: "38" },
+    status: SellStatus.PENDING,
+    details: [
+      {
+        productIdx: 3,
+        quantity: 1,
+        unitPrice: 189999,
+        size: "40",
+      },
     ],
   },
   {
-    vendedorIdx: 1,
-    ordenId: "orden-buyer-uuid-006",
-    total: 58500,
-    estado: EstadoVenta.CONFIRMADO,
-    detalles: [{ productoIdx: 6, cantidad: 1, precioUnitario: 58500, talle: "40" }],
-  },
-  {
-    vendedorIdx: 1,
-    ordenId: "orden-buyer-uuid-007",
-    total: 126000,
-    estado: EstadoVenta.PENDIENTE,
-    detalles: [{ productoIdx: 7, cantidad: 2, precioUnitario: 63000, talle: "39" }],
+    sellerIdx: 1,
+    orderId: "buyer-order-004",
+    total: 93999,
+    status: SellStatus.CONFIRMED,
+    details: [
+      {
+        productIdx: 4,
+        quantity: 1,
+        unitPrice: 52000,
+        size: "38",
+      },
+      {
+        productIdx: 5,
+        quantity: 1,
+        unitPrice: 41999,
+        size: "38",
+      },
+    ],
   },
 ];
-
-// ------------------------------------------------------------
 
 async function main() {
-  console.log("🌱 Iniciando seed...");
+  console.log("🌱 Starting seed...");
 
-  // Limpiar en orden (respetando FK)
-  await prisma.detalleVenta.deleteMany();
-  await prisma.venta.deleteMany();
-  await prisma.productoTalle.deleteMany();
-  await prisma.producto.deleteMany();
-  await prisma.vendedor.deleteMany();
+  // Delete respecting FK order
+  await prisma.sellDetail.deleteMany();
+  await prisma.sell.deleteMany();
+  await prisma.productSize.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.seller.deleteMany();
 
-  // 1. Vendedores
-  const vendedores = await Promise.all(
-    VENDEDORES_SEED.map((v) =>
-      prisma.vendedor.create({ data: v })
+  // Sellers
+  const sellers = await Promise.all(
+    SELLERS_SEED.map((seller) =>
+      prisma.seller.create({
+        data: seller,
+      })
     )
   );
-  console.log(`✅ ${vendedores.length} vendedores creados`);
 
-  // 2. Productos + talles
-  const productos = await Promise.all(
-    PRODUCTOS_SEED.map(({ vendedorIdx, talles, ...data }) =>
-      prisma.producto.create({
+  console.log(`✅ ${sellers.length} sellers created`);
+
+  // Products + sizes
+  const products = await Promise.all(
+    PRODUCTS_SEED.map(({ sellerIdx, sizes, ...data }) =>
+      prisma.product.create({
         data: {
           ...data,
-          precio: data.precio,
-          vendedorId: vendedores[vendedorIdx].id,
-          talles: {
-            create: talles,
+          sellerId: sellers[sellerIdx].id,
+          sizes: {
+            create: sizes,
           },
         },
       })
     )
   );
-  console.log(`✅ ${productos.length} productos creados`);
 
-  // 3. Ventas + detalles
-  const ventas = await Promise.all(
-    VENTAS_SEED.map(({ vendedorIdx, detalles, ...data }) =>
-      prisma.venta.create({
+  console.log(`✅ ${products.length} products created`);
+
+  // Sells + details
+  const sells = await Promise.all(
+    SELLS_SEED.map(({ sellerIdx, details, ...data }) =>
+      prisma.sell.create({
         data: {
           ...data,
-          vendedorId: vendedores[vendedorIdx].id,
-          detalles: {
-            create: detalles.map(({ productoIdx, ...d }) => ({
-              ...d,
-              productoId: productos[productoIdx].id,
+          sellerId: sellers[sellerIdx].id,
+          details: {
+            create: details.map(({ productIdx, ...detail }) => ({
+              ...detail,
+              productId: products[productIdx].id,
             })),
           },
         },
       })
     )
   );
-  console.log(`✅ ${ventas.length} ventas creadas`);
 
-  console.log("\n🎉 Seed completado. Credenciales de acceso:");
-  console.log("   Vendedor 1 → brian@seller.com");
-  console.log("   Vendedor 2 → marta@seller.com");
-  console.log("   Admin      → admin@marketplace.com");
-  console.log(
-    "\n   ⚠️  Recordá actualizar los clerkUserId en seed.ts con los IDs reales de tu dashboard de Clerk."
-  );
+  console.log(`✅ ${sells.length} sells created`);
+
+  console.log("🎉 Seed completed successfully");
 }
 
 main()
   .catch((e) => {
-    console.error("❌ Error en el seed:", e);
+    console.error("❌ Seed error:", e);
     process.exit(1);
   })
-  .finally(() => prisma.$disconnect());
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
+

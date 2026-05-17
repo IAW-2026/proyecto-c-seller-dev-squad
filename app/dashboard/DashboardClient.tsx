@@ -2,29 +2,29 @@
 
 import Link from "next/link";
 
-type EstadoVenta = "CONFIRMADO" | "PENDIENTE" | "CANCELADO";
+type SellStatus = "CONFIRMED" | "PENDING" | "CANCELLED";
 
 interface Props {
-  vendedor: { nombre: string; email: string };
+   seller: {  name: string; email: string };
   metricas: {
-    totalProductos: number;
-    totalVentas: number;
+    total_products: number;
+    total_Ventas: number;
     ingresoTotal: number;
-    ventasPorEstado: Record<EstadoVenta, number>;
+    ventasPorEstado: Record<SellStatus, number>;
   };
   ventasRecientes: {
     id: string;
-    ordenId: string;
+    orderId: string;
     total: number;
-    estado: EstadoVenta;
-    creadoEn: string;
+    status: SellStatus;
+    createdAt: string;
     items: number;
   }[];
-  productosBajoStock: {
+   productosBajoStock: {
     id: string;
-    nombre: string;
+    name: string;
     stock: number;
-    marca: string;
+    brand: string;
   }[];
 }
 
@@ -34,11 +34,11 @@ const fmt = (n: number) =>
 const fmtFecha = (iso: string) =>
   new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
 
-function EstadoBadge({ estado }: { estado: EstadoVenta }) {
+function EstadoBadge({ estado }: { estado: SellStatus }) {
   const map = {
-    CONFIRMADO: { cls: "badge-estado badge-confirmado", dot: "dot-success", label: "Confirmado" },
-    PENDIENTE:  { cls: "badge-estado badge-pendiente",  dot: "dot-warning", label: "Pendiente"  },
-    CANCELADO:  { cls: "badge-estado badge-cancelado",  dot: "dot-danger",  label: "Cancelado"  },
+    CONFIRMED: { cls: "badge-estado badge-confirmado", dot: "dot-success", label: "Confirmado" },
+    PENDING:  { cls: "badge-estado badge-pendiente",  dot: "dot-warning", label: "Pendiente"  },
+    CANCELLED:  { cls: "badge-estado badge-cancelado",  dot: "dot-danger",  label: "Cancelado"  },
   };
   const m = map[estado];
   return (
@@ -49,13 +49,13 @@ function EstadoBadge({ estado }: { estado: EstadoVenta }) {
   );
 }
 
-export default function DashboardClient({ vendedor, metricas, ventasRecientes, productosBajoStock }: Props) {
-  const { totalProductos, totalVentas, ingresoTotal, ventasPorEstado } = metricas;
+export default function DashboardClient({  seller, metricas, ventasRecientes,  productosBajoStock }: Props) {
+  const { total_products, total_Ventas, ingresoTotal, ventasPorEstado } = metricas;
 
   const totalEstados = Object.values(ventasPorEstado).reduce((a, b) => a + b, 0) || 1;
-  const pctConf = (ventasPorEstado.CONFIRMADO / totalEstados) * 100;
-  const pctPend = (ventasPorEstado.PENDIENTE  / totalEstados) * 100;
-  const pctCanc = (ventasPorEstado.CANCELADO  / totalEstados) * 100;
+  const pctConf = (ventasPorEstado.CONFIRMED / totalEstados) * 100;
+  const pctPend = (ventasPorEstado.PENDING  / totalEstados) * 100;
+  const pctCanc = (ventasPorEstado.CANCELLED  / totalEstados) * 100;
 
   return (
     <div className="dashboard-page">
@@ -78,9 +78,9 @@ export default function DashboardClient({ vendedor, metricas, ventasRecientes, p
   <section className="kpi-grid">
     {[
       { label: "Ingresos confirmados", value: fmt(ingresoTotal),   sub: "en ventas completadas" },
-      { label: "Ventas totales",        value: totalVentas,         sub: `${ventasPorEstado.PENDIENTE} pendientes` },
-      { label: "Productos activos",     value: totalProductos,      sub: "en catálogo" },
-      { label: "Tasa de confirmación",  value: `${totalVentas ? Math.round((ventasPorEstado.CONFIRMADO / totalVentas) * 100) : 0}%`, sub: "ventas confirmadas" },
+      { label: "Ventas totales",        value: total_Ventas,         sub: `${ventasPorEstado.PENDING} pendientes` },
+      { label: "Productos activos",     value: total_products,      sub: "en catálogo" },
+      { label: "Tasa de confirmación",  value: `${total_Ventas ? Math.round((ventasPorEstado.CONFIRMED / total_Ventas) * 100) : 0}%`, sub: "ventas confirmadas" },
     ].map((kpi) => (
       <div key={kpi.label} className="kpi-card">
         <p className="kpi-label">{kpi.label}</p>
@@ -106,15 +106,15 @@ export default function DashboardClient({ vendedor, metricas, ventasRecientes, p
         </div>
         <div className="estado-row">
           <div className="estado-dot-label"><span className="estado-dot dot-success" />Confirmado</div>
-          <strong>{ventasPorEstado.CONFIRMADO}</strong>
+          <strong>{ventasPorEstado.CONFIRMED}</strong>
         </div>
         <div className="estado-row">
           <div className="estado-dot-label"><span className="estado-dot dot-warning" />Pendiente</div>
-          <strong>{ventasPorEstado.PENDIENTE}</strong>
+          <strong>{ventasPorEstado.PENDING}</strong>
         </div>
         <div className="estado-row">
           <div className="estado-dot-label"><span className="estado-dot dot-danger" />Cancelado</div>
-          <strong>{ventasPorEstado.CANCELADO}</strong>
+          <strong>{ventasPorEstado.CANCELLED}</strong>
         </div>
       </div>
     </div>
@@ -134,13 +134,13 @@ export default function DashboardClient({ vendedor, metricas, ventasRecientes, p
           </tr>
         </thead>
         <tbody>
-          {productosBajoStock.length === 0 ? (
+          { productosBajoStock.length === 0 ? (
             <tr><td colSpan={3} style={{ textAlign: "center", color: "var(--color-muted)", padding: "32px 0" }}>Sin alertas de stock 🎉</td></tr>
           ) : (
-            productosBajoStock.map((p) => (
+             productosBajoStock.map((p) => (
               <tr key={p.id}>
-                <td style={{ fontSize: 13, fontWeight: 500, color: "var(--color-foreground)", padding: "14px 20px" }}>{p.nombre}</td>
-                <td style={{ fontSize: 13, color: "var(--color-muted)", padding: "14px 16px" }}>{p.marca}</td>
+                <td style={{ fontSize: 13, fontWeight: 500, color: "var(--color-foreground)", padding: "14px 20px" }}>{p. name}</td>
+                <td style={{ fontSize: 13, color: "var(--color-muted)", padding: "14px 16px" }}>{p.brand}</td>
                 <td style={{ padding: "14px 20px" }}>
                   <span className={p.stock === 0 ? "badge-stock-empty" : "badge-stock-warn"}>
                     {p.stock === 0 ? "Sin stock" : `${p.stock} u.`}
@@ -174,11 +174,11 @@ export default function DashboardClient({ vendedor, metricas, ventasRecientes, p
         ) : (
           ventasRecientes.map((v) => (
             <tr key={v.id}>
-              <td className="td-mono">#{v.ordenId.slice(-8).toUpperCase()}</td>
-              <td style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px" }}>{fmtFecha(v.creadoEn)}</td>
+              <td className="td-mono">#{v.orderId.toUpperCase()}</td>
+              <td style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px" }}>{fmtFecha(v.createdAt)}</td>
               <td style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px" }}>{v.items} ítem{v.items !== 1 ? "s" : ""}</td>
               <td className="td-total">{fmt(v.total)}</td>
-              <td style={{ padding: "14px 16px" }}><EstadoBadge estado={v.estado} /></td>
+              <td style={{ padding: "14px 16px" }}><EstadoBadge estado={v.status} /></td>
             </tr>
           ))
         )}
