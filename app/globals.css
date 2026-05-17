@@ -105,6 +105,7 @@
 .navbar-logo {
   width: 160px;
   height: auto;
+    display: block;
 }
 
 .mobile-logo {

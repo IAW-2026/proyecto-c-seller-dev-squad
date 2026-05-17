@@ -10,25 +10,17 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <Link href="/">
-        <div className="navbar-logo-wrapper">
-          <Image
-            src="/logo-light.webp"
-            alt="ZapasYa"
-            width={966}
-            height={326}
-            priority
-            className="navbar-logo logo-light"
-          />
-
-          <Image
-            src="/logo-dark.webp"
-            alt="ZapasYa"
-            width={966}
-            height={326}
-            priority
-            className="navbar-logo logo-dark"
-          />
-        </div>
+        <Image
+          src={theme === "dark"
+            ? "/logo-dark.webp"
+            : "/logo-light.webp"}
+          alt="ZapasYa"
+          width={966}
+          height={326}
+          priority
+          loading="eager"
+          className="navbar-logo"
+        />
   </Link>
       <button  onClick={toggleTheme}
         aria-label="Toggle theme"
