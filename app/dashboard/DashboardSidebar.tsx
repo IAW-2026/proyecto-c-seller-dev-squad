@@ -5,7 +5,6 @@ import { UserButton, useUser } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useTheme } from "@/hooks/useTheme";
-import { useEffect, useState } from "react";
 
 const NAV = [
   { href: "/dashboard",          label: "Resumen",   icon: "▦" },
@@ -23,27 +22,8 @@ export default function DashboardSidebar({ open, onClose }: Props) {
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
   const { user } = useUser();
-  const [ name, setname] = useState("Mi cuenta");
+  const name = user?.fullName || "Mi cuenta";
 
-  useEffect(() => {
-   async function loadUser() {
-      try {
-        const res = await fetch("/api/me");
-
-       if (!res.ok) return;
-
-        const data = await res.json();
-
-         if (data?. name) {
-           setname(data. name);
-         }
-        } catch (err) {
-      console.error(err);
-     }
-    }
-
-  loadUser();
-}, []);
   return (
     <>
       {/* overlay mobile */}
@@ -53,27 +33,17 @@ export default function DashboardSidebar({ open, onClose }: Props) {
       />
 
       <aside className={`sidebar ${open ? "open" : ""}`}>
-        <div className="sidebar-logo">
-         <Image
-           src="/logo-light.png"
-           alt="Seller"
-           width={1000}
-           height={360}
-           className="logo-light"
-           priority
-           style={{ width: "100%", height: "auto" }}         
-            />
+       <div className="sidebar-logo">
           <Image
-            src="/logo-dark.png"
+            src={theme === "dark" ? "/logo-dark.webp" : "/logo-light.webp"}
             alt="Seller"
-            width={1000}
-            height={360}
-            className="logo-dark"
+            width={966}
+            height={326}
             priority
-            style={{ width: "100%", height: "auto" }}
-           />
+            loading="eager"
+            className="sidebar-logo-image"
+          />
         </div>
-
         <nav className="sidebar-nav">
           {NAV.map((item) => {
             const active = pathname === item.href ||
