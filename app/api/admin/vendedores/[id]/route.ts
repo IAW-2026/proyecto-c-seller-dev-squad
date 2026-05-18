@@ -1,4 +1,4 @@
-// PATCH /api/admin/ sellers/:id — activar/desactivar seller(solo admin)
+// PATCH /api/admin/vendedores/:id — activar/desactivar seller(solo admin)
  
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
@@ -24,7 +24,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
  
     return NextResponse.json( seller);
   } catch (error) {
-    console.error("[PATCH /api/admin/ sellers/:id]", error);
+    console.error("[PATCH /api/admin/vendedores/:id]", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

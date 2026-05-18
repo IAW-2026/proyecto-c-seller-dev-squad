@@ -5,7 +5,7 @@ import Link from "next/link";
  
 // ── tipos ──────────────────────────────────────────────────
 type SellStatus = "CONFIRMED" | "PENDING" | "CANCELLED";
-type Tab = "resumen" | " sellers" | " products" | "ventas";
+type Tab = "resumen" | "sellers" | "products" | "ventas";
  
 interface Seller{
   id: string;  name: string; email: string; description: string | null;
@@ -85,7 +85,7 @@ export default function AdminClient({ stats,  sellers,  products, sells }: Props
       onConfirm: async () => {
         setLoading(true);
         try {
-          await fetch(`/api/admin/ sellers/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ active: !active }) });
+          await fetch(`/api/admin/vendedores/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ active: !active }) });
           setConfirm(null);
           startTransition(() => router.refresh());
         } catch { setError("Error al actualizar el  seller"); }
@@ -108,23 +108,43 @@ export default function AdminClient({ stats,  sellers,  products, sells }: Props
       },
     });
   }
+
+function ConfirmModal({ mensaje, onConfirm, onCancel, loading }: {
+  mensaje: string; loading: boolean; onConfirm: () => void; onCancel: () => void;
+}) {
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,.5)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={onCancel}>
+      <div className="card" style={{ padding: "28px 32px", width: 360 }} onClick={e => e.stopPropagation()}>
+        <p className="dashboard-topbar-title" style={{ marginBottom: 8 }}>¿Confirmar acción?</p>
+        <p className="text-muted" style={{ fontSize: 13, marginBottom: 24, lineHeight: 1.5 }}>{mensaje}</p>
+        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+          <button type="button" onClick={onCancel} className="btn-outline">Cancelar</button>
+          <button type="button" onClick={onConfirm} disabled={loading} className="btn-outline"
+            style={{ opacity: loading ? .7 : 1, color: "var(--color-danger)", borderColor: "var(--color-danger)" }}>
+            {loading ? "Procesando…" : "Confirmar"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
  
   const TABS: { id: Tab; label: string; icon: string }[] = [
     { id: "resumen",    label: "Resumen",    icon: "▦" },
-    { id: " sellers", label: "Vendedores", icon: "◉" },
-    { id: " products",  label: "Productos",  icon: "◫" },
+    { id: "sellers", label: "Vendedores", icon: "◉" },
+    { id: "products",  label: "Productos",  icon: "◫" },
     { id: "ventas",     label: "Ventas",     icon: "◈" },
   ];
  
   const  sellersFiltrados =  sellers.filter(v =>
-    v. name.toLowerCase().includes(searchV.toLowerCase()) ||
+    v.name.toLowerCase().includes(searchV.toLowerCase()) ||
     v.email.toLowerCase().includes(searchV.toLowerCase())
   );
  
   const  productsFiltrados =  products.filter(p =>
-    p. name.toLowerCase().includes(searchP.toLowerCase()) ||
+    p.name.toLowerCase().includes(searchP.toLowerCase()) ||
     p.brand.toLowerCase().includes(searchP.toLowerCase()) ||
-    p. seller.toLowerCase().includes(searchP.toLowerCase())
+    p.seller.toLowerCase().includes(searchP.toLowerCase())
   );
  
   return (
@@ -135,36 +155,35 @@ export default function AdminClient({ stats,  sellers,  products, sells }: Props
           <p className="dashboard-topbar-date">Panel de control del sistema</p>
         </div>
       </header>
- 
+
       <div className="dashboard-content">
- 
+
         {error && (
-          <div style={{ background: "var(--color-danger-light)", color: "var(--color-danger)", padding: "10px 16px", borderRadius: 9, fontSize: 13, marginBottom: 16 }} 
-          onClick={() => setError(null)}>
+          <div className="banner-error" style={{ cursor: "pointer" }} onClick={() => setError(null)}>
             {error} — click para cerrar
           </div>
         )}
- 
+
         {/* tabs */}
-        <div style={{ display: "flex", gap: 4, background: "var(--color-surface)", padding: 4, borderRadius: 12, border: "1px solid var(--color-border)", marginBottom: 24, flexWrap: "wrap" }}>
+        <div className="admin-tabs">
           {TABS.map(t => (
             <button type="button" key={t.id} onClick={() => setTab(t.id)}
-              style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 16px", borderRadius: 9, fontSize: 13, cursor: "pointer", border: "none", fontWeight: tab === t.id ? 600 : 400, background: tab === t.id ? "var(--color-primary)" : "transparent", color: tab === t.id ? "var(--color-on-primary)" : "var(--color-muted)", transition: "all .15s" }}>
+              className={`admin-tab${tab === t.id ? " active" : ""}`}>
               <span style={{ fontSize: 14 }}>{t.icon}</span>{t.label}
             </button>
           ))}
         </div>
- 
+
         {/* ── RESUMEN ── */}
         {tab === "resumen" && (
           <>
-            <div className="kpi-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
+            <div className="kpi-grid admin-kpi-grid">
               {[
-                { label: "Vendedores activos",   value: `${stats. activeSellers} / ${stats.totalSellers}` },
-                { label: "Productos activos",    value: `${stats. activeProducts} / ${stats.totalProducts}` },
-                { label: "Ventas totales",       value: stats.totalSells },
-                { label: "Ventas confirmadas",   value: stats.confirmedSells },
-                { label: "Ingresos totales",     value: fmt(stats.totalRevenue) },
+                { label: "Vendedores activos",  value: `${stats.activeSellers} / ${stats.totalSellers}` },
+                { label: "Productos activos",   value: `${stats.activeProducts} / ${stats.totalProducts}` },
+                { label: "Ventas totales",      value: stats.totalSells },
+                { label: "Ventas confirmadas",  value: stats.confirmedSells },
+                { label: "Ingresos totales",    value: fmt(stats.totalRevenue) },
               ].map(k => (
                 <div key={k.label} className="kpi-card">
                   <p className="kpi-label">{k.label}</p>
@@ -172,26 +191,25 @@ export default function AdminClient({ stats,  sellers,  products, sells }: Props
                 </div>
               ))}
             </div>
- 
-            {/* top  sellers */}
+
             <div className="card" style={{ marginTop: 24 }}>
               <div className="card-header">
                 <span className="card-title">Top vendedores por ventas</span>
-                <button type="button" onClick={() => setTab(" sellers")} className="card-link" style={{ background: "none", border: "none", cursor: "pointer" }}>Ver todos →</button>
+                <button type="button" onClick={() => setTab("sellers")} className="card-link" style={{ background: "none", border: "none", cursor: "pointer" }}>Ver todos →</button>
               </div>
               <table className="ventas-table">
                 <thead><tr><th>Vendedor</th><th>Email</th><th>Productos</th><th>Ventas</th><th>Estado</th></tr></thead>
                 <tbody>
-                  {[... sellers].sort((a, b) => b.totalSells - a.totalSells).slice(0, 5).map(v => (
+                  {[...sellers].sort((a, b) => b.totalSells - a.totalSells).slice(0, 5).map(v => (
                     <tr key={v.id}>
-                      <td style={{ fontSize: 13, fontWeight: 500, color: "var(--color-foreground)", padding: "14px 20px" }}>{v. name}</td>
-                      <td style={{ fontSize: 13, color: "var(--color-muted)", padding: "14px 16px" }}>{v.email}</td>
-                      <td style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px" }}>{v.totalProducts}</td>
-                      <td style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px" }}>{v.totalSells}</td>
-                      <td style={{ padding: "14px 16px" }}>
+                      <td className="admin-td-name">{v.name}</td>
+                      <td className="admin-td-muted">{v.email}</td>
+                      <td className="admin-td-center">{v.totalProducts}</td>
+                      <td className="admin-td-center">{v.totalSells}</td>
+                      <td className="admin-td">
                         <span className={v.active ? "badge-estado badge-confirmado" : "badge-estado badge-cancelado"}>
                           <span className={v.active ? "estado-dot dot-success" : "estado-dot dot-danger"} />
-                          {v.active ? "active" : "Inactive"}
+                          {v.active ? "activo" : "inactivo"}
                         </span>
                       </td>
                     </tr>
@@ -201,37 +219,37 @@ export default function AdminClient({ stats,  sellers,  products, sells }: Props
             </div>
           </>
         )}
- 
-        {/* ──  sellers ── */}
-        {tab === " sellers" && (
+
+        {/* ── SELLERS ── */}
+        {tab === "sellers" && (
           <div className="card">
             <div className="card-header">
-              <span className="card-title">{ sellers.length} vendedores registrados</span>
-              <input type="search" placeholder="Buscar…" value={searchV} onChange={e => setSearchV(e.target.value)}
-                style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: 12, color: "var(--color-foreground)", outline: "none", width: 200 }} />
+              <span className="card-title">{sellers.length} vendedores registrados</span>
+              <input type="search" placeholder="Buscar…" value={searchV}
+                onChange={e => setSearchV(e.target.value)} className="admin-search" />
             </div>
             <table className="ventas-table">
               <thead><tr><th>Vendedor</th><th>Email</th><th>Productos</th><th>Ventas</th><th>Registro</th><th>Estado</th><th>Acción</th></tr></thead>
               <tbody>
-                { sellersFiltrados.map(v => (
+                {sellersFiltrados.map(v => (
                   <tr key={v.id}>
-                    <td style={{ padding: "14px 20px" }}>
-                      <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>{v. name}</p>
-                      {v.description && <p style={{ fontSize: 11, color: "var(--color-muted)", marginTop: 2 }}>{v.description.slice(0, 40)}…</p>}
+                    <td className="admin-td">
+                      <p className="admin-td-name-text">{v.name}</p>
+                      {v.description && <p className="admin-td-sub">{v.description.slice(0, 40)}…</p>}
                     </td>
-                    <td style={{ fontSize: 13, color: "var(--color-muted)", padding: "14px 16px" }}>{v.email}</td>
-                    <td style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px", textAlign: "center" }}>{v.totalProducts}</td>
-                    <td style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px", textAlign: "center" }}>{v.totalSells}</td>
-                    <td style={{ fontSize: 12, color: "var(--color-muted)", padding: "14px 16px" }}>{fmtFecha(v.createdAt)}</td>
-                    <td style={{ padding: "14px 16px" }}>
+                    <td className="admin-td-muted">{v.email}</td>
+                    <td className="admin-td-center">{v.totalProducts}</td>
+                    <td className="admin-td-center">{v.totalSells}</td>
+                    <td className="admin-td-muted">{fmtFecha(v.createdAt)}</td>
+                    <td className="admin-td">
                       <span className={v.active ? "badge-estado badge-confirmado" : "badge-estado badge-cancelado"}>
                         <span className={v.active ? "estado-dot dot-success" : "estado-dot dot-danger"} />
-                        {v.active ? "active" : "Inactive"}
+                        {v.active ? "activo" : "inactivo"}
                       </span>
                     </td>
-                    <td style={{ padding: "14px 16px" }}>
+                    <td className="admin-td">
                       <button type="button" onClick={() => toggle_seller(v.id, v.active)}
-                        style={{ padding: "5px 12px", borderRadius: 7, fontSize: 12, cursor: "pointer", border: "1px solid var(--color-border)", background: "var(--color-surface)", color: v.active ? "var(--color-danger)" : "var(--color-success)" }}>
+                        className={`admin-action-btn${v.active ? " danger" : " success"}`}>
                         {v.active ? "Desactivar" : "Activar"}
                       </button>
                     </td>
@@ -241,41 +259,41 @@ export default function AdminClient({ stats,  sellers,  products, sells }: Props
             </table>
           </div>
         )}
- 
-        {/* ──  products ── */}
-        {tab === " products" && (
+
+        {/* ── PRODUCTS ── */}
+        {tab === "products" && (
           <div className="card">
             <div className="card-header">
-              <span className="card-title">{ products.length} Productos registrados</span>
-              <input type="search" placeholder="Buscar…" value={searchP} onChange={e => setSearchP(e.target.value)}
-                style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: 12, color: "var(--color-foreground)", outline: "none", width: 200 }} />
+              <span className="card-title">{products.length} productos registrados</span>
+              <input type="search" placeholder="Buscar…" value={searchP}
+                onChange={e => setSearchP(e.target.value)} className="admin-search" />
             </div>
             <table className="ventas-table">
               <thead><tr><th>Producto</th><th>Vendedor</th><th>Precio</th><th>Stock</th><th>Ventas</th><th>Estado</th><th>Acción</th></tr></thead>
               <tbody>
-                { productsFiltrados.map(p => (
+                {productsFiltrados.map(p => (
                   <tr key={p.id}>
-                    <td style={{ padding: "14px 20px" }}>
-                      <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>{p. name}</p>
-                      <p style={{ fontSize: 11, color: "var(--color-muted)", marginTop: 2 }}>{p.brand}</p>
+                    <td className="admin-td">
+                      <p className="admin-td-name-text">{p.name}</p>
+                      <p className="admin-td-sub">{p.brand}</p>
                     </td>
-                    <td style={{ fontSize: 13, color: "var(--color-muted)", padding: "14px 16px" }}>{p. seller}</td>
-                    <td style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)", padding: "14px 16px" }}>{fmt(p.price)}</td>
-                    <td style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px", textAlign: "center" }}>
+                    <td className="admin-td-muted">{p.seller}</td>
+                    <td className="admin-td-bold">{fmt(p.price)}</td>
+                    <td className="admin-td-center">
                       <span className={p.stock === 0 ? "badge-stock-empty" : p.stock <= 3 ? "badge-stock-warn" : undefined}>
                         {p.stock}
                       </span>
                     </td>
-                    <td style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px", textAlign: "center" }}>{p.totalSells}</td>
-                    <td style={{ padding: "14px 16px" }}>
+                    <td className="admin-td-center">{p.totalSells}</td>
+                    <td className="admin-td">
                       <span className={p.active ? "badge-estado badge-confirmado" : "badge-estado badge-cancelado"}>
                         <span className={p.active ? "estado-dot dot-success" : "estado-dot dot-danger"} />
-                        {p.active ? "active" : "Inactive"}
+                        {p.active ? "activo" : "inactivo"}
                       </span>
                     </td>
-                    <td style={{ padding: "14px 16px" }}>
+                    <td className="admin-td">
                       <button type="button" onClick={() => toggle_product(p.id, p.active)}
-                        style={{ padding: "5px 12px", borderRadius: 7, fontSize: 12, cursor: "pointer", border: "1px solid var(--color-border)", background: "var(--color-surface)", color: p.active ? "var(--color-danger)" : "var(--color-success)" }}>
+                        className={`admin-action-btn${p.active ? " danger" : " success"}`}>
                         {p.active ? "Desactivar" : "Activar"}
                       </button>
                     </td>
@@ -285,7 +303,7 @@ export default function AdminClient({ stats,  sellers,  products, sells }: Props
             </table>
           </div>
         )}
- 
+
         {/* ── VENTAS ── */}
         {tab === "ventas" && (
           <div className="card">
@@ -298,20 +316,20 @@ export default function AdminClient({ stats,  sellers,  products, sells }: Props
                 {sells.map(v => (
                   <tr key={v.id}>
                     <td className="td-mono">#{v.orderId.slice(-8).toUpperCase()}</td>
-                    <td style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px" }}>{v. seller}</td>
-                    <td style={{ fontSize: 13, color: "var(--color-foreground)", padding: "14px 16px", textAlign: "center" }}>{v.items}</td>
+                    <td className="admin-td-muted">{v.seller}</td>
+                    <td className="admin-td-center">{v.items}</td>
                     <td className="td-total">{fmt(v.total)}</td>
-                    <td style={{ fontSize: 13, color: "var(--color-muted)", padding: "14px 16px" }}>{fmtFecha(v.createdAt)}</td>
-                    <td style={{ padding: "14px 16px" }}><EstadoBadge estado={v.status} /></td>
+                    <td className="admin-td-muted">{fmtFecha(v.createdAt)}</td>
+                    <td className="admin-td"><EstadoBadge estado={v.status} /></td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         )}
- 
+
       </div>
- 
+
       {confirm && (
         <ConfirmModal
           mensaje={confirm.mensaje}
@@ -323,4 +341,3 @@ export default function AdminClient({ stats,  sellers,  products, sells }: Props
     </div>
   );
 }
- 
