@@ -228,19 +228,20 @@ function ConfirmModal({ mensaje, onConfirm, onCancel, loading }: {
               <input type="search" placeholder="Buscar…" value={searchV}
                 onChange={e => setSearchV(e.target.value)} className="admin-search" />
             </div>
-            <table className="ventas-table">
-              <thead><tr><th>Vendedor</th><th>Email</th><th>Productos</th><th>Ventas</th><th>Registro</th><th>Estado</th><th>Acción</th></tr></thead>
+            <div className="admin-table-wrapper">
+             <table className="ventas-table">
+              <thead><tr><th>Vendedor</th><th>Email</th><th>Productos</th><th>Ventas</th><th className="admin-hide-mobile"> Registro</th><th>Estado</th><th>Acción</th></tr></thead>
               <tbody>
                 {sellersFiltrados.map(v => (
                   <tr key={v.id}>
-                    <td className="admin-td">
+                    <td className="admin-td admin-td-vendedor-mobile">
                       <p className="admin-td-name-text">{v.name}</p>
-                      {v.description && <p className="admin-td-sub">{v.description.slice(0, 40)}…</p>}
+                      {v.description && <p className="admin-td-sub admin-hide-mobile">{v.description.slice(0, 40)}…</p>}
                     </td>
-                    <td className="admin-td-muted">{v.email}</td>
-                    <td className="admin-td-center">{v.totalProducts}</td>
+                    <td className="admin-td-muted admin-hide-mobile">{v.email}</td>
+                    <td className="admin-td-center admin-hide-mobile">{v.totalProducts}</td>
                     <td className="admin-td-center">{v.totalSells}</td>
-                    <td className="admin-td-muted">{fmtFecha(v.createdAt)}</td>
+                    <td className="admin-td-muted admin-hide-mobile">{fmtFecha(v.createdAt)}</td>
                     <td className="admin-td">
                       <span className={v.active ? "badge-estado badge-confirmado" : "badge-estado badge-cancelado"}>
                         <span className={v.active ? "estado-dot dot-success" : "estado-dot dot-danger"} />
@@ -250,7 +251,8 @@ function ConfirmModal({ mensaje, onConfirm, onCancel, loading }: {
                     <td className="admin-td">
                       <button type="button" onClick={() => toggle_seller(v.id, v.active)}
                         className={`admin-action-btn${v.active ? " danger" : " success"}`}>
-                        {v.active ? "Desactivar" : "Activar"}
+                       <span className="admin-hide-mobile">{v.active ? "Desactivar" : "Activar"}</span>
+                       <span className="admin-show-mobile">{v.active ? "✕" : "✓"}</span>
                       </button>
                     </td>
                   </tr>
@@ -258,6 +260,7 @@ function ConfirmModal({ mensaje, onConfirm, onCancel, loading }: {
               </tbody>
             </table>
           </div>
+        </div>
         )}
 
         {/* ── PRODUCTS ── */}
@@ -268,8 +271,9 @@ function ConfirmModal({ mensaje, onConfirm, onCancel, loading }: {
               <input type="search" placeholder="Buscar…" value={searchP}
                 onChange={e => setSearchP(e.target.value)} className="admin-search" />
             </div>
-            <table className="ventas-table">
-              <thead><tr><th>Producto</th><th>Vendedor</th><th>Precio</th><th>Stock</th><th>Ventas</th><th>Estado</th><th>Acción</th></tr></thead>
+            <div className="admin-table-wrapper">
+             <table className="ventas-table">
+              <thead><tr><th>Producto</th><th>Vendedor</th><th>Precio</th><th>Stock</th><th className="admin-hide-mobile">Ventas</th><th>Estado</th><th>Acción</th></tr></thead>
               <tbody>
                 {productsFiltrados.map(p => (
                   <tr key={p.id}>
@@ -277,14 +281,14 @@ function ConfirmModal({ mensaje, onConfirm, onCancel, loading }: {
                       <p className="admin-td-name-text">{p.name}</p>
                       <p className="admin-td-sub">{p.brand}</p>
                     </td>
-                    <td className="admin-td-muted">{p.seller}</td>
-                    <td className="admin-td-bold">{fmt(p.price)}</td>
+                    <td className="admin-td-muted admin-hide-mobile">{p.seller}</td>
+                    <td className="admin-td-bold admin-hide-mobile">{fmt(p.price)}</td>
                     <td className="admin-td-center">
                       <span className={p.stock === 0 ? "badge-stock-empty" : p.stock <= 3 ? "badge-stock-warn" : undefined}>
                         {p.stock}
                       </span>
                     </td>
-                    <td className="admin-td-center">{p.totalSells}</td>
+                    <td className="admin-td-center admin-hide-mobile">{p.totalSells}</td>
                     <td className="admin-td">
                       <span className={p.active ? "badge-estado badge-confirmado" : "badge-estado badge-cancelado"}>
                         <span className={p.active ? "estado-dot dot-success" : "estado-dot dot-danger"} />
@@ -294,7 +298,8 @@ function ConfirmModal({ mensaje, onConfirm, onCancel, loading }: {
                     <td className="admin-td">
                       <button type="button" onClick={() => toggle_product(p.id, p.active)}
                         className={`admin-action-btn${p.active ? " danger" : " success"}`}>
-                        {p.active ? "Desactivar" : "Activar"}
+                         <span className="admin-hide-mobile">{p.active ? "Desactivar" : "Activar"}</span>
+                         <span className="admin-show-mobile">{p.active ? "✕" : "✓"}</span>
                       </button>
                     </td>
                   </tr>
@@ -302,6 +307,7 @@ function ConfirmModal({ mensaje, onConfirm, onCancel, loading }: {
               </tbody>
             </table>
           </div>
+       </div>
         )}
 
         {/* ── VENTAS ── */}
@@ -310,7 +316,8 @@ function ConfirmModal({ mensaje, onConfirm, onCancel, loading }: {
             <div className="card-header">
               <span className="card-title">{sells.length} ventas registradas</span>
             </div>
-            <table className="ventas-table">
+            <div className="admin-table-wrapper">
+             <table className="ventas-table">
               <thead><tr><th>Orden</th><th>Vendedor</th><th>Ítems</th><th>Total</th><th>Fecha</th><th>Estado</th></tr></thead>
               <tbody>
                 {sells.map(v => (
@@ -326,6 +333,7 @@ function ConfirmModal({ mensaje, onConfirm, onCancel, loading }: {
               </tbody>
             </table>
           </div>
+        </div>
         )}
 
       </div>
