@@ -14,6 +14,7 @@ interface Detail {
   quantity: number;
   unitPrice: number;
   size: string;
+  color: string;
   product: ProductInfo;
 }
 interface Sell { id: string; orderId: string; total: number; status: SellStatus; createdAt: string; details: Detail[] }
@@ -60,7 +61,7 @@ function VentaRow({ v, onCambiarEstado }: { v: Sell; onCambiarEstado: (id: strin
                       </div>
                       <div>
                         <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>{d. product. name}</p>
-                        <p style={{ fontSize: 12, color: "var(--color-muted)" }}>{d. product.brand}{d.size ? ` · size ${d.size}` : ""} · ×{d.quantity}</p>
+                        <p style={{ fontSize: 12, color: "var(--color-muted)" }}>{d. product.brand}{d.color ? ` · ${d.color}` : ""}{d.size ? ` · talle ${d.size}` : ""} {` · ×${d.quantity}`}</p>
                       </div>
                     </div>
                     <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>{fmt(d.unitPrice * d.quantity)}</p>

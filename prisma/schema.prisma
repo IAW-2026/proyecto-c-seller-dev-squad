@@ -38,6 +38,7 @@ model Product {
   category    String
   image       String?
   colors      String[]
+  direction   String?
   active      Boolean  @default(true)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -93,6 +94,7 @@ model SellDetail {
   quantity  Int
   unitPrice Decimal @db.Decimal(10, 2)
   size      String?
+  color     String?
 
   sellId String
   sell   Sell   @relation(fields: [sellId], references: [id], onDelete: Cascade)

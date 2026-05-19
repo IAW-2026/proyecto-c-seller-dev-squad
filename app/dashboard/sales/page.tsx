@@ -69,6 +69,7 @@ export default async function SalesPage({ searchParams }: Props) {
         quantity:       d.quantity,
         unitPrice: Number(d.unitPrice),
           size:          d.size ?? "",
+          color:        d.color ?? "",
            product: {
              name:    d. product. name,
             brand:     d. product.brand ?? "",

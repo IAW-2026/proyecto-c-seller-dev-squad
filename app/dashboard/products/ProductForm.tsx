@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 interface sizeItem { size: string; stock: number }
 
 interface  productInicial {
-  id: string;  name: string; description: string | null; price: number;
+  id: string;  name: string; description: string | null; colors: string[]; direction: string | null; price: number;
   stock: number; brand: string; category:string; image: string | null;
   active: boolean; sizes: sizeItem[];
 }
@@ -31,6 +31,14 @@ const categories = [
   "Casual",
   "Moda",
   "Otra",
+];
+const COLORS = [
+  "Negro",
+  "Blanco",
+  "Rojo",
+  "Azul",
+  "Verde",
+  "Gris",
 ];
 // ── helpers de UI ──────────────────────────────────────────
 function Label({ children, required }: { children: React.ReactNode; required?: boolean }) {
@@ -86,12 +94,14 @@ export default function ProductForm({ modo,  productInicial }: Props) {
   const router = useRouter();
 
   const [ name,      setname]      = useState( productInicial?. name      ?? "");
-  const [description, setdescription] = useState( productInicial?.description ?? null);
+  const [description, setdescription] = useState( productInicial?.description ?? "");
   const [price,      setprice]      = useState( productInicial?.price?.toString() ?? "");
   const [stock,       setStock]       = useState( productInicial?.stock?.toString()  ?? "0");
   const [brand,       setbrand]       = useState( productInicial?.brand       ?? "");
-  const [image,   setimage]   = useState( productInicial?.image   ?? null);
-  const [active,      setactive]      = useState( productInicial?.active      ?? true);
+  const [image,   setimage]   = useState( productInicial?.image   ?? "");
+  const [direction, setDirection] = useState(productInicial?.direction ?? "");
+  const [colors, setColors] = useState<string[]>(productInicial?.colors ?? []);  
+  const [active,setactive]= useState( productInicial?.active?? true);
   const [sizes,      setsizes]      = useState<sizeItem[]>( productInicial?.sizes ?? []);
   const [category, setCategory] = useState(productInicial?.category ?? "");
   const [errors,   setErrors]   = useState<Record<string, string>>({});
@@ -155,6 +165,8 @@ export default function ProductForm({ modo,  productInicial }: Props) {
       brand:       brand || null,
       category:    category || null,
       image:   image?.trim() || null,
+      direction: direction?.trim() || null,
+      colors,
       active,
       sizes,
     };
@@ -281,10 +293,51 @@ export default function ProductForm({ modo,  productInicial }: Props) {
               </div>
             )}
           </div>
+          <div style={{ gridColumn: "1 / -1" }}>
+            <Label>Dirección</Label>
+            <Input
+              value={direction}
+              onChange={(e) => setDirection(e.target.value)}
+              placeholder="Ej: Av. Colón 1234, Bahía Blanca"
+            />
+            <p className="text-faint" style={{ fontSize: 11, marginTop: 6 }}>
+              Dirección donde se retira o vende el producto.
+            </p>
+          </div>
 
         </div>
       </Card>
+        <Card title="Colores disponibles">
+          <Label>Seleccioná los colores</Label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
 
+              {COLORS.map((c) => {
+                const selected = colors.includes(c);
+
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => {
+                      setColors((prev) =>
+                        prev.includes(c)
+                          ? prev.filter((x) => x !== c)
+                          : [...prev, c]
+                      );
+                    }}
+                    className={`talle-toggle ${selected ? "selected" : ""}`}
+                  >
+                    {c}
+                  </button>
+                );
+              })}
+
+            </div>
+
+            <p className="text-faint" style={{ fontSize: 11, marginTop: 10 }}>
+              Elegí uno o más colores para este producto.
+            </p>
+      </Card>
       {/* ── Stock y sizes ── */}
       <Card title="Stock y talles">
 

@@ -17,7 +17,7 @@ export default async function EditProductPage({ params }: Props) {
     where: { id, sellerId:  seller.id },
     include: { sizes: true },
   });
-  if (! product) notFound();
+  if (!product) notFound();
  
   return (
     <div className="bg-wash" style={{ minHeight: "100vh" }}>
@@ -41,7 +41,9 @@ export default async function EditProductPage({ params }: Props) {
             stock:        product.stock,
             brand:        product.brand ?? "",
             category: product.category ?? "",
+            direction: product.direction ?? "",
             image:    product.image ?? null,
+            colors:     product.colors ?? [],
             active:       product.active,
             sizes:       product.sizes.map((t) => ({ size: t.size, stock: t.stock })),
           }}

@@ -7,8 +7,8 @@ import Link from "next/link";
 // ── tipos ──────────────────────────────────────────────────
 interface Size   { size: string; stock: number }
 interface  Product {
-  id: string;  name: string; brand: string; price: number;
-  stock: number; active: boolean; image: string | null;
+  id: string;  name: string; brand: string; category: string | null; price: number;
+  stock: number; active: boolean; image: string | null; direction: string | null; colors: string[];
   sizes: Size[]; createdAt: string;
 }
 interface Props {
@@ -117,6 +117,30 @@ function ProductCard({ p, onDelete }: { p:  Product; onDelete: (id: string,  nam
           {p.name}
         </p>
         <p className="product-card-price">{fmt(p.price)}</p>
+          {p.category && (
+            <p className="text-muted" style={{ fontSize: 12, marginTop: 2 }}>
+              {p.category}
+            </p>
+          )}
+
+          {p.colors.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 8 }}>
+              {p.colors.map((c) => (
+                <span key={c} className="size-chip">
+                  {c}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {p.direction && (
+            <p
+              className="text-muted"
+              style={{ fontSize: 11, marginTop: 8, lineHeight: 1.4 }}
+            >
+              📍 {p.direction}
+            </p>
+          )}
 
         {/* sizes */}
         {p.sizes.length > 0 && (

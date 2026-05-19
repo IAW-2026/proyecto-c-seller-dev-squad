@@ -39,7 +39,10 @@ export async function GET(req: NextRequest) {
           price:      true,
           stock:       true,
           brand:       true,
+          category:    true,
           image:   true,
+          direction: true,
+          colors: true,
           sellerId:  true,
           sizes: { select: { size: true, stock: true } },
         },
@@ -74,10 +77,10 @@ export async function POST(req: NextRequest) {
     }
  
     const body = await req.json();
-    const {  name, description, price, stock, brand, category, image, sizes } = body;
+    const {  name, description, price, stock, brand, category, image, direction, colors, sizes } = body;
  
     // validación server-side
-    if (! name?.trim()) {
+    if (!name?.trim()) {
       return NextResponse.json({ error: "El  nombre es obligatorio" }, { status: 400 });
     }
     if (!price || Number(price) <= 0) {
@@ -86,13 +89,15 @@ export async function POST(req: NextRequest) {
  
     const  product = await prisma.product.create({
       data: {
-         name:       name.trim(),
+        name:       name.trim(),
         description: description?.trim() ?? null,
         price:      Number(price),
         stock:       Number(stock ?? 0),
         brand:       brand ?? null,
         category:    category ?? null,
         image:      image ?? null,
+        direction: direction?.trim() || null,
+        colors: colors ?? [],
         sellerId:   seller.id,
         sizes: sizes?.length
           ? { create: sizes.map((t: { size: string; stock: number }) => ({ size: t.size, stock: t.stock })) }

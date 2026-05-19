@@ -19,8 +19,8 @@ const { id } = await params;
       },
     });
  
-    if (! product || ! product.active) {
-      return NextResponse.json({ error: " product no encontrado" }, { status: 404 });
+    if (!product || !product.active) {
+      return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
     }
  
     return NextResponse.json({ ... product, price: Number( product.price) });
@@ -53,7 +53,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
  
     const body = await req.json();
-    const {  name, description, price, stock, brand, image, active, sizes } = body;
+    const {  name, description, price, stock, brand, category, image, direction, colors, active, sizes } = body;
  
     // actualizar sizes si vienen en el body
     if (sizes !== undefined) {
@@ -77,7 +77,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         ...(price      !== undefined && { price:      Number(price) }),
         ...(stock       !== undefined && { stock:       Number(stock) }),
         ...(brand       !== undefined && { brand }),
+        ...(category    !== undefined && { category }),
         ...(image   !== undefined && { image:   image?.trim() || null }),
+        ...(direction !== undefined && { direction: direction?.trim() || null }),
+        ...(colors !== undefined && { colors }),
         ...(active      !== undefined && { active }),
       },
       include: { sizes: true },
