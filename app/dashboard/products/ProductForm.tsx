@@ -1,5 +1,6 @@
 "use client";
 
+import { useGenerarDescripcion } from "@/hooks/useGenerarDescripcion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -97,6 +98,8 @@ export default function ProductForm({ modo,  productInicial }: Props) {
   const [loading,  setLoading]  = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [success,  setSuccess]  = useState(false);
+  const { generarDescripcion, loading: loadingIA, error: errorIA } = useGenerarDescripcion();
+
 
   // ── sizes ─────────────────────────────────────────────
   function togglesize(t: string) {
@@ -125,7 +128,16 @@ export default function ProductForm({ modo,  productInicial }: Props) {
     return e;
   }
 
-  // ── submit ─────────────────────────────────────────────
+  async function handleGenerarDescripcion() {
+  const resultado = await generarDescripcion({
+    nombre: name,
+    categoria: category,
+    keywords: brand,
+    imagen: image ?? undefined,
+  });
+  if (resultado) setdescription(resultado);
+}
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setApiError(null);
@@ -229,11 +241,27 @@ export default function ProductForm({ modo,  productInicial }: Props) {
           </div>
 
           <div style={{ gridColumn: "1 / -1" }}>
-            <Label>Descripción</Label>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+              <Label>Descripción</Label>
+              <button
+                type="button"
+                onClick={handleGenerarDescripcion}
+                disabled={loadingIA || !name.trim()}
+                className="btn-outline"
+                style={{ fontSize: 11, padding: "4px 10px", display: "flex", alignItems: "center", gap: 6 }}
+              >
+                  {loadingIA
+                      ? "Generando..."
+                      : description
+                      ? "🔄 Regenerar"
+                      : "✨ Generar con IA"}
+                </button>
+              </div>
+            {errorIA && <p className="field-message-error">{errorIA}</p>}
             <Textarea
               value={description ?? ""}
               onChange={(e) => setdescription(e.target.value)}
-              placeholder="Describí el  producto: materiales, características, etc."
+              placeholder="Describí el producto: materiales, características, etc."
               error={errors.description}
             />
           </div>
