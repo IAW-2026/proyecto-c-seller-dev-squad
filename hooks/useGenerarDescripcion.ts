@@ -16,38 +16,31 @@ export function useGenerarDescripcion() {
     setError(null);
 
     try {
-      const controller = new AbortController();
-
-      const timeout = setTimeout(() => {
-        controller.abort();
-      }, 15000);
-
       const res = await fetch("/api/generar-descripcion", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(datos),
-        signal: controller.signal,
       });
 
-      clearTimeout(timeout);
+      // 1. Consumimos el JSON una Sola Vez
+      const data = await res.json();
 
+      // 2. Evaluamos si el servidor devolvió un error (ej: status 400 o 500)
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.error || "Error al generar descripción");
       }
 
-      const data = await res.json();
-
+      // 3. Si todo salió bien, devolvemos la propiedad que viene de la API
       return data.descripcion as string;
+
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
           : "No se pudo generar la descripción"
       );
-
       return null;
     } finally {
       setLoading(false);

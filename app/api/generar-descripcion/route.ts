@@ -1,82 +1,69 @@
-import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 import { NextRequest, NextResponse } from "next/server";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Inicializamos el cliente oficial de Gemini
+// Si no pasas parámetros, busca automáticamente process.env.GEMINI_API_KEY
+const ai = new GoogleGenAI({});
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const {
-      nombre,
-      categoria,
-      keywords,
-      imagen,
-    } = body;
+    console.log("BODY RECIBIDO:", body);
 
+    const { nombre, categoria, keywords, imagen } = body;
+
+    // Validaciones básicas
     if (!nombre || typeof nombre !== "string") {
       return NextResponse.json(
-        {
-          error: "El nombre es requerido",
-        },
-        {
-          status: 400,
-        }
+        { error: "El nombre de la zapatilla es requerido" },
+        { status: 400 }
       );
     }
 
     if (nombre.length > 120) {
       return NextResponse.json(
-        {
-          error: "Nombre demasiado largo",
-        },
-        {
-          status: 400,
-        }
+        { error: "Nombre demasiado largo" },
+        { status: 400 }
       );
     }
 
     const prompt = `
-Generá una descripción breve y persuasiva para ecommerce.
+Generá una descripción breve, atractiva y persuasiva para una tienda online de calzado.
 
-Reglas:
-- Máximo 80 palabras
-- Tono profesional y vendedor
-- Resaltar beneficios del producto
-- No usar emojis
-- No usar títulos
-- No inventar características
-- Texto listo para una tienda online
+Reglas estrictas:
+- Máximo 80 palabras.
+- Tono profesional, moderno y enfocado en la venta de zapatillas.
+- Resaltar los beneficios (comodidad, estilo, durabilidad, rendimiento) según el tipo de zapatilla.
+- No uses emojis.
+- No uses títulos de ningún tipo.
+- No inventes características técnicas específicas que no estén en los datos (ej: si no dice "cámara de aire", no lo pongas).
+- Devuelve directamente el texto listo para publicar.
 
-Datos:
-- Nombre: ${nombre}
-${categoria ? `- Categoría: ${categoria}` : ""}
-${keywords ? `- Marca o keywords: ${keywords}` : ""}
-${imagen ? `- Imagen: ${imagen}` : ""}
+Datos del producto:
+- Nombre del modelo: ${nombre}
+${categoria ? `- Estilo/Categoría: ${categoria}` : ""}
+${keywords ? `- Características clave / Marca: ${keywords}` : ""}
 `;
 
-    const response = await openai.responses.create({
-      model: "gpt-5-mini",
-      input: prompt,
+    // Llamada al SDK oficial utilizando el modelo rápido gemini-2.5-flash
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
     });
 
-    const descripcion = response.output_text;
+    const descripcion = response.text;
 
     return NextResponse.json({
       descripcion,
     });
+
   } catch (error) {
-    console.error(error);
+    console.error("ERROR EN API GEMINI:", error);
 
     return NextResponse.json(
-      {
-        error: "Error interno del servidor",
-      },
-      {
-        status: 500,
-      }
-    );
+      { error: "Error interno al generar la descripción con Gemini" },
+      { status: 500 }
+    )
   }
 }

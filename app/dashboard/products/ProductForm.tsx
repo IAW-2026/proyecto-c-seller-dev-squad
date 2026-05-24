@@ -143,7 +143,6 @@ export default function ProductForm({ modo,  productInicial }: Props) {
     nombre: name,
     categoria: category,
     keywords: brand,
-    imagen: image ?? undefined,
   });
   if (resultado) setdescription(resultado);
 }
