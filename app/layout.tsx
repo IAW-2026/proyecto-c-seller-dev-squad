@@ -4,7 +4,6 @@ import ClerkThemeProvider from "./components/ClerkThemeProvider";
 import "./globals.css";
 import Script from "next/script";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -17,46 +16,48 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Seller App — Marketplace de Zapatillas",
-  description: "Panel de  sellers",
+  description: "Panel de sellers",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (      
-       <html
+    <html
       lang="es"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      {/* CORRECCIÓN DE HTML: Envolvemos el Script dentro de <head> */}
+      <head>
+        <Script
+          id="theme-script"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                try {
+                  const saved = localStorage.getItem("theme");
+                  const preferred =
+                    saved ||
+                    (window.matchMedia("(prefers-color-scheme: light)").matches
+                      ? "light"
+                      : "dark");
+                  document.documentElement.setAttribute(
+                    "data-theme",
+                    preferred
+                  );
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
+
       <body
         suppressHydrationWarning
         className="min-h-full flex flex-col"
       >
-        <Script
-          id="theme-script"
-          strategy="beforeInteractive"
-        >
-          {`
-            (function () {
-              try {
-                const saved = localStorage.getItem("theme");
-
-                const preferred =
-                  saved ||
-                  (window.matchMedia("(prefers-color-scheme: light)").matches
-                    ? "light"
-                    : "dark");
-
-                document.documentElement.setAttribute(
-                  "data-theme",
-                  preferred
-                );
-              } catch (e) {}
-            })();
-          `}
-        </Script>
-
         <ClerkThemeProvider>
           {children}
         </ClerkThemeProvider>

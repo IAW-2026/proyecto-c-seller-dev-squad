@@ -10,7 +10,7 @@ const isPublicApiRoute = createRouteMatcher([
   "/api/products(.*)", 
   "/api/sales", 
   "/api/sales/(.*)",  
-  "/api/generar-descripcion(.*)", // <-- Añadido aquí
+  "/api/generar-descripcion(.*)",
   "/onboarding",
 ]);
 
