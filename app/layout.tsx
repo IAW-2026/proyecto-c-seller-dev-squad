@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ClerkThemeProvider from "./components/ClerkThemeProvider";
 import "./globals.css";
-import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,17 +21,14 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  return (      
+   return (
     <html
       lang="es"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable}`}
     >
-      {/* CORRECCIÓN DE HTML: Envolvemos el Script dentro de <head> */}
       <head>
-        <Script
-          id="theme-script"
-          strategy="beforeInteractive"
+        <script
           dangerouslySetInnerHTML={{
             __html: `
               (function () {
@@ -43,6 +39,7 @@ export default function RootLayout({
                     (window.matchMedia("(prefers-color-scheme: light)").matches
                       ? "light"
                       : "dark");
+
                   document.documentElement.setAttribute(
                     "data-theme",
                     preferred
@@ -54,10 +51,7 @@ export default function RootLayout({
         />
       </head>
 
-      <body
-        suppressHydrationWarning
-        className="min-h-full flex flex-col"
-      >
+      <body suppressHydrationWarning>
         <ClerkThemeProvider>
           {children}
         </ClerkThemeProvider>

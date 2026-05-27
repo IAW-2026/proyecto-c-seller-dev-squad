@@ -25,21 +25,18 @@ export default clerkMiddleware(async (auth, req) => {
   
   const { sessionClaims } = await auth();
 
-  const role = (sessionClaims?.metadata as any)?.role
-            ?? (sessionClaims?.publicMetadata as any)?.role
-            ?? (sessionClaims as any)?.role
-            ?? null;
+   const role =
+    (sessionClaims?.publicMetadata as { role?: string })?.role ??
+    null;
 
-  // Solo sellers y admins pueden entrar al dashboard
   const rolesPermitidos = ["seller", "admin"];
   if (role && !rolesPermitidos.includes(role)) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
-  /* // Solo admins pueden entrar a /dashboard/admin
   if (isAdminRoute(req) && role !== "admin") {
     return NextResponse.redirect(new URL("/dashboard", req.url));
-  }*/
+  }
   
   return NextResponse.next();
 });

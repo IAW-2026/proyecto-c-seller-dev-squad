@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
@@ -24,6 +25,14 @@ export async function POST(req: NextRequest) {
         email:       email.trim(),
         description: description?.trim() ?? null,
          avatarUrl: ""
+      },
+    });
+
+    const clerk = await clerkClient();
+
+    await clerk.users.updateUserMetadata(userId, {
+      publicMetadata: {
+        role: "seller",
       },
     });
 
