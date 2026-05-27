@@ -78,6 +78,15 @@ export async function POST(req: NextRequest) {
  
     const body = await req.json();
     const {  name, description, price, stock, brand, category, image, direction, colors, sizes } = body;
+
+    const stockTotal =
+      sizes?.length > 0
+        ? sizes.reduce(
+            (acc: number, s: { stock: number }) =>
+              acc + Number(s.stock || 0),
+            0
+          )
+        : Number(stock ?? 0);
  
     // validación server-side
     if (!name?.trim()) {
@@ -92,7 +101,7 @@ export async function POST(req: NextRequest) {
         name:       name.trim(),
         description: description?.trim() ?? null,
         price:      Number(price),
-        stock:       Number(stock ?? 0),
+        stock:       stockTotal,
         brand:       brand ?? null,
         category:    category ?? null,
         image:      image ?? null,

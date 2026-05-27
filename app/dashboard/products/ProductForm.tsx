@@ -156,11 +156,16 @@ export default function ProductForm({ modo,  productInicial }: Props) {
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
 
+    const stockTotal =
+      sizes.length > 0
+          ? sizes.reduce((acc, s) => acc + Number(s.stock), 0)
+          : Number(stock);
+
     const body = {
        name:       name.trim(),
       description: description?.trim() || null,
       price:      Number(price),
-      stock:       Number(stock),
+      stock:       stockTotal,
       brand:       brand || null,
       category:    category || null,
       image:   image?.trim() || null,
@@ -194,7 +199,11 @@ export default function ProductForm({ modo,  productInicial }: Props) {
       setLoading(false);
     }
   }
-
+  
+  const stockTotal =
+  sizes.length > 0
+    ? sizes.reduce((acc, s) => acc + Number(s.stock), 0)
+    : Number(stock);
   // ── render ─────────────────────────────────────────────
   return (
     <form onSubmit={handleSubmit} noValidate>
@@ -341,17 +350,24 @@ export default function ProductForm({ modo,  productInicial }: Props) {
       <Card title="Stock y talles">
 
         <div style={{ marginBottom: 18 }}>
-          <Label>Stock general</Label>
+          <Label>Stock total</Label>
+
           <Input
-            type="number" min="0"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
-            placeholder="0"
-            style={{ maxWidth: 140 }}
-            error={errors.stock}
+            type="number"
+            value={stockTotal}
+            readOnly
+            style={{
+              maxWidth: 140,
+              background: "var(--color-surface-alt)",
+              cursor: "not-allowed",
+            }}
           />
-          <p className="text-faint" style={{ fontSize: 11, marginTop: 6 }}>
-            Se usa como stock total si no cargás talles individuales.
+
+          <p
+            className="text-faint"
+            style={{ fontSize: 11, marginTop: 6 }}
+          >
+            Se actualiza automáticamente según los talles cargados.
           </p>
         </div>
 

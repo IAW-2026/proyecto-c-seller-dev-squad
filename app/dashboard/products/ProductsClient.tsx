@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-// ── tipos ──────────────────────────────────────────────────
 interface Size   { size: string; stock: number }
 interface  Product {
   id: string;  name: string; brand: string; category: string | null; price: number;
@@ -20,7 +19,6 @@ interface Props {
 const fmt = (n: number) =>
   new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
 
-// ── modal confirmación de eliminación ─────────────────────
 function ConfirmModal({  name, onConfirm, onCancel, loading }: {
    name: string; loading: boolean;
   onConfirm: () => void; onCancel: () => void;
@@ -82,7 +80,6 @@ function ProductImage({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-// ── card de  product ───────────────────────────────────────
 function ProductCard({ p, onDelete }: { p:  Product; onDelete: (id: string,  name: string) => void }) {
   const stockTotal = p.sizes.reduce((a, t) => a + t.stock, 0) || p.stock;
   const stockBajo  = stockTotal <= 3;
@@ -176,8 +173,6 @@ function ProductCard({ p, onDelete }: { p:  Product; onDelete: (id: string,  nam
   );
 }
 
-
-// ── componente principal ───────────────────────────────────
 export default function ProductsClient({  products, total, page, perPage, q, estadoFiltro }: Props) {
   const router       = useRouter();
   const pathname     = usePathname();

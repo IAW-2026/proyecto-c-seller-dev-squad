@@ -54,6 +54,14 @@ export async function PATCH(req: NextRequest, { params }: Params) {
  
     const body = await req.json();
     const {  name, description, price, stock, brand, category, image, direction, colors, active, sizes } = body;
+    const stockTotal =
+      sizes?.length > 0
+        ? sizes.reduce(
+            (acc: number, s: { stock: number }) =>
+              acc + Number(s.stock || 0),
+            0
+          )
+        : Number(stock ?? existente.stock);
  
     // actualizar sizes si vienen en el body
     if (sizes !== undefined) {
@@ -75,7 +83,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         ...( name      !== undefined && {  name:       name.trim() }),
         ...(description !== undefined && { description: description?.trim() ?? null }),
         ...(price      !== undefined && { price:      Number(price) }),
-        ...(stock       !== undefined && { stock:       Number(stock) }),
+        ...(stock       !== undefined || sizes !== undefined ? { stock: stockTotal } : {}),
         ...(brand       !== undefined && { brand }),
         ...(category    !== undefined && { category }),
         ...(image   !== undefined && { image:   image?.trim() || null }),

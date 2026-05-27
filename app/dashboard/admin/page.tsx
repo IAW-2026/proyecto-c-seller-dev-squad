@@ -19,9 +19,13 @@ export default async function AdminPage() {
     }),
     prisma.product.findMany({
       orderBy: { createdAt: "desc" },
-      include: {
-         seller: { select: {  name: true } },
-        _count: { select: { sellDetails: true } },
+      include: {seller: { select: { name: true,},},
+        sizes: true,
+        _count: {
+          select: {
+            sellDetails: true,
+          },
+        },
       },
     }),
     prisma.sell.findMany({
@@ -52,42 +56,52 @@ export default async function AdminPage() {
       .reduce((acc, s) => acc + Number(s.total), 0),
   };
 
-  return (
-    <AdminClient
-      stats={stats}
-      sellers={sellers.map((s) => ({
-        id: s.id,
-        name: s.name,
-        email: s.email,
-        description: s.description ?? null,
-        active: s.active,
-        createdAt: s.createdAt.toISOString(),
-        totalProducts: s._count.products,
-        totalSells: s._count.sells,
-      }))}
+return (
+  <AdminClient
+    stats={stats}
+    sellers={sellers.map((s) => ({
+      id: s.id,
+      name: s.name,
+      email: s.email,
+      description: s.description ?? null,
+      active: s.active,
+      createdAt: s.createdAt.toISOString(),
+      totalProducts: s._count.products,
+      totalSells: s._count.sells,
+    }))}
 
-      products={products.map((p) => ({
+    products={products.map((p) => {
+      const stockTotal =
+        p.sizes.length > 0
+          ? p.sizes.reduce(
+              (total, size) => total + size.stock,
+              0
+            )
+          : p.stock;
+
+      return {
         id: p.id,
         name: p.name,
         brand: p.brand,
         price: Number(p.price),
-        stock: p.stock,
+        stock: stockTotal,
         active: p.active,
-        image:     p.image ?? null,
+        image: p.image ?? null,
         createdAt: p.createdAt.toISOString(),
         seller: p.seller.name,
         totalSells: p._count.sellDetails,
-      }))}
+      };
+    })}
 
-      sells={sells.map((s) => ({
-        id: s.id,
-        orderId: s.orderId,
-        total: Number(s.total),
-        status: s.status,
-        createdAt: s.createdAt.toISOString(),
-        seller: s.seller.name,
-        items: s._count.details,
-      }))}
-    />
-  );
+    sells={sells.map((s) => ({
+      id: s.id,
+      orderId: s.orderId,
+      total: Number(s.total),
+      status: s.status,
+      createdAt: s.createdAt.toISOString(),
+      seller: s.seller.name,
+      items: s._count.details,
+    }))}
+  />
+);
 }
