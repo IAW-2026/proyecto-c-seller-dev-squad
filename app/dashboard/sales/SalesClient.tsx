@@ -159,7 +159,7 @@ export default function SalesClient({ sells, total, page, perPage, estadoFiltro,
               </button>
             ))}
           </div>
-          <input type="search" defaultValue={q} placeholder="Buscar por ID de orden…" onChange={e => navigate({ q: e.target.value, page: "1" })}
+          <input type="search" defaultValue={q} placeholder="Buscar por ID de orden (ej: BUYER-ORDER-001)" onChange={e => navigate({ q: e.target.value, page: "1" })}
             style={{ flex: 1, minWidth: 160, padding: "9px 14px", borderRadius: 9, border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: 13, color: "var(--color-foreground)", outline: "none" }} />
         </div>
 

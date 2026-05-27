@@ -322,7 +322,7 @@ function ConfirmModal({ mensaje, onConfirm, onCancel, loading }: {
               <tbody>
                 {sells.map(v => (
                   <tr key={v.id}>
-                    <td className="td-mono">#{v.orderId.slice(-8).toUpperCase()}</td>
+                    <td className="td-mono">#{v.orderId}</td>
                     <td className="admin-td-muted">{v.seller}</td>
                     <td className="admin-td-center">{v.items}</td>
                     <td className="td-total">{fmt(v.total)}</td>

@@ -96,9 +96,21 @@ export async function POST(req: NextRequest) {
 
     const total = Number(product.price) * quantity;
 
+    const lastSell = await prisma.sell.findFirst({ orderBy: {createdAt: "desc",},});
+    let nextNumber = 1;
+
+    if (
+      lastSell?.orderId &&
+      lastSell.orderId.startsWith("BUYER-ORDER-")
+    ) {
+      nextNumber =Number(lastSell.orderId.replace("BUYER-ORDER-", "")) + 1;
+       }
+
+const orderId =
+  `BUYER-ORDER-${String(nextNumber).padStart(3, "0")}`;
     const sell = await prisma.sell.create({
       data: {
-        orderId: crypto.randomUUID(),
+        orderId,
         total,
         status: "PENDING",
 
