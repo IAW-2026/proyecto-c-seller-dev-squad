@@ -4,12 +4,28 @@ import { prisma } from "@/lib/prisma";
 import OnboardingForm from "./OnboardingForm";
 
 export default async function OnboardingPage() {
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
+  
   if (!userId) redirect("/sign-in");
 
-  // si ya tiene  seller, mandar al dashboard
-  const seller= await prisma.seller.findUnique({ where: { clerkUserId: userId } });
-  if (seller) redirect("/dashboard");
+  const role =
+    (sessionClaims?.metadata as any)?.role ??
+    (sessionClaims?.publicMetadata as any)?.role ??
+    null;
+
+  if (role === "admin") {
+    redirect("/dashboard/admin");
+  }
+
+  const seller = await prisma.seller.findUnique({
+    where: {
+      clerkUserId: userId,
+    },
+  });
+
+  if (seller) {
+    redirect("/dashboard");
+  }
 
   return <OnboardingForm />;
 }

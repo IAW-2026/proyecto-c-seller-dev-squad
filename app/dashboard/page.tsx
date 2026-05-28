@@ -1,14 +1,21 @@
-// Panel de administración del  seller — Seller App
-
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import DashboardClient from "./DashboardClient";
 
 export default async function DashboardPage() {
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
   if (!userId) {
     redirect("/sign-in");
+  }
+
+  const role =
+    (sessionClaims?.metadata as any)?.role ??
+    (sessionClaims?.publicMetadata as any)?.role ??
+    null;
+
+  if (role === "admin") {
+    redirect("/dashboard/admin");
   }
 
   const seller= await prisma.seller.findFirst({
@@ -18,6 +25,7 @@ export default async function DashboardPage() {
   });
 
   if (!seller) redirect("/onboarding"); 
+
   const [total_products, total_Ventas, ventas,  productosBajoStock] = await Promise.all([
     prisma.product.count({
       where: {

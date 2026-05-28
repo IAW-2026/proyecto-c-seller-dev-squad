@@ -15,17 +15,6 @@ export default async function DashboardLayout({
     redirect("/sign-in");
   }
 
-  const seller= await prisma.seller.findUnique({
-    where: {
-      clerkUserId: userId,
-    },
-  });
-
-  // Usuario autenticado pero sin  seller
-  if (!seller) {
-    redirect("/onboarding");
-  }
-
   return (
     <DashboardClientLayout>
       {children}

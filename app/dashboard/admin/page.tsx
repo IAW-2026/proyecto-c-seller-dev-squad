@@ -4,11 +4,19 @@ import { prisma } from "@/lib/prisma";
 import AdminClient from "./AdminClient";
  
 export default async function AdminPage() {
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
+  
   if (!userId) redirect("/sign-in");
  
-  const seller= await prisma.seller.findUnique({ where: { clerkUserId: userId } });
-  if (!seller) redirect("/onboarding");
+  const role =
+    (sessionClaims?.metadata as any)?.role ??
+    (sessionClaims?.publicMetadata as any)?.role ??
+    null;
+
+  // Solo admins
+  if (role !== "admin") {
+    redirect("/dashboard");
+  }
  
   const [ sellers,  products, sells] = await Promise.all([
     prisma.seller.findMany({

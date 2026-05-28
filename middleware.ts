@@ -26,8 +26,12 @@ export default clerkMiddleware(async (auth, req) => {
   const { sessionClaims } = await auth();
 
    const role =
+    (sessionClaims?.metadata as { role?: string })?.role ??
     (sessionClaims?.publicMetadata as { role?: string })?.role ??
     null;
+
+      console.log("MIDDLEWARE ROLE:", role);
+
 
   const rolesPermitidos = ["seller", "admin"];
   if (role && !rolesPermitidos.includes(role)) {
