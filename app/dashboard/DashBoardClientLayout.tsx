@@ -7,8 +7,11 @@ import DashboardSidebar from "./DashboardSidebar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, mounted } = useTheme();
 
+  if (!mounted) {
+    return null;
+  }
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <DashboardSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />

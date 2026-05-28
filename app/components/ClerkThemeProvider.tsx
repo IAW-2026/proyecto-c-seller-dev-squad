@@ -9,11 +9,13 @@ export default function ClerkThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const { theme } = useTheme();
+const { theme, toggleTheme, mounted } = useTheme();
 
+if (!mounted) {
+  return null;
+}
   return (
     <ClerkProvider
-      key={theme}
       afterSignOutUrl="/sign-in"
       appearance={{
         baseTheme: theme === "dark" ? dark : undefined,

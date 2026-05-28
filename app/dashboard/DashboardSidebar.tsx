@@ -21,9 +21,14 @@ interface Props {
 
 export default function DashboardSidebar({ open, onClose }: Props) {
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, mounted } = useTheme();
   const { user } = useUser();
   const name = user?.fullName || "Mi cuenta";
+
+  if (!mounted) {
+    return null;
+  } 
+  
 
   return (
     <>

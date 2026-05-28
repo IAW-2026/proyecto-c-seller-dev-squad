@@ -7,8 +7,11 @@ import { dark } from "@clerk/themes";
 
 
 export default function SignUpPage() {
-  const { theme } = useTheme();
+  const { theme, toggleTheme, mounted } = useTheme();
 
+  if (!mounted) {
+    return null;
+  }
   return (
     <>
       <Navbar />
@@ -18,7 +21,6 @@ export default function SignUpPage() {
           <SignUp
             fallbackRedirectUrl="/onboarding"
             forceRedirectUrl="/onboarding"
-            key={theme}
             appearance={{
               baseTheme:
                 theme === "dark"

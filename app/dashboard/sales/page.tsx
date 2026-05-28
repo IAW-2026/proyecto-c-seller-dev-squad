@@ -4,6 +4,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { Suspense } from "react";
 import SalesClient from "./SalesClient";
 
 const PER_PAGE = 10;
@@ -58,7 +59,8 @@ export default async function SalesPage({ searchParams }: Props) {
   ) as Record<string, { count: number; sum: number }>;
 
   return (
-    <SalesClient
+    <Suspense fallback={<div>Cargando...</div>}>
+     <SalesClient
       sells={ventas.map((v) => ({
         id:       v.id,
         orderId:  v.orderId,
@@ -84,5 +86,6 @@ export default async function SalesPage({ searchParams }: Props) {
       q={q}
       resumen={totalPorEstado}
     />
+  </Suspense>
   );
 }

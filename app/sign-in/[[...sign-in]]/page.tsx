@@ -7,8 +7,11 @@ import { dark } from "@clerk/themes";
 
 
 export default function SignInPage() {
-  const { theme } = useTheme();
+  const { theme, toggleTheme, mounted } = useTheme();
 
+  if (!mounted) {
+    return null;
+  }
   return (
     <>
        <Navbar />
@@ -30,7 +33,6 @@ export default function SignInPage() {
           signUpUrl="/sign-up"
           fallbackRedirectUrl="/dashboard"
           forceRedirectUrl="/dashboard"
-            key={theme}
             appearance={{
               baseTheme:
                 theme === "dark"
@@ -38,11 +40,8 @@ export default function SignInPage() {
                   : undefined,
 
               elements: {
-                logoBox: {
-                  display: "none",},
-                  footerAction: {
-                    display: "none",
-                          },
+                logoBox: {display: "none",},
+                  footerAction: {display: "none", },
               },
             }}
           />

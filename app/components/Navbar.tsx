@@ -5,7 +5,11 @@ import Link from "next/link";
 import { useTheme } from "@/hooks/useTheme";
 
 export default function Navbar() {
-  const { theme, toggleTheme } = useTheme();
+const { theme, toggleTheme, mounted } = useTheme();
+
+if (!mounted) {
+  return null;
+}
 
   return (
     <header className="navbar">

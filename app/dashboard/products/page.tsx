@@ -3,6 +3,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { Suspense } from "react";
 import ProductsClient from "./ProductsClient";
 
 const PER_PAGE = 8;
@@ -50,12 +51,13 @@ export default async function ProductsPage({ searchParams }: Props) {
   ]);
 
   return (
-    <ProductsClient
-       products={ products.map((p) => ({
-        id:        p.id,
-         name:    p. name,
-        brand:     p.brand,
-        category: p.category ?? null,
+    <Suspense fallback="Cargando...">
+      <ProductsClient
+         products={ products.map((p) => ({
+          id:        p.id,
+           name:    p. name,
+          brand:     p.brand,
+          category: p.category ?? null,
         direction: p.direction ?? null,
         colors:    p.colors ?? [],
         price:    Number(p.price),
@@ -71,5 +73,6 @@ export default async function ProductsPage({ searchParams }: Props) {
       q={q}
       estadoFiltro={estado ?? "todos"}
     />
+    </Suspense>
   );
 }

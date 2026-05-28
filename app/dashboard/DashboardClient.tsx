@@ -1,5 +1,5 @@
 "use client";
-
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 type SellStatus = "CONFIRMED" | "PENDING" | "CANCELLED";
@@ -50,6 +50,16 @@ function EstadoBadge({ estado }: { estado: SellStatus }) {
 }
 
 export default function DashboardClient({  seller, metricas, ventasRecientes,  productosBajoStock }: Props) {
+  const [fechaActual, setFechaActual] = useState("");
+  useEffect(() => {
+    setFechaActual(
+      new Date().toLocaleDateString("es-AR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      })
+    );
+  }, []); 
   const { total_products, total_Ventas, ingresoTotal, ventasPorEstado } = metricas;
 
   const totalEstados = Object.values(ventasPorEstado).reduce((a, b) => a + b, 0) || 1;
@@ -64,7 +74,7 @@ export default function DashboardClient({  seller, metricas, ventasRecientes,  p
         <div>
           <h1 className="dashboard-topbar-title">Resumen</h1>
           <p className="dashboard-topbar-date">
-            {new Date().toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" })}
+              {fechaActual}
           </p>
         </div>
         <Link href="/dashboard/products/new" className="btn-primary" style={{ padding: "9px 18px", borderRadius: 9, fontSize: 13, fontWeight: 500, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
