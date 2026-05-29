@@ -30,9 +30,6 @@ export default clerkMiddleware(async (auth, req) => {
     (sessionClaims?.publicMetadata as { role?: string })?.role ??
     null;
 
-      console.log("MIDDLEWARE ROLE:", role);
-
-
   const rolesPermitidos = ["seller", "admin"];
   if (role && !rolesPermitidos.includes(role)) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));

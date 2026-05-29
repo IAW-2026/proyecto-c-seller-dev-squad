@@ -9,8 +9,6 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    console.log("BODY RECIBIDO:", body);
-
     const { nombre, categoria, keywords, imagen } = body;
 
     // Validaciones básicas

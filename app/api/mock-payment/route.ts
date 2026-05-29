@@ -1,0 +1,51 @@
+import { NextRequest, NextResponse } from "next/server";
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+
+    const { sellId } = body;
+
+    console.log("Procesando pago:", sellId);
+
+    // espera 10 segundos REALMENTE
+    await new Promise((resolve) =>
+      setTimeout(resolve, 10000)
+    );
+
+    // simulación aleatoria
+    const estados = ["CONFIRMED", "CANCELLED"];
+
+    const status =
+      estados[Math.floor(Math.random() * estados.length)];
+
+    await fetch(
+      `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sellId,
+          status,
+        }),
+      }
+    );
+
+    console.log("Pago procesado:", sellId, status);
+
+    return NextResponse.json({
+      ok: true,
+      status,
+    });
+
+  } catch (error) {
+    console.error("Error mock payment:", error);
+
+    return NextResponse.json(
+      { error: "Error mock payment" },
+      { status: 500 }
+    );
+  }
+}

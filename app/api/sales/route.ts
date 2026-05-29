@@ -12,13 +12,6 @@ export async function POST(req: NextRequest) {
       color,
     } = body;
 
-    console.log("BODY RECIBIDO:", {
-      productId,
-      quantity,
-      size,
-      color,
-    });
-
     if (!productId) {
       return NextResponse.json(
         { error: "Falta productId" },
@@ -40,8 +33,6 @@ export async function POST(req: NextRequest) {
         sizes: true,
       },
     });
-
-    console.log("PRODUCTO ENCONTRADO:", product);
 
     if (!product) {
       return NextResponse.json(
@@ -95,16 +86,24 @@ export async function POST(req: NextRequest) {
     }
 
     const total = Number(product.price) * quantity;
+  const sells = await prisma.sell.findMany({
+    select: {
+      orderId: true,
+    },
+  });
 
-    const lastSell = await prisma.sell.findFirst({ orderBy: {createdAt: "desc",},});
-    let nextNumber = 1;
+  const numbers = sells
+    .map((s) => {
+      const match = s.orderId.match(/\d+/);
+      return match ? Number(match[0]) : 0;
+    });
 
-    if (
-      lastSell?.orderId &&
-      lastSell.orderId.startsWith("BUYER-ORDER-")
-    ) {
-      nextNumber =Number(lastSell.orderId.replace("BUYER-ORDER-", "")) + 1;
-       }
+  const maxNumber =
+    numbers.length > 0
+      ? Math.max(...numbers)
+      : 0;
+
+  const nextNumber = maxNumber + 1;
 
 const orderId =
   `BUYER-ORDER-${String(nextNumber).padStart(3, "0")}`;
@@ -130,6 +129,19 @@ const orderId =
         details: true,
       },
     });
+
+    fetch(
+      `${process.env.NEXT_PUBLIC_APP_URL}/api/mock-payment`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sellId: sell.id,
+        }),
+      }
+    ).catch(console.error);
 
     // Descuenta stock
     if (selectedSize) {
@@ -183,7 +195,6 @@ const orderId =
     );
 
   } catch (error) {
-    console.error("ERROR API SALES:", error);
 
     return NextResponse.json(
       { error: "Error interno" },
