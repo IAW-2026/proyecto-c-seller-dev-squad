@@ -19,7 +19,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Feedback App no configurada" }, { status: 503 });
   }
 
-  const res = await fetch(`${FEEDBACK_APP_URL}/reviews/seller/${vendedor.id}`);
+  const res = await fetch(`${FEEDBACK_APP_URL}/reviews/seller/${vendedor.id}` ,
+  { headers: {  "X-API-Key": process.env.INTERNAL_API_KEY!, }, });
   const data = await res.json();
   return NextResponse.json(data);
 }

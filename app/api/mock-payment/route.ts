@@ -15,12 +15,13 @@ export async function POST(req: NextRequest) {
     const status =
       estados[Math.floor(Math.random() * estados.length)];
 
-    await fetch(
+   await fetch(
       `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-API-Key": process.env.INTERNAL_API_KEY!,
         },
         body: JSON.stringify({
           sellId,
