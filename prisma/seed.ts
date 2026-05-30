@@ -1,7 +1,3 @@
-// ============================================================
-// prisma/seed.ts — Seller App
-// Datos precargados
-//
 // Ejecutar con:
 //   npx prisma db seed
 import { PrismaClient, SellStatus } from "@prisma/client";
@@ -13,11 +9,6 @@ dotenv.config({ path: ".env.local" });
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
-// ------------------------------------------------------------
-// IMPORTANTE: reemplazá estos IDs con los clerk_user_id reales
-// de las cuentas que uses para la demo. Los podés obtener
-// desde el dashboard de Clerk → Users.
-// ------------------------------------------------------------
 const SELLERS_SEED = [
   {
     clerkUserId: "user_3Dmn3iLVDbiXRlsplW5U4D8Nikn",
@@ -27,17 +18,10 @@ const SELLERS_SEED = [
     avatarUrl: "",
   },
   {
-    clerkUserId: "user_seller_002",
+    clerkUserId: "user_3DpXMEd6u89VnAWhsLtcjJc75bQ",
     name: "Bart Simpson",
-    email: "simpson.bart@gmail.com",
+    email: "bart.simpsonvendedor@gmail.com",
     description: "Urban and skate sneakers specialist.",
-    avatarUrl: "",
-  },
-  {
-    clerkUserId: "user_admin_001",
-    name: "Administrator",
-    email: "admin@marketplace.com",
-    description: "Marketplace admin account.",
     avatarUrl: "",
   },
 ];
