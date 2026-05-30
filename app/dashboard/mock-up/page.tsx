@@ -9,14 +9,11 @@ export default function MockShop() {
     fetch("/api/products")
       .then((r) => r.json())
       .then((data) => {
-        console.log("PRODUCTOS:", data);
         setProducts(data.data);
       });
   }, []);
 
   async function comprar(product: any) {
-    console.log("COMPRANDO:", product);
-
     const res = await fetch("/api/sales", {
       method: "POST",
       headers: {
@@ -32,8 +29,6 @@ export default function MockShop() {
     });
 
     const data = await res.json();
-
-    console.log("RESPUESTA API:", data);
 
     if (!res.ok) {
       alert(data.error);

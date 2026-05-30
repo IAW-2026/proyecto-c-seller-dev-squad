@@ -44,7 +44,6 @@ ${categoria ? `- Estilo/Categoría: ${categoria}` : ""}
 ${keywords ? `- Características clave / Marca: ${keywords}` : ""}
 `;
 
-    // Llamada al SDK oficial utilizando el modelo rápido gemini-2.5-flash
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,

@@ -6,14 +6,10 @@ export async function POST(req: NextRequest) {
 
     const { sellId } = body;
 
-    console.log("Procesando pago:", sellId);
-
-    // espera 10 segundos REALMENTE
     await new Promise((resolve) =>
       setTimeout(resolve, 10000)
     );
 
-    // simulación aleatoria
     const estados = ["CONFIRMED", "CANCELLED"];
 
     const status =
@@ -32,8 +28,6 @@ export async function POST(req: NextRequest) {
         }),
       }
     );
-
-    console.log("Pago procesado:", sellId, status);
 
     return NextResponse.json({
       ok: true,

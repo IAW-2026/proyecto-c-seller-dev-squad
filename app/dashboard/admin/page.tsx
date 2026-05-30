@@ -13,7 +13,6 @@ export default async function AdminPage() {
     (sessionClaims?.publicMetadata as any)?.role ??
     null;
 
-  // Solo admins
   if (role !== "admin") {
     redirect("/dashboard");
   }

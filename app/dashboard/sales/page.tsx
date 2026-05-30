@@ -1,4 +1,3 @@
-// app/dashboard/sales/page.tsx
 // Historial de ventas del  seller con filtros por estado y paginación
 
 import { auth } from "@clerk/nextjs/server";

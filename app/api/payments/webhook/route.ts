@@ -23,12 +23,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    console.log(
-      "VENTA ACTUALIZADA:",
-      updatedSell.id,
-      status
-    );
-
     return NextResponse.json({
       ok: true,
       sell: updatedSell,
