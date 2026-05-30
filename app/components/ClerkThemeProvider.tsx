@@ -2,18 +2,13 @@
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
-import { useTheme } from "@/hooks/useTheme";
+import { ThemeProvider, useTheme } from "@/hooks/ThemeProvider";
 
-export default function ClerkThemeProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-const { theme, toggleTheme, mounted } = useTheme();
+function ClerkWithTheme({ children }: { children: React.ReactNode }) {
+  const { theme, mounted } = useTheme();
 
-if (!mounted) {
-  return null;
-}
+  if (!mounted) return null;
+
   return (
     <ClerkProvider
       afterSignOutUrl="/sign-in"
@@ -23,5 +18,13 @@ if (!mounted) {
     >
       {children}
     </ClerkProvider>
+  );
+}
+
+export default function ClerkThemeProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <ThemeProvider>
+      <ClerkWithTheme>{children}</ClerkWithTheme>
+    </ThemeProvider>
   );
 }

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/ThemeProvider";
 
 export default function Navbar() {
 const { theme, toggleTheme, mounted } = useTheme();

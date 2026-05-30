@@ -4,7 +4,7 @@ import Link from "next/link";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/ThemeProvider";
 
 const NAV = [
   { href: "/dashboard",          label: "Resumen",   icon: "▦" },

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/ThemeProvider";
 import DashboardSidebar from "./DashboardSidebar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
