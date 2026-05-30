@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# C-Seller Dev Squad
 
-## Getting Started
+Aplicación web para la gestión de vendedores, productos y ventas dentro de un marketplace. Incluye panel de administración, panel de vendedores, gestión de stock, simulación de compras y procesamiento de pagos mediante integración con servicios externos.
 
-First, run the development server:
+## Deploy: 
+     https://proyecto-c-seller-dev-squad.vercel.app/
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Acceso
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Administrador
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Usuario | Email | Contraseña |
+|----------|----------|----------|
+| Administrador | zapasya.clerk@gmail.com | ZapasYa11@ |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Vendedor
 
-## Learn More
+| Usuario | Email | Contraseña |
+|----------|----------|----------|
+| Bart Simpson | bart.simpsonvendedor@gmail.com | BartolomeoSimpson1989 |
+| Lady Gaga | lady.gaga.vendedora@gmail.com | G4g4Password |
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Registro de nuevos usuarios
+Los nuevos usuarios pueden registrarse desde la pantalla de inicio de sesión utilizando una dirección de correo electrónico no registrada previamente.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Simulación de compra de productos 
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Con el objetivo de probar que el sistema responde frente a la compra de un producto (y recibir desde Payments si el pago fue exitoso (confirmado) o no (Cancelado)): Se accede para comprar un producto mediante -> dashboard/mock-up
