@@ -13,18 +13,25 @@ Aplicación web para la gestión de vendedores, productos y ventas dentro de un 
 - Sistema de reseñas para vendedores.
 
 ## Integraciones
+- Buyer App: exposición del catálogo de productos
 - Payment App: procesamiento y confirmación de pagos.
 - Feedback App: consulta de reseñas de vendedores.
 
 ## Acceso por tipo de usuario
 
 ### Administrador
+ Permite:
+ - Visualizar y gestionar vendedores y productos
 
 | Usuario | Email | Contraseña |
 |----------|----------|----------|
 | Administrador | zapasya.clerk@gmail.com | ZapasYa11@ |
 
 ### Vendedor
+  Permite:
+  - Publicar zapatillas
+  - Consultar ventas realizadas
+  - Visualizar reseñas recibidas
 
 | Usuario | Email | Contraseña |
 |----------|----------|----------|
@@ -39,6 +46,11 @@ Los nuevos usuarios pueden registrarse desde la pantalla de inicio de sesión ut
 ## Simulación de compra de productos 
 
 Con el objetivo de probar que el sistema responde frente a la compra de un producto (y recibir desde Payments si el pago fue exitoso (confirmado) o no (Cancelado)): Se accede para comprar un producto mediante -> dashboard/mock-up
+
+## Seguridad
+
+Las comunicaciones entre aplicaciones utilizan una API Key compartida mediante el header: X-API-Key
+Las solicitudes que no incluyen una clave válida son rechazadas.
 
 ## Tecnologías
 - Next.js
