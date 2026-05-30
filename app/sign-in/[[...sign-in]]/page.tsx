@@ -26,8 +26,8 @@ export default function SignInPage() {
           </div>    
 
           <SignIn
-          fallbackRedirectUrl="/dashboard"
-          forceRedirectUrl="/dashboard"
+          forceRedirectUrl="/loading"
+          fallbackRedirectUrl="/loading"
             appearance={{
               baseTheme:
                 theme === "dark"
