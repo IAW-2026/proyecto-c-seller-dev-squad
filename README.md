@@ -5,7 +5,18 @@ Aplicación web para la gestión de vendedores, productos y ventas dentro de un 
 ## Deploy: 
      https://proyecto-c-seller-dev-squad.vercel.app/
 
-## Acceso
+## Funcionalidades
+- Gestión de productos y stock.
+- Gestión de ventas.
+- Simulación de pagos.
+- Panel de administración.
+- Sistema de reseñas para vendedores.
+
+## Integraciones
+- Payment App: procesamiento y confirmación de pagos.
+- Feedback App: consulta de reseñas de vendedores.
+
+## Acceso por tipo de usuario
 
 ### Administrador
 
@@ -28,3 +39,12 @@ Los nuevos usuarios pueden registrarse desde la pantalla de inicio de sesión ut
 ## Simulación de compra de productos 
 
 Con el objetivo de probar que el sistema responde frente a la compra de un producto (y recibir desde Payments si el pago fue exitoso (confirmado) o no (Cancelado)): Se accede para comprar un producto mediante -> dashboard/mock-up
+
+## Tecnologías
+- Next.js
+- React
+- TypeScript
+- Prisma
+- PostgreSQL
+- Clerk
+- Vercel

@@ -11,19 +11,26 @@ const NAV = [
   { href: "/dashboard/products", label: "Productos", icon: "◫" },
   { href: "/dashboard/sales",    label: "Ventas",    icon: "◈" },
   { href: "/dashboard/reviews",  label: "Reseñas",   icon: "★" },
+  { href: "/dashboard/profile",  label: "Mi perfil", icon: "◎" },
   { href: "/dashboard/admin",    label: "Admin",     icon: "◉" },
 ];
 
 interface Props {
   open: boolean;
   onClose: () => void;
+  role: string;
 }
 
-export default function DashboardSidebar({ open, onClose }: Props) {
+export default function DashboardSidebar({ open, onClose, role }: Props) {
   const pathname = usePathname();
   const { theme, toggleTheme, mounted } = useTheme();
   const { user } = useUser();
   const name = user?.fullName || "Mi cuenta";
+  const NAV_FILTRADO = NAV.filter(item => {
+  if (item.href === "/dashboard/admin") return role === "admin";
+  if (role === "admin") return item.href === "/dashboard/admin";
+  return true;
+});
 
   if (!mounted) {
     return null;
@@ -51,7 +58,7 @@ export default function DashboardSidebar({ open, onClose }: Props) {
           />
         </div>
         <nav className="sidebar-nav">
-          {NAV.map((item) => {
+          {NAV_FILTRADO.map((item) => {
             const active = pathname === item.href ||
               (item.href !== "/dashboard" && pathname.startsWith(item.href));
             return (
@@ -89,7 +96,7 @@ export default function DashboardSidebar({ open, onClose }: Props) {
           <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
           <div>
             <p className="sidebar-user-name">{name}</p>
-            <p className="sidebar-user-role"> seller</p>
+            <p className="sidebar-user-role">{role === "admin" ? "Administrador" : "Vendedor"}</p>
           </div>
         </div>
       </aside>

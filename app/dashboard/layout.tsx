@@ -16,8 +16,10 @@ export default async function DashboardLayout({
     (sessionClaims?.publicMetadata as any)?.role ??
     null;
 
+  if (!role) redirect("/unauthorized");
+
   if (role === "admin") {
-    return <DashboardClientLayout>{children}</DashboardClientLayout>;
+    return <DashboardClientLayout role={role!}>{children}</DashboardClientLayout>;
   }
 
   const seller = await prisma.seller.findUnique({
@@ -28,5 +30,5 @@ export default async function DashboardLayout({
   if (!seller) redirect("/onboarding");
   if (!seller.active) redirect("/unauthorized");
 
-  return <DashboardClientLayout>{children}</DashboardClientLayout>;
+  return <DashboardClientLayout role={role!}>{children}</DashboardClientLayout>;
 }

@@ -5,16 +5,20 @@ import Image from "next/image";
 import { useTheme } from "@/hooks/ThemeProvider";
 import DashboardSidebar from "./DashboardSidebar";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+interface Props {
+  children: React.ReactNode;
+  role: string;
+}
+
+export default function DashboardLayout({ children, role }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { theme, toggleTheme, mounted } = useTheme();
 
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) {return null;}
+
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
-      <DashboardSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <DashboardSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} role={role} />
 
       <div className="dashboard-main" style={{ flex: 1, marginLeft: 224 }}>
 
