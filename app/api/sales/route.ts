@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { waitUntil } from "@vercel/functions";
 
 export async function POST(req: NextRequest) {
   try {
@@ -130,18 +131,16 @@ const orderId =
       },
     });
 
-    fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/mock-payment`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          sellId: sell.id,
-        }),
-      }
-    ).catch(console.error);
+    waitUntil(
+  fetch(
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/mock-payment`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sellId: sell.id }),
+    }
+  ).catch(console.error)
+);
 
     // Descuenta stock
     if (selectedSize) {
