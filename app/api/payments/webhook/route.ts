@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
 
     const { sellId, status } = body;
 
+
     if (!sellId || !status) {
       return NextResponse.json(
         { error: "Datos faltantes" },
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     console.error("ERROR WEBHOOK:", error);
+    
 
     return NextResponse.json(
       { error: "Error interno" },

@@ -100,7 +100,11 @@ export default function AdminClient({ stats,  sellers,  products, sells }: Props
       onConfirm: async () => {
         setLoading(true);
         try {
-          await fetch(`/api/products/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ active: !active }) });
+          const res = await fetch(`/api/products/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ active: !active }),
+          });
           setConfirm(null);
           startTransition(() => router.refresh());
         } catch { setError("Error al actualizar el  product"); }

@@ -32,68 +32,72 @@ const { id } = await params;
  
 // ── PATCH /api/products/:id ────────────────────────────────
 export async function PATCH(req: NextRequest, { params }: Params) {
-  const { id } = await params; 
+  const { id } = await params;
+
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    const { userId, sessionClaims } = await auth();
+    if (!userId) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
+    const role =
+      (sessionClaims?.metadata as any)?.role ??
+      (sessionClaims?.publicMetadata as any)?.role ??
+      null;
+
+    const isAdmin = role === "admin";
+
+    if (!isAdmin) {
+      const seller = await prisma.seller.findUnique({ where: { clerkUserId: userId } });
+      if (!seller) return NextResponse.json({ error: "Vendedor no encontrado" }, { status: 403 });
+
+      const existente = await prisma.product.findFirst({
+        where: { id, sellerId: seller.id },
+      });
+      if (!existente) return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
     }
- 
-    const seller= await prisma.seller.findUnique({ where: { clerkUserId: userId } });
-    if (!seller) {
-      return NextResponse.json({ error: "Vendedor no encontrado" }, { status: 403 });
-    }
- 
-    // verificar que el  product pertenece a este  seller
-    const existente = await prisma.product.findFirst({
-      where: { id, sellerId:  seller.id },
-    });
-    if (!existente) {
-      return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
-    }
- 
+
+    // buscar el producto para obtener stock actual (disponible para todos)
+    const producto = await prisma.product.findUnique({ where: { id } });
+    if (!producto) return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
+
     const body = await req.json();
-    const {  name, description, price, stock, brand, category, image, direction, colors, active, sizes } = body;
+    const { name, description, price, stock, brand, category, image, direction, colors, active, sizes } = body;
+
     const stockTotal =
       sizes?.length > 0
-        ? sizes.reduce(
-            (acc: number, s: { stock: number }) =>
-              acc + Number(s.stock || 0),
-            0
-          )
-        : Number(stock ?? existente.stock);
- 
+        ? sizes.reduce((acc: number, s: { stock: number }) => acc + Number(s.stock || 0), 0)
+        : Number(stock ?? producto.stock); // ← usa producto en vez de existente
+
     // actualizar sizes si vienen en el body
     if (sizes !== undefined) {
-      await prisma.productSize.deleteMany({ where: {  productId: id } });
+      await prisma.productSize.deleteMany({ where: { productId: id } });
       if (sizes.length > 0) {
         await prisma.productSize.createMany({
           data: sizes.map((t: { size: string; stock: number }) => ({
-             productId: id,
-            size:      t.size,
-            stock:      t.stock,
+            productId: id,
+            size: t.size,
+            stock: t.stock,
           })),
         });
       }
     }
- 
+
     const updatedAt = await prisma.product.update({
       where: { id },
       data: {
-        ...( name      !== undefined && {  name:       name.trim() }),
+        ...(name        !== undefined && { name: name.trim() }),
         ...(description !== undefined && { description: description?.trim() ?? null }),
-        ...(price      !== undefined && { price:      Number(price) }),
-        ...(stock       !== undefined || sizes !== undefined ? { stock: stockTotal } : {}),
+        ...(price       !== undefined && { price: Number(price) }),
+        ...(stock !== undefined || sizes !== undefined ? { stock: stockTotal } : {}),
         ...(brand       !== undefined && { brand }),
         ...(category    !== undefined && { category }),
-        ...(image   !== undefined && { image:   image?.trim() || null }),
-        ...(direction !== undefined && { direction: direction?.trim() || null }),
-        ...(colors !== undefined && { colors }),
+        ...(image       !== undefined && { image: image?.trim() || null }),
+        ...(direction   !== undefined && { direction: direction?.trim() || null }),
+        ...(colors      !== undefined && { colors }),
         ...(active      !== undefined && { active }),
       },
       include: { sizes: true },
     });
- 
+
     return NextResponse.json({ ...updatedAt, price: Number(updatedAt.price) });
   } catch (error) {
     console.error("[PATCH /api/products/:id]", error);

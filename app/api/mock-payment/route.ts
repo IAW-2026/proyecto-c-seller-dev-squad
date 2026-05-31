@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     const { sellId } = body;
 
     await new Promise((resolve) =>
-      setTimeout(resolve, 10000)
+      setTimeout(resolve, 3000)
     );
 
     const estados = ["CONFIRMED", "CANCELLED"];
