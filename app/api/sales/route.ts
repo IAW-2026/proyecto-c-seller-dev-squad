@@ -131,6 +131,10 @@ const orderId =
       },
     });
 
+    console.log("[SALES] NEXT_PUBLIC_APP_URL:", process.env.NEXT_PUBLIC_APP_URL);
+console.log("[SALES] INTERNAL_API_KEY existe:", !!process.env.INTERNAL_API_KEY);
+console.log("[SALES] Llamando webhook para sell:", sell.id);
+
     waitUntil(
   fetch(
     `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`,
