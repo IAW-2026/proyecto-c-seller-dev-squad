@@ -133,11 +133,17 @@ const orderId =
 
     waitUntil(
   fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/mock-payment`,
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sellId: sell.id }),
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Key": process.env.INTERNAL_API_KEY!,
+      },
+      body: JSON.stringify({
+        sellId: sell.id,
+        status: Math.random() > 0.5 ? "CONFIRMED" : "CANCELLED",
+      }),
     }
   ).catch(console.error)
 );
