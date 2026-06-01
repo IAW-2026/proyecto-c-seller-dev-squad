@@ -135,7 +135,7 @@ const orderId =
 console.log("[SALES] INTERNAL_API_KEY existe:", !!process.env.INTERNAL_API_KEY);
 console.log("[SALES] Llamando webhook para sell:", sell.id);
 
-    waitUntil(
+   waitUntil(
   fetch(
     `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`,
     {
@@ -149,9 +149,14 @@ console.log("[SALES] Llamando webhook para sell:", sell.id);
         status: Math.random() > 0.5 ? "CONFIRMED" : "CANCELLED",
       }),
     }
-  ).catch(console.error)
+  )
+  .then(async (res) => {
+    console.log("[SALES] Webhook respondió:", res.status, await res.text());
+  })
+  .catch((err) => {
+    console.error("[SALES] Webhook error:", err);
+  })
 );
-
     // Descuenta stock
     if (selectedSize) {
       await prisma.productSize.update({
