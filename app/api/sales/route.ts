@@ -193,6 +193,7 @@ const orderId =
         }),
       }
     );
+    console.log("[SALES] URL webhook:", `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`);
       console.log("[SALES] Webhook respondió:", webhookRes.status);
     } catch (err) {
       console.error("[SALES] Webhook error:", err);
