@@ -131,32 +131,6 @@ const orderId =
       },
     });
 
-    console.log("[SALES] NEXT_PUBLIC_APP_URL:", process.env.NEXT_PUBLIC_APP_URL);
-console.log("[SALES] INTERNAL_API_KEY existe:", !!process.env.INTERNAL_API_KEY);
-console.log("[SALES] Llamando webhook para sell:", sell.id);
-
-   waitUntil(
-  fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-Key": process.env.INTERNAL_API_KEY!,
-      },
-      body: JSON.stringify({
-        sellId: sell.id,
-        status: Math.random() > 0.5 ? "CONFIRMED" : "CANCELLED",
-      }),
-    }
-  )
-  .then(async (res) => {
-    console.log("[SALES] Webhook respondió:", res.status, await res.text());
-  })
-  .catch((err) => {
-    console.error("[SALES] Webhook error:", err);
-  })
-);
     // Descuenta stock
     if (selectedSize) {
       await prisma.productSize.update({
@@ -203,16 +177,30 @@ console.log("[SALES] Llamando webhook para sell:", sell.id);
       });
     }
 
-    return NextResponse.json(
-      sell,
-      { status: 201 }
-    );
+ try {
+      const webhookRes = await fetch(
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-Key": process.env.INTERNAL_API_KEY!,
+          },
+          body: JSON.stringify({
+            sellId: sell.id,
+            status: Math.random() > 0.5 ? "CONFIRMED" : "CANCELLED",
+          }),
+        }
+      );
+      console.log("[SALES] Webhook respondió:", webhookRes.status);
+    } catch (err) {
+      console.error("[SALES] Webhook error:", err);
+    }
+
+    return NextResponse.json(sell, { status: 201 });
 
   } catch (error) {
-
-    return NextResponse.json(
-      { error: "Error interno" },
-      { status: 500 }
-    );
+    console.error("[SALES ERROR]", error);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
