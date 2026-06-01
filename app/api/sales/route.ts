@@ -90,6 +90,8 @@ export async function POST(req: NextRequest) {
           }),
         }
       );
+      console.log("[SALES] bypass secret existe:", !!process.env.VERCEL_AUTOMATION_BYPASS_SECRET);
+console.log("[SALES] bypass secret valor:", process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.slice(0, 5));
       console.log("[SALES] baseUrl:", baseUrl);
       console.log("[SALES] Webhook respondió:", webhookRes.status);
     } catch (err) {
