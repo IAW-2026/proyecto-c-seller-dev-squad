@@ -179,19 +179,20 @@ const orderId =
 
  try {
       const webhookRes = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-API-Key": process.env.INTERNAL_API_KEY!,
-          },
-          body: JSON.stringify({
-            sellId: sell.id,
-            status: Math.random() > 0.5 ? "CONFIRMED" : "CANCELLED",
-          }),
-        }
-      );
+      `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": process.env.INTERNAL_API_KEY!,
+          "x-vercel-protection-bypass": process.env.VERCEL_AUTOMATION_BYPASS_SECRET!,
+        },
+        body: JSON.stringify({
+          sellId: sell.id,
+          status: Math.random() > 0.5 ? "CONFIRMED" : "CANCELLED",
+        }),
+      }
+    );
       console.log("[SALES] Webhook respondió:", webhookRes.status);
     } catch (err) {
       console.error("[SALES] Webhook error:", err);
