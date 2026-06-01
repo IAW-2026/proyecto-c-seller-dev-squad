@@ -3,9 +3,9 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
 const MOCK_REVIEWS = [
-  { id: "rev_001", sellerId: "user_3Dmn3iLVDbiXRlsplW5U4D8Nikn", rating: 5, comentario: "Excelente atención y producto tal como se describía.", fecha: "2026-04-10" },
+  { id: "rev_001", sellerId: "user_3EXRTQxtmlNmH0zzBL2j4ywNU5i", rating: 5, comentario: "Excelente atención y producto tal como se describía.", fecha: "2026-04-10" },
   { id: "rev_002", sellerId: "user_3DpXMEd6u89VnAWhsLtcjJc75bQ", rating: 4, comentario: "Llegó rápido y en perfectas condiciones.", fecha: "2026-04-15" },
-  { id: "rev_003", sellerId: "user_3Dmn3iLVDbiXRlsplW5U4D8Nikn", rating: 5, comentario: "Muy buena experiencia de compra, recomendado.", fecha: "2026-04-22" },
+  { id: "rev_003", sellerId: "user_3EXRTQxtmlNmH0zzBL2j4ywNU5i", rating: 5, comentario: "Muy buena experiencia de compra, recomendado.", fecha: "2026-04-22" },
   { id: "rev_004", sellerId: "user_3DpXMEd6u89VnAWhsLtcjJc75bQ", rating: 3, comentario: "El producto estaba bien pero tardó más de lo esperado.", fecha: "2026-05-01" },
   { id: "rev_005", sellerId: "user_3DpOYfSLrQPxMxBXGccpbrQ1Ahd", rating: 5, comentario: "Zapatillas increíbles, muy buena calidad.", fecha: "2026-05-03" },
 ];
