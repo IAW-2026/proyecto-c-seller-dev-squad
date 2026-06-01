@@ -30,7 +30,7 @@ Los usuarios ya registrados, realizan el sign in utilizando el panel provisto po
 
 | Usuario | Email | Contraseña |
 |----------|----------|----------|
-| Administrador | admin+clerktest@iaw.com | iawuser# |
+| Administrador | admin+clerk_test@iaw.com | iawuser# |
 
 ### Vendedor
   Permite:
@@ -42,7 +42,7 @@ Los usuarios ya registrados, realizan el sign in utilizando el panel provisto po
 |----------|----------|----------|
 | Bart Simpson | bart.simpsonvendedor@gmail.com | BartolomeoSimpson1989 |
 | Lady Gaga | lady.gaga.vendedora@gmail.com | G4g4Password |
-| Seller User | seller+clerktest@iaw.com | iawuser# |
+| Seller User | seller+clerk_test@iaw.com | iawuser# |
 
 ## Simulación de compra de productos 
 
