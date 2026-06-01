@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Inicializamos el cliente oficial de Gemini
 // Si no pasas parámetros, busca automáticamente process.env.GEMINI_API_KEY
-const ai = new GoogleGenAI({});
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(req: NextRequest) {
   try {
