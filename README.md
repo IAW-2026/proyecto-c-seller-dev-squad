@@ -61,7 +61,11 @@ de la simulación de un pago.
 - La asignación de roles se hace mediante publicMetadata.role en Clerk.
 - La sidebar se actualiza dependiendo del rol.
 - Stock por talle mediante ProductSize en lugar de un único stock global.
+- La app presenta modalidad oscuro/claro, la cual actualiza el estilo visual, colores y logo cuando se cambia de una a otra. En cuanto al logo, se los adaptó para que cuesten lo menos posible en cuanto al renderizado, haciéndolos .webp. 
+- El estilo visual y organización visual está adaptado tanto para desktop como para celulares. La versión de celular fue adaptada para una buena composición visual, específicamente en el panel de administrador.
 - La lógica de stock puede fallar frente a compras simultáneas a un mismo producto que le queda una unidad
+- Se toma como conocimiento de que el uso de Clerk afecta a la performance y cualquier elemento de la misma. Por ejemplo, en el sidebar, con la cuestión de la opción de sign out contenida en el mismo.
+- El uso de mounted fue en beneficio de minimizar las cuestiones de hidratación. 
 
 ## Tecnologías
 - Next.js
