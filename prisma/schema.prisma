@@ -1,0 +1,108 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Seller {
+  id          String   @id @default(uuid())
+  clerkUserId String   @unique @map("clerk_user_id")
+  name        String
+  email       String   @unique
+  description String?
+  avatarUrl   String?   @map("avatar_url")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  products Product[]
+  sells    Sell[]
+
+  @@map("sellers")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int      @default(0)
+  brand       String
+  category    String
+  image       String?
+  colors      String[]
+  direction   String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  sellerId String
+  seller   Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+  sizes       ProductSize[]
+  sellDetails SellDetail[]
+
+  @@index([sellerId])
+  @@map("products")
+}
+
+model ProductSize {
+  id        String   @id @default(uuid())
+  size      String
+  stock     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, size])
+  @@map("product_sizes")
+}
+
+model Sell {
+  id        String     @id @default(uuid())
+  orderId   String     @unique @map("order_id")
+  paymentId String?    @map("payment_id")
+  total     Decimal    @db.Decimal(10, 2)
+  status    SellStatus @default(PENDING)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  sellerId String       @map("seller_id")
+  seller   Seller       @relation(fields: [sellerId], references: [id])
+  details  SellDetail[]
+
+  @@index([sellerId])
+  @@map("sells")
+}
+
+enum SellStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model SellDetail {
+  id        String  @id @default(uuid())
+  quantity  Int
+  unitPrice Decimal @db.Decimal(10, 2)
+  size      String?
+  color     String?
+
+  sellId String
+  sell   Sell   @relation(fields: [sellId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@index([sellId])
+  @@index([productId])
+  @@map("sell_details")
+}
