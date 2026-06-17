@@ -8,9 +8,21 @@ interface Params { params: Promise<{ id: string }> }
 
 export async function PATCH(req: NextRequest, { params }: Params) {
   try {
-    const { userId } = await auth();
+    const { userId, sessionClaims } = await auth();
     if (!userId) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
  
+    const role =
+      (sessionClaims?.publicMetadata as {
+        role?: string;
+      })?.role;
+
+    if (role !== "admin") {
+      return NextResponse.json(
+        { error: "Forbidden" },
+        { status: 403 }
+      );
+    }
+
     const { id } = await params;
     const { active } = await req.json();
     if (typeof active !== "boolean") {
