@@ -12,17 +12,18 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     if (!userId) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
  
     const role =
-      (sessionClaims?.publicMetadata as {
-        role?: string;
-      })?.role;
+  (sessionClaims?.metadata as any)?.role ??
+  (sessionClaims?.publicMetadata as any)?.role ??
+  null;
 
-    if (role !== "admin") {
-      return NextResponse.json(
-        { error: "Forbidden" },
-        { status: 403 }
-      );
-    }
+const isAdmin = role === "admin";
 
+if (!isAdmin) {
+  return NextResponse.json(
+    { error: "Forbidden" },
+    { status: 403 }
+  );
+}
     const { id } = await params;
     const { active } = await req.json();
     if (typeof active !== "boolean") {
