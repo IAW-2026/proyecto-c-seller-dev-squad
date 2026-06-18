@@ -6,14 +6,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
-interface Params { params: { id: string } }
+interface Params { params: Promise<{ id: string }> }
 
 // ── GET /api/sales/:id ─────────────────────────────────────
 // Consumido por Shipping App para obtener detalle de venta.
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
+    const { id } = await params;
+
     const sell = await prisma.sell.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         details: { include: { product: { select: { name: true, brand: true, image: true } } } },
         seller:  { select: { id: true, name: true, email: true } },
@@ -52,6 +54,8 @@ export async function GET(_req: NextRequest, { params }: Params) {
 // Privado: solo el vendedor dueño puede cambiar el estado.
 export async function PATCH(req: NextRequest, { params }: Params) {
   try {
+    const { id } = await params;
+
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
@@ -63,7 +67,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     const sell = await prisma.sell.findFirst({
-      where: { id: params.id, sellerId: seller.id },
+      where: { id, sellerId: seller.id },
     });
     if (!sell) {
       return NextResponse.json({ error: "Venta no encontrada" }, { status: 404 });
@@ -76,7 +80,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     const updated = await prisma.sell.update({
-      where: { id: params.id },
+      where: { id },
       data:  { status },
     });
 
