@@ -2,55 +2,146 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
-const MOCK_REVIEWS = [
-  { id: "rev_001", sellerId: "user_3EXRTQxtmlNmH0zzBL2j4ywNU5i", rating: 5, comentario: "Excelente atención y producto tal como se describía.", fecha: "2026-04-10" },
-  { id: "rev_002", sellerId: "user_3DpXMEd6u89VnAWhsLtcjJc75bQ", rating: 4, comentario: "Llegó rápido y en perfectas condiciones.", fecha: "2026-04-15" },
-  { id: "rev_003", sellerId: "user_3EXRTQxtmlNmH0zzBL2j4ywNU5i", rating: 5, comentario: "Muy buena experiencia de compra, recomendado.", fecha: "2026-04-22" },
-  { id: "rev_004", sellerId: "user_3DpXMEd6u89VnAWhsLtcjJc75bQ", rating: 3, comentario: "El producto estaba bien pero tardó más de lo esperado.", fecha: "2026-05-01" },
-  { id: "rev_005", sellerId: "user_3DpOYfSLrQPxMxBXGccpbrQ1Ahd", rating: 5, comentario: "Zapatillas increíbles, muy buena calidad.", fecha: "2026-05-03" },
-];
-
 export default async function ReviewsPage() {
   const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
 
-  const vendedor = await prisma.seller.findUnique({ where: { clerkUserId: userId } });
-  if (!vendedor) redirect("/sign-in");
+  if (!userId) {
+    redirect("/sign-in");
+  }
 
-  const reviews = MOCK_REVIEWS.filter(
-    (review) => review.sellerId === userId
+  const vendedor = await prisma.seller.findUnique({
+    where: {
+      clerkUserId: userId,
+    },
+  });
+
+  if (!vendedor) {
+    redirect("/dashboard");
+  }
+
+  const feedbackUrl = process.env.FEEDBACK_APP_URL!;
+
+  let reviews: any[] = [];
+
+  try {
+    const res = await fetch(
+    `${feedbackUrl}/api/reviews/seller/${vendedor.id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.API_KEY_SELLER_APP}`,
+      },
+      cache: "no-store",
+    }
   );
+
+    if (res.ok) {
+      const result = await res.json();
+      reviews = result.data ?? [];
+    }
+  } catch (error) {
+    console.error(
+      "[REVIEWS_PAGE] Error obteniendo reseñas:",
+      error
+    );
+  }
 
   const promedio =
     reviews.length > 0
-      ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
+      ? reviews.reduce(
+          (acc, review) => acc + review.rating,
+          0
+        ) / reviews.length
       : 0;
 
   return (
     <div className="dashboard-page">
       <header className="dashboard-topbar">
         <div>
-          <h1 className="dashboard-topbar-title">Reseñas</h1>
+          <h1 className="dashboard-topbar-title">
+            Reseñas
+          </h1>
+
           <p className="dashboard-topbar-date">
-            {reviews.length} reseñas · promedio {Math.round(promedio * 10) / 10} ★
+            {reviews.length} reseñas · promedio{" "}
+            {promedio.toFixed(1)} ★
           </p>
         </div>
       </header>
 
       <div className="dashboard-content">
-        {reviews.map((r) => (
-          <div key={r.id} className="card" style={{ marginBottom: 12 }}>
+        {reviews.length === 0 ? (
+          <div className="card">
             <div className="card-body">
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                <span style={{ fontSize: 16, letterSpacing: 2 }}>
-                  {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}
-                </span>
-                <span className="text-faint" style={{ fontSize: 11 }}>{r.fecha}</span>
-              </div>
-              <p className="text-strong" style={{ fontSize: 13 }}>{r.comentario}</p>
+              <p>No hay reseñas disponibles.</p>
             </div>
           </div>
-        ))}
+        ) : (
+          reviews.slice(0, 5).map((review) => (
+            <div
+              key={review.id}
+              className="card"
+              style={{ marginBottom: 12 }}
+            >
+              <div className="card-body">
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 8,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 16,
+                      letterSpacing: 2,
+                    }}
+                  >
+                    {"★".repeat(review.rating)}
+                    {"☆".repeat(5 - review.rating)}
+                  </span>
+
+                  <span
+                    className="text-faint"
+                    style={{ fontSize: 11 }}
+                  >
+                    {new Date(
+                      review.fecha
+                    ).toLocaleDateString()}
+                  </span>
+                </div>
+
+                <p
+                  style={{
+                    fontWeight: 600,
+                    marginBottom: 6,
+                  }}
+                >
+                  {review.userName}
+                </p>
+
+                <p>{review.comentario}</p>
+              </div>
+            </div>
+          ))
+        )}
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: 20,
+          }}
+        >
+          <a
+            href={`${feedbackUrl}/explorar/vendedor/${vendedor.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary"
+          >
+            Ver todas las reseñas en Feedback App
+          </a>
+        </div>
       </div>
     </div>
   );
