@@ -13,12 +13,14 @@ export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl;
     const q      = searchParams.get("q")     ?? "";
     const brand  = searchParams.get("brand")  ?? "";
+    const category = searchParams.get("category") ?? "";
     const page   = Math.max(1, Number(searchParams.get("page")  ?? "1"));
     const limit  = Math.min(50, Math.max(1, Number(searchParams.get("limit") ?? "20")));
  
     const where = {
       active: true,
       ...(brand && { brand: { equals: brand, mode: "insensitive" as const } }),
+      ...(category && { category: { equals: category, mode: "insensitive" as const } }),
       ...(q && {
         OR: [
           {  name:      { contains: q, mode: "insensitive" as const } },
