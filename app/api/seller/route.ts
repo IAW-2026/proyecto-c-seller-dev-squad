@@ -8,7 +8,7 @@ export async function GET() {
     },
     select: {
       id: true,
-      clerkId: true,
+      clerkUserId: true,
       name: true,
       email: true,
       description: true,
