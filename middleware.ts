@@ -12,6 +12,7 @@ const isPublicApiRoute = createRouteMatcher([
   "/api/sales/(.*)",  
   "/api/generar-descripcion(.*)",
   "/api/payments/webhook",
+  "/api/admin/products",
   "/onboarding",
 ]);
 
