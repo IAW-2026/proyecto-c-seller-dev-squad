@@ -5,11 +5,14 @@ import DashboardClient from "./DashboardClient";
 
 export default async function DashboardPage() {
   const { userId, sessionClaims } = await auth();
+
+  console.log("[DASHBOARD] userId:", userId);
+console.log("[DASHBOARD] sessionClaims:", sessionClaims);
+
   if (!userId) {
     redirect("/sign-in");
   }
-console.log("[DASHBOARD] userId:", userId);
-console.log("[DASHBOARD] sessionClaims:", sessionClaims);
+
 
   const role =
     (sessionClaims?.metadata as any)?.role ??
