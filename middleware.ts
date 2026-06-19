@@ -21,11 +21,16 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   if (isProtectedRoute(req)) {
-    await auth.protect();
-  }
-  
-  const { userId, sessionClaims } = await auth();
+  const session = await auth();
 
+  if (!session.userId) {
+    return NextResponse.redirect(
+      new URL("/sign-in", req.url)
+    );
+  }
+}
+  const { userId, sessionClaims } = await auth();
+  console.log("[MIDDLEWARE] path:", req.nextUrl.pathname);
    console.log("[MIDDLEWARE] userId:", userId);
   console.log("[MIDDLEWARE] claims:", sessionClaims);
 
