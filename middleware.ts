@@ -24,7 +24,10 @@ export default clerkMiddleware(async (auth, req) => {
     await auth.protect();
   }
   
-  const { sessionClaims } = await auth();
+  const { userId, sessionClaims } = await auth();
+
+   console.log("[MIDDLEWARE] userId:", userId);
+  console.log("[MIDDLEWARE] claims:", sessionClaims);
 
    const role =
     (sessionClaims?.metadata as { role?: string })?.role ??
