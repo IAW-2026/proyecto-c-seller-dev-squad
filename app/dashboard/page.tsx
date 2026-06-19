@@ -8,6 +8,8 @@ export default async function DashboardPage() {
   if (!userId) {
     redirect("/sign-in");
   }
+console.log("[DASHBOARD] userId:", userId);
+console.log("[DASHBOARD] sessionClaims:", sessionClaims);
 
   const role =
     (sessionClaims?.metadata as any)?.role ??
