@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { verifySellerToken } from "@/lib/sellerToken";
 import DashboardClientLayout from "./DashBoardClientLayout";
 
 export default async function DashboardLayout({
@@ -9,26 +10,44 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { userId, sessionClaims } = await auth();
-  if (!userId) redirect("/sign-in");
 
-  const role =
+  let effectiveUserId = userId;
+  let role =
     (sessionClaims?.metadata as any)?.role ??
     (sessionClaims?.publicMetadata as any)?.role ??
     null;
 
-  if (!role) redirect("/unauthorized");
+  // si no hay sesión Clerk, intentamos con token
+  if (!effectiveUserId) {
+    // NO podemos leer searchParams desde layout
+    // así que para que esto funcione deberías pasar el token
+    // mediante cookie o middleware
+    redirect("/sign-in");
+  }
 
   if (role === "admin") {
-    return <DashboardClientLayout role={role!}>{children}</DashboardClientLayout>;
+    return (
+      <DashboardClientLayout role="admin">
+        {children}
+      </DashboardClientLayout>
+    );
   }
 
   const seller = await prisma.seller.findUnique({
-    where: { clerkUserId: userId },
-    select: { active: true },
+    where: {
+      clerkUserId: effectiveUserId,
+    },
+    select: {
+      active: true,
+    },
   });
 
   if (!seller) redirect("/onboarding");
   if (!seller.active) redirect("/unauthorized");
 
-  return <DashboardClientLayout role={role!}>{children}</DashboardClientLayout>;
+  return (
+    <DashboardClientLayout role="seller">
+      {children}
+    </DashboardClientLayout>
+  );
 }
