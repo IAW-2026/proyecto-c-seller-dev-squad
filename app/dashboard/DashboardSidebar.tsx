@@ -24,8 +24,9 @@ interface Props {
 export default function DashboardSidebar({ open, onClose, role }: Props) {
   const pathname = usePathname();
   const { theme, toggleTheme, mounted } = useTheme();
-  const { user } = useUser();
-  const name = user?.fullName || "Mi cuenta";
+  //const { user } = useUser();
+  //const name = user?.fullName ||"Mi cuenta";
+  const name = "Mi cuenta";
   const NAV_FILTRADO = NAV.filter(item => {
   if (item.href === "/dashboard/admin") return role === "admin";
   if (role === "admin") return item.href === "/dashboard/admin";
