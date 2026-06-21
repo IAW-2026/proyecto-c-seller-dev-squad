@@ -11,6 +11,8 @@ export default async function Page({
 }) {
   const { token } = await searchParams;
 
+  console.log("[HANDOFF] token:", token);
+
   if (!token) {
     redirect("/sign-in");
   }
@@ -18,9 +20,13 @@ export default async function Page({
 const verified =
   await verifySellerToken(token);
 
+console.log("[HANDOFF] verified:", verified);
+
 if (!verified) {
   redirect("/sign-in");
 }
+
+console.log("[HANDOFF] searching seller for:", verified.userId);
 
 const seller =
   await prisma.seller.findUnique({
@@ -28,6 +34,8 @@ const seller =
       clerkUserId: verified.userId,
     },
   });
+
+  console.log("[HANDOFF] seller:", seller);
 
 if (seller) {
   redirect("/dashboard");
