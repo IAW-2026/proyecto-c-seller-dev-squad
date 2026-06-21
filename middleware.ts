@@ -18,6 +18,10 @@ const isPublicApiRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+  const isTokenHandoffRoute = createRouteMatcher([
+  "/auth/handoff",
+]);
+
   if (isPublicApiRoute(req)) {
     return NextResponse.next();
   }

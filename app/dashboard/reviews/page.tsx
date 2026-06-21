@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import VerResenasButton from "../../components/VerReseñasButton";
 
 export default async function ReviewsPage() {
   const { userId } = await auth();
@@ -133,16 +134,10 @@ export default async function ReviewsPage() {
             marginTop: 20,
           }}
         >
-          <a
-            href={`${feedbackUrl}/explorar/vendedor/${vendedor.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary"
-          >
-            Ver todas las reseñas en Feedback App
-          </a>
+          <VerResenasButton />
         </div>
       </div>
     </div>
   );
 }
+           
