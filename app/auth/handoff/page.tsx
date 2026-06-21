@@ -38,8 +38,8 @@ const seller =
   console.log("[HANDOFF] seller:", seller);
 
 if (seller) {
-  redirect("/dashboard");
+  redirect(`/dashboard?token=${token}`);
 }
 
-redirect("/onboarding");
+redirect(`/onboarding?token=${token}`);
 }

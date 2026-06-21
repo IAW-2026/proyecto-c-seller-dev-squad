@@ -1,18 +1,48 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { verifySellerToken } from "@/lib/sellerToken";
 import DashboardClient from "./DashboardClient";
 
-export default async function DashboardPage() {
-  const { userId, sessionClaims } = await auth();
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    token?: string;
+  }>;
+}) {
+  const { token } = await searchParams;
 
-  console.log("[DASHBOARD] userId:", userId);
-console.log("[DASHBOARD] sessionClaims:", sessionClaims);
+  const {
+    userId,
+    sessionClaims,
+  } = await auth();
 
-  if (!userId) {
-    redirect("/sign-in");
+  let effectiveUserId = userId;
+
+  if (!effectiveUserId && token) {
+    const verified =
+      await verifySellerToken(token);
+
+    if (verified) {
+      effectiveUserId =
+        verified.userId;
+    }
   }
 
+  console.log("[DASHBOARD] userId:", userId);
+  console.log(
+    "[DASHBOARD] effectiveUserId:",
+    effectiveUserId
+  );
+  console.log(
+    "[DASHBOARD] sessionClaims:",
+    sessionClaims
+  );
+
+  if (!effectiveUserId) {
+    redirect("/sign-in");
+  }
 
   const role =
     (sessionClaims?.metadata as any)?.role ??
@@ -23,13 +53,17 @@ console.log("[DASHBOARD] sessionClaims:", sessionClaims);
     redirect("/dashboard/admin");
   }
 
-  const seller= await prisma.seller.findFirst({
+  const seller = await prisma.seller.findFirst({
     where: {
-      clerkUserId: userId,
+      clerkUserId: effectiveUserId,
     },
   });
 
-  if (!seller) redirect("/onboarding"); 
+  if (!seller) {
+    redirect("/onboarding");
+  }
+
+  // ... todo el resto de tu código queda igual
 
   const [total_products, total_Ventas, ventas,  productosBajoStock] = await Promise.all([
     prisma.product.count({

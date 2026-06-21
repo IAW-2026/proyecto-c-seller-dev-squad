@@ -2,6 +2,7 @@
 // Las rutas de API públicas (GET /api/products, POST /api/sales) quedan abiertas.
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { verifySellerToken } from "@/lib/sellerToken";
 
 const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
 const isAdminRoute     = createRouteMatcher(["/dashboard/admin(.*)"]);
@@ -29,7 +30,19 @@ export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
   const session = await auth();
 
+  const token =
+    req.nextUrl.searchParams.get("token");
+
   if (!session.userId) {
+    if (token) {
+      const verified =
+        await verifySellerToken(token);
+
+      if (verified) {
+        return NextResponse.next();
+      }
+    }
+
     return NextResponse.redirect(
       new URL("/sign-in", req.url)
     );
