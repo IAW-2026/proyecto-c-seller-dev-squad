@@ -17,13 +17,14 @@ export default async function DashboardLayout({
     (sessionClaims?.publicMetadata as any)?.role ??
     null;
 
+    console.log("[LAYOUT] userId:", userId);
+console.log("[LAYOUT] effectiveUserId:", effectiveUserId);
+
   // si no hay sesión Clerk, intentamos con token
   if (!effectiveUserId) {
-    // NO podemos leer searchParams desde layout
-    // así que para que esto funcione deberías pasar el token
-    // mediante cookie o middleware
-    redirect("/sign-in");
-  }
+  console.log("[LAYOUT] no user");
+  return children;
+}
 
   if (role === "admin") {
     return (
