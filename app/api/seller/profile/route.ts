@@ -1,20 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { getEffectiveUserId } from "@/lib/getEffectiveUser";
 
 export async function PATCH(req: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    const effectiveUserId = await getEffectiveUserId();
 
-    const { description } = await req.json();
+    if (!effectiveUserId) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
+
+    const { description, avatarUrl } = await req.json();
+
     if (typeof description !== "string") {
       return NextResponse.json({ error: "Descripción inválida" }, { status: 400 });
     }
 
+    if (avatarUrl !== undefined && avatarUrl !== null && typeof avatarUrl !== "string") {
+      return NextResponse.json({ error: "Avatar URL inválida" }, { status: 400 });
+    }
+
     const seller = await prisma.seller.update({
-      where: { clerkUserId: userId },
-      data: { description: description.trim() || null },
+      where: { clerkUserId: effectiveUserId },
+      data: {
+        description: description.trim() || null,
+        ...(avatarUrl !== undefined && { avatar_url: avatarUrl }),
+      },
     });
 
     return NextResponse.json(seller);
