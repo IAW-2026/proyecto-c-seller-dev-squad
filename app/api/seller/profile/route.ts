@@ -20,12 +20,11 @@ export async function PATCH(req: NextRequest) {
     if (avatarUrl !== undefined && avatarUrl !== null && typeof avatarUrl !== "string") {
       return NextResponse.json({ error: "Avatar URL inválida" }, { status: 400 });
     }
-
     const seller = await prisma.seller.update({
       where: { clerkUserId: effectiveUserId },
       data: {
         description: description.trim() || null,
-        ...(avatarUrl !== undefined && { avatar_url: avatarUrl }),
+        ...(avatarUrl !== undefined && { avatarUrl: avatarUrl }),
       },
     });
 
