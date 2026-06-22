@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { verifySellerToken } from "@/lib/sellerToken";
 import DashboardClient from "./DashboardClient";
+import { getEffectiveUserId } from "@/lib/getEffectiveUser";
 
 export default async function DashboardPage({
   searchParams,
@@ -11,24 +12,14 @@ export default async function DashboardPage({
     token?: string;
   }>;
 }) {
-  const { token } = await searchParams;
 
   const {
     userId,
     sessionClaims,
   } = await auth();
 
-  let effectiveUserId = userId;
-
-  if (!effectiveUserId && token) {
-    const verified =
-      await verifySellerToken(token);
-
-    if (verified) {
-      effectiveUserId =
-        verified.userId;
-    }
-  }
+  const effectiveUserId =
+  await getEffectiveUserId();
 
   console.log("[DASHBOARD] userId:", userId);
   console.log(

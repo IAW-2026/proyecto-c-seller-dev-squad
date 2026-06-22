@@ -1,30 +1,27 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { verifySellerToken } from "@/lib/sellerToken";
 import DashboardClientLayout from "./DashBoardClientLayout";
+import { getEffectiveUserId } from "@/lib/getEffectiveUser";
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { userId, sessionClaims } = await auth();
+  const effectiveUserId =
+    await getEffectiveUserId();
 
-  let effectiveUserId = userId;
-  let role =
+  if (!effectiveUserId) {
+    redirect("/sign-in");
+  }
+
+  const { sessionClaims } = await auth();
+
+  const role =
     (sessionClaims?.metadata as any)?.role ??
     (sessionClaims?.publicMetadata as any)?.role ??
-    null;
-
-    console.log("[LAYOUT] userId:", userId);
-console.log("[LAYOUT] effectiveUserId:", effectiveUserId);
-
-  // si no hay sesión Clerk, intentamos con token
-  if (!effectiveUserId) {
-  console.log("[LAYOUT] no user");
-  return children;
-}
+    "seller";
 
   if (role === "admin") {
     return (
@@ -43,8 +40,13 @@ console.log("[LAYOUT] effectiveUserId:", effectiveUserId);
     },
   });
 
-  if (!seller) redirect("/onboarding");
-  if (!seller.active) redirect("/unauthorized");
+  if (!seller) {
+    redirect("/onboarding");
+  }
+
+  if (!seller.active) {
+    redirect("/unauthorized");
+  }
 
   return (
     <DashboardClientLayout role="seller">
