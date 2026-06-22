@@ -12,6 +12,11 @@ export async function getEffectiveUserId() {
   const token =
     (await cookies()).get("seller_handoff")?.value;
 
+console.log(
+  "[EFFECTIVE] cookie:",
+  (await cookies()).get("seller_handoff")
+);
+
   if (!token) {
     return null;
   }

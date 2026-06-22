@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-
 import { verifySellerToken } from "@/lib/sellerToken";
 import { prisma } from "@/lib/prisma";
 
@@ -31,9 +29,14 @@ export async function GET(req: Request) {
       },
     });
 
-  const cookieStore = await cookies();
+  const response = NextResponse.redirect(
+    new URL(
+      seller ? "/dashboard" : "/onboarding",
+      req.url
+    )
+  );
 
-  cookieStore.set("seller_handoff", token, {
+  response.cookies.set("seller_handoff", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -41,10 +44,5 @@ export async function GET(req: Request) {
     maxAge: 60 * 60 * 8,
   });
 
-  return NextResponse.redirect(
-    new URL(
-      seller ? "/dashboard" : "/onboarding",
-      req.url
-    )
-  );
+  return response;
 }

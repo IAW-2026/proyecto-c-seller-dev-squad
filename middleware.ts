@@ -30,19 +30,15 @@ export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
   const session = await auth();
 
-  const token =
-    req.nextUrl.searchParams.get("token");
+  const handoff =
+    req.cookies.get("seller_handoff")?.value;
 
-  if (!session.userId) {
-    if (token) {
-      const verified =
-        await verifySellerToken(token);
+  console.log(
+  "[MIDDLEWARE] handoff:",
+  req.cookies.get("seller_handoff")
+);
 
-      if (verified) {
-        return NextResponse.next();
-      }
-    }
-
+  if (!session.userId && !handoff) {
     return NextResponse.redirect(
       new URL("/sign-in", req.url)
     );
