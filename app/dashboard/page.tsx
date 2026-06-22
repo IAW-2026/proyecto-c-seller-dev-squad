@@ -21,16 +21,6 @@ export default async function DashboardPage({
   const effectiveUserId =
   await getEffectiveUserId();
 
-  console.log("[DASHBOARD] userId:", userId);
-  console.log(
-    "[DASHBOARD] effectiveUserId:",
-    effectiveUserId
-  );
-  console.log(
-    "[DASHBOARD] sessionClaims:",
-    sessionClaims
-  );
-
   if (!effectiveUserId) {
     redirect("/sign-in");
   }
