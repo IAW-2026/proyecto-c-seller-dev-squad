@@ -13,7 +13,6 @@ interface Props {
 
 export default async function ProductsPage({ searchParams }: Props) {
   const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
 
   const effectiveUserId =
     await getEffectiveUserId();
