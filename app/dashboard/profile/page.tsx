@@ -11,18 +11,17 @@ export default async function ProfilePage() {
 
   const seller = await prisma.seller.findUnique({
     where: { clerkUserId: effectiveUserId },
-    select: { name: true, email: true, description: true, avatar_url: true },
-  });
+    select: { name: true, email: true, description: true, avatarUrl: true },  });
 
   if (!seller) redirect("/onboarding");
 
-  return (
+ return (
     <ProfileClient
       seller={{
         name:        seller.name,
         email:       seller.email,
         description: seller.description,
-        avatarUrl:   seller.avatar_url,
+        avatarUrl:   seller.avatarUrl,
       }}
     />
   );
