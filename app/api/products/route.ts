@@ -69,11 +69,15 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
-    if (!userId) {
+
+    const effectiveUserId =
+        await getEffectiveUserId();
+      
+    if (!effectiveUserId) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
  
-    const seller= await prisma.seller.findUnique({ where: { clerkUserId: userId } });
+    const seller= await prisma.seller.findUnique({ where: { clerkUserId: effectiveUserId } });
     if (!seller) {
       return NextResponse.json({ error: "Vendedor no encontrado" }, { status: 403 });
     }

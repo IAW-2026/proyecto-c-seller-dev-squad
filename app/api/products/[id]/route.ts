@@ -36,7 +36,11 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
   try {
     const { userId, sessionClaims } = await auth();
-    if (!userId) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    const effectiveUserId =
+        await getEffectiveUserId();
+      
+  
+    if (!effectiveUserId) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
     const role =
       (sessionClaims?.metadata as any)?.role ??
@@ -46,7 +50,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     const isAdmin = role === "admin";
 
     if (!isAdmin) {
-      const seller = await prisma.seller.findUnique({ where: { clerkUserId: userId } });
+      const seller = await prisma.seller.findUnique({ where: { clerkUserId: effectiveUserId } });
       if (!seller) return NextResponse.json({ error: "Vendedor no encontrado" }, { status: 403 });
 
       const existente = await prisma.product.findFirst({
