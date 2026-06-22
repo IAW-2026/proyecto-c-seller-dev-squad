@@ -5,6 +5,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";   
+
 
 const BUYER_APP_URL    = process.env.BUYER_APP_URL ?? "";
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY ?? "";
@@ -115,39 +117,54 @@ export async function POST(req: NextRequest) {
         }));
     }
 
-    const sell = await prisma.sell.create({
-      data: {
-        orderId,
-        paymentId: paymentId ?? null,
-        total:     Number(total),
-        status:    "CONFIRMED",
-        sellerId:  seller.id,
-        details: detailsData.length ? { create: detailsData } : undefined,
-      },
-      include: {
-        details: { include: { product: { select: { name: true, brand: true } } } },
-      },
-    });
+    try {
+      const sell = await prisma.sell.create({
+        data: {
+          orderId,
+          paymentId: paymentId ?? null,
+          total:     Number(total),
+          status:    "CONFIRMED",
+          sellerId:  seller.id,
+          details: detailsData.length ? { create: detailsData } : undefined,
+        },
+        include: {
+          details: { include: { product: { select: { name: true, brand: true } } } },
+        },
+      });
 
-    return NextResponse.json(
-      {
-        id:        sell.id,
-        sellerId:  sell.sellerId,
-        orderId:   sell.orderId,
-        status:    sell.status.toLowerCase(),
-        total:     Number(sell.total),
-        paymentId: sell.paymentId,
-        items:     sell.details.map((d) => ({
-          productId: d.productId,
-          quantity:  d.quantity,
-          price:     Number(d.unitPrice),
-          size:      d.size,
-          color:     d.color,
-          name:      d.product.name,
-        })),
-      },
-      { status: 201 }
-    );
+      return NextResponse.json(
+        {
+          id:        sell.id,
+          sellerId:  sell.sellerId,
+          orderId:   sell.orderId,
+          status:    sell.status.toLowerCase(),
+          total:     Number(sell.total),
+          paymentId: sell.paymentId,
+          items:     sell.details.map((d) => ({
+            productId: d.productId,
+            quantity:  d.quantity,
+            price:     Number(d.unitPrice),
+            size:      d.size,
+            color:     d.color,
+            name:      d.product.name,
+          })),
+        },
+        { status: 201 }
+      );
+    } catch (createError) {
+      // Race condition: otra request creó la venta entre nuestro findUnique y el create.
+      // Buscamos la que ganó y devolvemos 200 (idempotente).
+      if (
+        createError instanceof Prisma.PrismaClientKnownRequestError &&
+        createError.code === "P2002"
+      ) {
+        const sellExistente = await prisma.sell.findUnique({ where: { orderId } });
+        if (sellExistente) {
+          return NextResponse.json(sellExistente, { status: 200 });
+        }
+      }
+      throw createError; // cualquier otro error lo relanzamos al catch externo
+    }
   } catch (error) {
     console.error("[POST /api/sales]", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
