@@ -1,19 +1,20 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { getEffectiveUserId } from "@/lib/getEffectiveUser";
 import { generateToken } from "@/lib/handoffToken";
 import { prisma } from "@/lib/prisma";
 
 export async function getSellerReviewsUrl() {
-  const { userId } = await auth();
+  const effectiveUserId =
+    await getEffectiveUserId();
 
-  if (!userId) {
+  if (!effectiveUserId) {
     throw new Error("No autenticado");
   }
 
   const seller = await prisma.seller.findUnique({
     where: {
-      clerkUserId: userId,
+      clerkUserId: effectiveUserId,
     },
   });
 
@@ -24,7 +25,7 @@ export async function getSellerReviewsUrl() {
   const token = await generateToken(
     process.env.API_KEY_SELLER_APP!,
     {
-      userId,
+      userId: effectiveUserId,
       targetId: seller.id,
     }
   );
