@@ -2,12 +2,17 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ProductForm from "../ProductForm";
+import { getEffectiveUserId } from "@/lib/getEffectiveUser";
 
 export default async function NewProductPage() {
   const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
-
-  const seller= await prisma.seller.findUnique({ where: { clerkUserId: userId } });
+const effectiveUserId =
+    await getEffectiveUserId();
+  
+    if (!effectiveUserId) {
+      redirect("/sign-in");
+    }
+  const seller= await prisma.seller.findUnique({ where: { clerkUserId: effectiveUserId } });
   if (!seller) redirect("/onboarding");
 
   return (

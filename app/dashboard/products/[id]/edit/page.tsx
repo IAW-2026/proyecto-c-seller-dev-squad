@@ -2,15 +2,20 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ProductForm from "../../ProductForm";
+import { getEffectiveUserId } from "@/lib/getEffectiveUser";
  
 interface Props { params: Promise<{ id: string }> }
  
 export default async function EditProductPage({ params }: Props) {
   const { id } = await params;
   const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
- 
-  const seller= await prisma.seller.findUnique({ where: { clerkUserId: userId } });
+  const effectiveUserId =
+    await getEffectiveUserId();
+  
+    if (!effectiveUserId) {
+      redirect("/sign-in");
+    } 
+  const seller= await prisma.seller.findUnique({ where: { clerkUserId: effectiveUserId } });
   if (!seller) redirect("/onboarding");
  
   const  product = await prisma.product.findFirst({

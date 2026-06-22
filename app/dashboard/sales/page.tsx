@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Suspense } from "react";
 import SalesClient from "./SalesClient";
+import { getEffectiveUserId } from "@/lib/getEffectiveUser";
+
 
 const PER_PAGE = 10;
 
@@ -16,9 +18,15 @@ type SellStatus = "CONFIRMED" | "PENDING" | "CANCELLED";
 
 export default async function SalesPage({ searchParams }: Props) {
   const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
 
-  const seller= await prisma.seller.findUnique({ where: { clerkUserId: userId } });
+  const effectiveUserId =
+  await getEffectiveUserId();
+
+  if (!effectiveUserId) {
+    redirect("/sign-in");
+  }
+
+  const seller= await prisma.seller.findUnique({ where: { clerkUserId: effectiveUserId } });
   if (!seller) redirect("/onboarding");
   const { estado, page: pageParam, q: qParam } = await searchParams;
 

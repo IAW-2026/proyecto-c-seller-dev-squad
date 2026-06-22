@@ -2,17 +2,21 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import VerResenasButton from "../../components/VerReseñasButton";
+import { getEffectiveUserId } from "@/lib/getEffectiveUser";
 
 export default async function ReviewsPage() {
   const { userId } = await auth();
 
-  if (!userId) {
-    redirect("/sign-in");
-  }
+  const effectiveUserId =
+    await getEffectiveUserId();
+  
+    if (!effectiveUserId) {
+      redirect("/sign-in");
+    }
 
   const vendedor = await prisma.seller.findUnique({
     where: {
-      clerkUserId: userId,
+      clerkUserId: effectiveUserId,
     },
   });
 

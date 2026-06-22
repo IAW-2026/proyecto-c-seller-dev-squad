@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Suspense } from "react";
 import ProductsClient from "./ProductsClient";
+import { getEffectiveUserId } from "@/lib/getEffectiveUser";
 
 const PER_PAGE = 8;
 
@@ -14,7 +15,14 @@ export default async function ProductsPage({ searchParams }: Props) {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
-  const seller= await prisma.seller.findUnique({ where: { clerkUserId: userId } });
+  const effectiveUserId =
+    await getEffectiveUserId();
+  
+    if (!effectiveUserId) {
+      redirect("/sign-in");
+    }
+
+  const seller= await prisma.seller.findUnique({ where: { clerkUserId: effectiveUserId } });
   if (!seller) redirect("/onboarding");
 
   const { q: rawQ, page: rawPage, estado } = await searchParams; 
