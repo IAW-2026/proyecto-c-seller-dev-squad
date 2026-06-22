@@ -4,6 +4,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import {effectiveUserId} from "@/lib/getEffectiveUser";
+
  
 // ── GET /api/products ──────────────────────────────────────
 // Público: la Buyer App lo consume sin autenticación de usuario.
