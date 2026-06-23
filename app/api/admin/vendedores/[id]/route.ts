@@ -1,43 +1,64 @@
-// PATCH /api/admin/vendedores/:id — activar/desactivar seller(solo admin)
- 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
- 
-interface Params { params: Promise<{ id: string }> }
 
-export async function PATCH(req: NextRequest, { params }: Params) {
-  try {
-    const { userId, sessionClaims } = await auth();
-    if (!userId) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
- 
-    const role =
-  (sessionClaims?.metadata as any)?.role ??
-  (sessionClaims?.publicMetadata as any)?.role ??
-  null;
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "PATCH, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, X-Superadmin-Key",
+};
 
-const isAdmin = role === "admin";
-
-if (!isAdmin) {
-  return NextResponse.json(
-    { error: "Forbidden" },
-    { status: 403 }
-  );
+function checkAuth(req: NextRequest) {
+  const apiKey = req.headers.get("X-Superadmin-Key");
+  return apiKey === process.env.SUPERADMIN_API_KEY;
 }
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: CORS_HEADERS,
+  });
+}
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!checkAuth(req)) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401, headers: CORS_HEADERS }
+    );
+  }
+
+  try {
     const { id } = await params;
     const { active } = await req.json();
+
     if (typeof active !== "boolean") {
-      return NextResponse.json({ error: "El campo active debe ser booleano" }, { status: 400 });
+      return NextResponse.json(
+        { error: "El campo active debe ser booleano" },
+        { status: 400, headers: CORS_HEADERS }
+      );
     }
- 
-    const seller= await prisma.seller.update({
-      where: { id: id },
-      data:  { active },
+
+    const seller = await prisma.seller.update({
+      where: { id },
+      data: { active },
     });
- 
-    return NextResponse.json( seller);
+
+    return NextResponse.json(
+      {
+        ok: true,
+        active: seller.active,
+      },
+      { headers: CORS_HEADERS }
+    );
   } catch (error) {
     console.error("[PATCH /api/admin/vendedores/:id]", error);
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+
+    return NextResponse.json(
+      { error: "Error interno del servidor" },
+      { status: 500, headers: CORS_HEADERS }
+    );
   }
 }
