@@ -21,9 +21,9 @@ interface Props {
 const sizes_BASE = ["35","36","37","38","39","40","41","42","43","44","45"];
 const brandS = ["Adidas","Converse","New Balance","Nike","Puma","Reebok","Vans","Otra"];
 const categories = [
-  "Mujer",
-  "Hombre",
-  "Niño/a",
+  "mujer",
+  "hombre",
+  "nino",
 ];
 const COLORS = [
   "Negro",
