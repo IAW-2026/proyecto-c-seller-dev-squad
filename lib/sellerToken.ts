@@ -46,16 +46,16 @@ function base64urlDecode(str: string): ArrayBuffer {
 }
 
 type SellerTokenPayload = {
-  userId: string;
+  clerkId: string;
   exp: number;
 };
 
 export async function generateSellerToken(
-  data: { userId: string },
+  data: { clerkId: string },
   ttlSeconds = 180
 ): Promise<string> {
   const payload: SellerTokenPayload = {
-    userId: data.userId,
+    clerkId: data.clerkId,
     exp: Math.floor(Date.now() / 1000) + ttlSeconds,
   };
 
@@ -82,7 +82,7 @@ export async function generateSellerToken(
 
 export async function verifySellerToken(
   token: string
-): Promise<{ userId: string } | null> {
+): Promise<{ clerkId: string } | null> {
   const [payloadB64, sigB64] = token.split(".");
 
   if (!payloadB64 || !sigB64) {
@@ -117,7 +117,7 @@ export async function verifySellerToken(
     }
 
     return {
-      userId: payload.userId,
+      clerkId: payload.clerkId,
     };
   } catch {
     return null;
