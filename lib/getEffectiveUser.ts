@@ -24,5 +24,5 @@ console.log(
   const verified =
     await verifySellerToken(token);
 
-  return verified?.userId ?? null;
+  return verified?.clerkId ?? null;
 }
