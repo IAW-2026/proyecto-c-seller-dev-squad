@@ -25,7 +25,7 @@ if (!verified) {
 const seller =
   await prisma.seller.findUnique({
     where: {
-      clerkUserId: verified.userId,
+      clerkUserId: verified.clerkId,
     },
   });
 
