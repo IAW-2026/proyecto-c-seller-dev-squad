@@ -58,10 +58,13 @@ export default function DashboardSidebar({ open, onClose, role }: Props) {
             className="sidebar-logo-image"
           />
         </div>
-        <nav className="sidebar-nav">
+       <nav className="sidebar-nav">
           {NAV_FILTRADO.map((item) => {
-            const active = pathname === item.href ||
-              (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            const active =
+              pathname === item.href ||
+              (item.href !== "/dashboard" &&
+                pathname.startsWith(item.href));
+
             return (
               <Link
                 key={item.href}
@@ -69,11 +72,30 @@ export default function DashboardSidebar({ open, onClose, role }: Props) {
                 className={`sidebar-nav-item ${active ? "active" : ""}`}
                 onClick={onClose}
               >
-                <span className="sidebar-nav-icon">{item.icon}</span>
+                <span className="sidebar-nav-icon">
+                  {item.icon}
+                </span>
                 {item.label}
               </Link>
             );
           })}
+
+          <div
+            style={{
+              margin: "12px 18px",
+              borderTop: "1px solid var(--color-border)",
+            }}
+          />
+
+          <a
+            href="https://zapasya.vercel.app/home"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sidebar-nav-item"
+          >
+            <span className="sidebar-nav-icon">↩</span>
+            Ir a ZapasYa
+          </a>
         </nav>
 
         {/* toggle de tema — desktop */}
@@ -92,6 +114,7 @@ export default function DashboardSidebar({ open, onClose, role }: Props) {
             {theme === "dark" ? "Modo claro" : "Modo oscuro"}
           </button>
         </div>
+
 
         <div className="sidebar-user">
           <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
