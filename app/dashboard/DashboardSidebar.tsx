@@ -88,9 +88,7 @@ export default function DashboardSidebar({ open, onClose, role }: Props) {
           />
 
           <a
-            href="https://zapasya.vercel.app/home"
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`https://zapasya.vercel.app/home?theme=${theme}`}
             className="sidebar-nav-item"
           >
             <span className="sidebar-nav-icon">↩</span>

@@ -4,7 +4,7 @@ import { getEffectiveUserId } from "@/lib/getEffectiveUser";
 import { generateToken } from "@/lib/handoffToken";
 import { prisma } from "@/lib/prisma";
 
-export async function getSellerReviewsUrl() {
+export async function getSellerReviewsUrl(theme?: string) {
   const effectiveUserId =
     await getEffectiveUserId();
 
@@ -30,5 +30,9 @@ export async function getSellerReviewsUrl() {
     }
   );
 
-  return `${process.env.FEEDBACK_APP_URL}/explorar/vendedor/${seller.id}?token=${token}`;
+  let url = `${process.env.FEEDBACK_APP_URL}/explorar/vendedor/${seller.id}?token=${token}`;
+  if (theme === "light" || theme === "dark") {
+    url += `&theme=${theme}`;
+  }
+  return url;
 }

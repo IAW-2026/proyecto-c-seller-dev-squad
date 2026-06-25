@@ -19,12 +19,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlTheme = params.get("theme");
     const saved = localStorage.getItem("theme");
     const preferred =
+      urlTheme ||
       saved ||
       (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
     setTheme(preferred);
     document.documentElement.setAttribute("data-theme", preferred);
+    if (urlTheme && urlTheme !== saved) {
+      localStorage.setItem("theme", urlTheme);
+    }
     setMounted(true);
   }, []);
 

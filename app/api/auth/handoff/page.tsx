@@ -7,9 +7,10 @@ export default async function Page({
 }: {
   searchParams: Promise<{
     token?: string;
+    theme?: string;
   }>;
 }) {
-  const { token } = await searchParams;
+  const { token, theme } = await searchParams;
 
   if (!token) {
     redirect("/sign-in");
@@ -29,9 +30,10 @@ const seller =
     },
   });
 
-if (seller) {
-  redirect("/dashboard");
-}
+const base = seller ? "/dashboard" : "/onboarding";
+const url = theme === "light" || theme === "dark"
+  ? `${base}?theme=${theme}`
+  : base;
 
-redirect("/onboarding");
+redirect(url);
 }

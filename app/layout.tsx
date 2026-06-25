@@ -33,8 +33,11 @@ export default function RootLayout({
             __html: `
               (function () {
                 try {
+                  const params = new URLSearchParams(window.location.search);
+                  const urlTheme = params.get("theme");
                   const saved = localStorage.getItem("theme");
                   const preferred =
+                    urlTheme ||
                     saved ||
                     (window.matchMedia("(prefers-color-scheme: light)").matches
                       ? "light"
