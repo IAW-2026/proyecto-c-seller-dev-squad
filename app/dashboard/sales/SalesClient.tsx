@@ -109,7 +109,7 @@ export default function SalesClient({ sells, total, page, perPage, estadoFiltro,
   async function handleCambiarEstado(id: string, estado: SellStatus) {
     setError(null);
     try {
-      const res = await fetch(`/api/sales/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ estado }) });
+      const res = await fetch(`/api/sales/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: estado, }) });
       if (!res.ok) throw new Error("No se pudo actualizar el estado");
       router.refresh();
     } catch (e: any) { setError(e.message); }
