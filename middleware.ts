@@ -33,10 +33,7 @@ export default clerkMiddleware(async (auth, req) => {
   const handoff =
     req.cookies.get("seller_handoff")?.value;
 
-  console.log(
-  "[MIDDLEWARE] handoff:",
-  req.cookies.get("seller_handoff")
-);
+
 
   if (!session.userId && !handoff) {
     return NextResponse.redirect(
@@ -45,9 +42,6 @@ export default clerkMiddleware(async (auth, req) => {
   }
 }
   const { userId, sessionClaims } = await auth();
-  console.log("[MIDDLEWARE] path:", req.nextUrl.pathname);
-   console.log("[MIDDLEWARE] userId:", userId);
-  console.log("[MIDDLEWARE] claims:", sessionClaims);
 
    const role =
     (sessionClaims?.metadata as { role?: string })?.role ??

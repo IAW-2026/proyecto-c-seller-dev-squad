@@ -8,7 +8,6 @@ export default function VerResenasButton() {
 
   const handleClick = async () => {
     const url = await getSellerReviewsUrl(theme);
-    alert(url);
     window.location.href = url;
   };
 
