@@ -1,9 +1,71 @@
-# seller
+# C-Seller Dev Squad
 
-Aplicación **Seller** del [Proyecto IAW 2026](https://iaw-2026.github.io/proyecto/) — comisión `<!-- completar -->`.
+Aplicación web para la gestión de vendedores, productos y ventas dentro de un marketplace. Los productos del sitio consisten de zapatillas de varias categorías: Running, training, lifestyle, casual, etc. Incluye panel de administración, panel de vendedores, gestión de stock, simulación de compras y procesamiento de pagos mediante integración con servicios externos. Desde el panel de administración se tiene una vista general y panorámica de lo que consiste el dominio de la app. Desde ver los vendedores, productos y ventas, como poder intervenir activando/desactivando vendedores y/o productos. 
 
-Esta app corresponde al rol del vendedor en los proyectos de tipo **B (Delivery)** y **C (Marketplace)**.
+## Deploy: 
+     https://proyecto-c-seller-dev-squad.vercel.app/
 
----
+## Funcionalidades
+- Gestión de productos y stock.
+- Gestión de ventas.
+- Simulación de pagos.
+- Panel de administración.
+- Sistema de reseñas para vendedores.
+- Generación de descripciones de productos (mediante el uso de Gemini)
 
-Enunciado completo: <https://iaw-2026.github.io/proyecto/>
+## Integraciones
+- Buyer App: exposición del catálogo de productos
+- Payment App: procesamiento y confirmación de pagos.
+- Feedback App: consulta de reseñas de vendedores.
+
+### Registro de usuarios
+Los nuevos usuarios pueden registrarse desde la pantalla de inicio de sesión utilizando una dirección de correo electrónico no registrada previamente.
+Los usuarios ya registrados, realizan el sign in utilizando el panel provisto por Clerk, el cual se ubica en la pantalla de inicio. 
+
+## Acceso por tipo de usuario
+
+### Administrador
+ Permite:
+ - Visualizar y gestionar vendedores y productos
+
+| Usuario | Email | Contraseña |
+|----------|----------|----------|
+| Administrador | admin+clerk_test@iaw.com | iawuser# |
+
+### Vendedor
+  Permite:
+  - Publicar zapatillas
+  - Consultar ventas realizadas
+  - Visualizar reseñas recibidas
+
+| Usuario | Email | Contraseña |
+|----------|----------|----------|
+| Bart Simpson | bart.simpsonvendedor@gmail.com | BartolomeoSimpson1989 |
+| Lady Gaga | lady.gaga.vendedora@gmail.com | G4g4Password |
+| Seller User | seller+clerk_test@iaw.com | iawuser# |
+
+
+## Seguridad
+
+Las comunicaciones entre aplicaciones utilizan una API Key compartida mediante el header: X-API-Key
+Las solicitudes que no incluyen una clave válida son rechazadas. Se ve reflejado en api/sales, api/payments/webhook, en la cuestión
+de la simulación de un pago.
+
+## Notas generales:
+- La asignación de roles se hace mediante publicMetadata.role en Clerk.
+- La sidebar se actualiza dependiendo del rol.
+- Stock por talle mediante ProductSize en lugar de un único stock global.
+- La app presenta modalidad oscuro/claro, la cual actualiza el estilo visual, colores y logo cuando se cambia de una a otra. En cuanto al logo, se los adaptó para que cuesten lo menos posible en cuanto al renderizado, haciéndolos .webp. 
+- El estilo visual y organización visual está adaptado tanto para desktop como para celulares. La versión de celular fue adaptada para una buena composición visual, específicamente en el panel de administrador.
+- La lógica de stock puede fallar frente a compras simultáneas a un mismo producto que le queda una unidad
+- Se toma como conocimiento de que el uso de Clerk afecta a la performance y cualquier elemento de la misma. Por ejemplo, en el sidebar, con la cuestión de la opción de sign out contenida en el mismo.
+- El uso de mounted fue en beneficio de minimizar las cuestiones de hidratación. 
+
+## Tecnologías
+- Next.js
+- React
+- TypeScript
+- Prisma
+- PostgreSQL
+- Clerk
+- Vercel
