@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useClerk } from "@clerk/nextjs";
+import { useTheme } from "@/hooks/ThemeProvider";
 import Navbar from "@/app/components/Navbar";
 
 export default function OnboardingForm() {
@@ -13,6 +14,7 @@ export default function OnboardingForm() {
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState<string | null>(null);
   const { signOut } = useClerk();
+  const { theme } = useTheme();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -120,20 +122,53 @@ export default function OnboardingForm() {
               )}
 
               <button
-                type="submit"
-                disabled={loading}
-                className="btn-primary"
-                style={{ width: "100%", justifyContent: "center", opacity: loading ? .7 : 1 }}
-              >
-                {loading ? "Registrando…" : "Comenzar a vender"}
+                  type="submit"
+                  disabled={loading}
+                  className="btn-primary"
+                  style={{ width: "100%", justifyContent: "center", opacity: loading ? .7 : 1 }}
+                >
+                  {loading ? "Registrando…" : "Comenzar a vender"}
                 </button>
+
                 <button
-                   type="button"
-                   onClick={() => signOut({ redirectUrl: "/sign-in" })}
-                   style={{ width: "100%", justifyContent: "center", marginTop: 10, padding: "10px", borderRadius: 9, border: "1px solid var(--color-border)", background: "transparent", fontSize: 13, color: "var(--color-muted)", cursor: "pointer" }}
-                            >
-                   Inicio de sesión
-                  </button>
+                  type="button"
+                  onClick={() => signOut({ redirectUrl: "/sign-in" })}
+                  style={{
+                    width: "100%",
+                    justifyContent: "center",
+                    marginTop: 10,
+                    padding: "10px",
+                    borderRadius: 9,
+                    border: "1px solid var(--color-border)",
+                    background: "transparent",
+                    fontSize: 13,
+                    color: "var(--color-muted)",
+                    cursor: "pointer",
+                  }}
+                >
+                  Iniciar sesión
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.location.href = `https://zapasya.vercel.app/home?theme=${theme}`;
+                  }}
+                  style={{
+                    width: "100%",
+                    justifyContent: "center",
+                    marginTop: 10,
+                    padding: "10px",
+                    borderRadius: 9,
+                    border: "1px solid var(--color-border)",
+                    background: "transparent",
+                    fontSize: 13,
+                    color: "var(--color-muted)",
+                    cursor: "pointer",
+                  }}
+                >
+                  ↩ Volver a ZapasYa
+                </button>
             </form>
           </div>
         </div>
