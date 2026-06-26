@@ -44,12 +44,6 @@ Los usuarios ya registrados, realizan el sign in utilizando el panel provisto po
 | Lady Gaga | lady.gaga.vendedora@gmail.com | G4g4Password |
 | Seller User | seller+clerk_test@iaw.com | iawuser# |
 
-## Simulación de compra de productos 
-
-Con el objetivo de probar que el sistema responde frente a la compra de un producto (y recibir desde Payments si el pago fue exitoso (confirmado) o no (Cancelado)): Se accede para comprar un producto mediante -> dashboard/mock-up
-
-Acotaciones: Al intentar comprar un producto, sale una notifiación que indica si fue éxitoso o no. Si no lo fue, marca el por qué. Ante una compra exitosa, hace falta recargar la página para ver que cambie la cantidad del stock.
-Si cuando se hace la venta, tenés abierto desde otro lugar el panel de administrador, debes de recargar la página para que se pueda ver la nueva venta. El estado puede ser confirmado o cancelado. El estado pendiente es imperceptible, ya que payments responde de forma casi inmediata. 
 
 ## Seguridad
 
